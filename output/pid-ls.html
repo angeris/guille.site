@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>PID as least squares</title>
+    
+    <link rel="stylesheet" href="/theme/css/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Raleway:100,300,500" rel="stylesheet">
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [ ['$','$'], ['\\(','\\)'] ]
+            }
+        });
+    </script>
+    
+    <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">    	
+
+</head>
+<body>
+    <div class="container">
+<div class="row">
+    <div class="col-md-8">
+        <h2><a href="/">&larr; Home</a></h2>
+        <h1>PID as least squares</h1>
+        <p>Category: <a href="/category/math.html">math</a></p>
+        <p><label>Posted <strong>September 13, 2017</strong></label></p>
+        <p>I want to say this is a folk theorem (borrowing terminology from game theory) in that everyone who does optimal control theory knows about this stuff, probably,<sup id="fnref-people"><a class="footnote-ref" href="#fn-people">1</a></sup> but I haven't really seen it stated explicitly anywhere. If anyone does indeed work on optimal control, I'd love to know your thoughts! (even if you don't, I'd still like to know your thoughts on it!)</p>
+<p>For context, I'm currently leading a team on path planning for fixed-wing UAVs (I still don't really know who put me in charge of this stuff, or <em>why</em> for that matter---overall, it seems pretty terrifying for them, but kinda fun for me), and I wondered why I hadn't actually seen least squares in many papers on fixed-wing control. I still haven't gotten an answer to the question, to be honest, but I did waste some potentially productive time showing that PID $\subset$ LS. Some quick definitions: let $u(t)$ be our control input and allow $\varepsilon(t)$ to be the error of the function (that is, $\varepsilon(t) = x(t) - \hat x(t)$ where $x(t)$ is the desired position and $\hat x(t)$ is the current position), then a PID controller is defined as</p>
+<p>$$
+u(t) = K_p \varepsilon(t) + K_i \int_0^t d\tau\,\varepsilon(\tau) + K_d\frac{\partial\varepsilon(t)}{\partial t}
+$$</p>
+<p>where each of the $K_{(\cdot)}$ variables are a gain or proportionality constant. Say $K_p$ is the proportional constant (i.e. how much of $u$ is proportional to the current error), $K_i$ is the integral proportionality constant (i.e. how much of $u$ is proportional to the integral of the error), and $K_d$ is the derivative constant (i.e. ditto). For a more thorough explanation for what each of these means intuitively, see the <a href="https://en.wikipedia.org/wiki/PID_controller">PID wikipedia page</a>.</p>
+<p>Anyways, I'll likely make a separate (more introductory) post to least squares but, for now, I define an LS problem to be an optimization problem of the form, for arbitrary but given $A, b, \lambda_j&gt;0, C, d$</p>
+<p>$$
+\begin{aligned}
+&amp; \underset{u}{\text{minimize}}
+&amp; &amp; \sum_j \lambda_j \lVert A_j u - b_j\lVert_2^2 \\
+&amp; \text{subject to}
+&amp; &amp; Cu = d
+\end{aligned}
+$$</p>
+<p>where the $\lVert \cdot \lVert_2^2$ norm is the usual $\ell_2$-norm (i.e. $\lVert x \lVert_2^2 = \sum_i x_i^2$). It's notable that this problem has an analytical solution (not that you'd necessarily <em>want</em> the analytical solution for most big-enough scenarios) and is extremely well-behaved for most optimization methods.<sup id="fnref-politifact"><a class="footnote-ref" href="#fn-politifact">2</a></sup> Now, consider the following objective function with trivial equality constraints (e.g. $0=0$, for convenience, by setting $C = (0,0,…,0)^T,\, d = 0$) and $K$ being some proportionality constant (I'll make the connection to the original $K_{(\cdot)}$ variables above, soon):</p>
+<p>$$
+E(u, \varepsilon) = \lambda_p \left\lVert u - K\varepsilon (t)\right\lVert_2^2 + \lambda_i \left\lVert u - K\int d\tau\, \varepsilon(t)\right\lVert_2^2 + \lambda_d\left\lVert u - K \frac{\partial\varepsilon(t)}{\partial t}\right\lVert_2^2
+$$</p>
+<p>Minimizing this function by setting its gradient to zero (this is necessary and sufficient by differentiability, convexity, and coerciveness [that is, $E(u) \to \infty$, whenever $\lVert u\lVert \to \infty$]) gives the solution<sup id="fnref-generalization"><a class="footnote-ref" href="#fn-generalization">3</a></sup></p>
+<p>$$
+\nabla E(u, \varepsilon) = \lambda_p \left(u - K\varepsilon (t)\right) + \lambda_i \left( u - K\int d\tau\, \varepsilon(t)\right) + \lambda_d\left(u - K \frac{\partial\varepsilon(t)}{\partial t}\right) = 0,
+$$</p>
+<p>or, after rearranging</p>
+<p>$$
+u = \frac{K}{\lambda_p + \lambda_i + \lambda_d}\left(\lambda_p \varepsilon(t) + \lambda_i\int d\tau\, \varepsilon(t) + \lambda_d \frac{\partial\varepsilon(t)}{\partial t}\right),
+$$</p>
+<p>which allows the following correspondence between the original PID and the LS problem to be</p>
+<p>$$
+\begin{align}
+K &amp;= K_p + K_i + K_d\\
+\lambda_p &amp;= \frac{K_p}{K}\\
+\lambda_i &amp;= \frac{K_i}{K}\\
+\lambda_d &amp;= \frac{K_d}{K}.
+\end{align}
+$$</p>
+<p>So, now we've given the condition we wanted and we're done!</p>
+<p>Anyways, you may ask, why is this useful? I guess it kind of extends the framework to add constraints from your control surface, or secondary objectives. To be completely honest, though? I have no idea.</p>
+<!-- [^gametheory]: See, for example, (https://en.wikipedia.org/wiki/Folk_theorem_(game_theory)). -->
+
+<div class="footnote">
+<hr>
+<ol>
+<li id="fn-people">
+<p>I mostly know people who do hardware work, etc. on UAVs, so I don't really have a representative sample of control people.&#160;<a class="footnote-backref" href="#fnref-people" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn-politifact">
+<p><strong>PolitiFact</strong>: <em>Mostly true.</em> I mean the usual cases (e.g. first-order methods, second-order methods, or conjugate gradient/quasi-newton methods). It's horribly behaved in conic program (SOCP) solvers.&#160;<a class="footnote-backref" href="#fnref-politifact" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn-generalization">
+<p>There's an immediate generalization here: any control of the form $\sum_i \gamma_i\left(u - C_i\right), \gamma_i&gt;0$ can be immediately written as the minimizer to an energy function $E(u) = \sum_i \eta_i\lVert u - \xi C_i\lVert^2_2$. We can actually go further and note there's yet another generalization to any control of the form $\sum_i \left(S_iu - C_i\right)$, where each $S_i$ is symmetric and (strictly) positive definite. This is true as each $S_i$ has an inverse and a 'square root' matrix (e.g. let, $S$ be some positive-definite matrix. We know $SV =  V\Lambda$ for $V^TV = VV^T = I$ and diagonal $\Lambda &gt; 0$, thus $S^{1/2}=V\Lambda^{1/2}V^T$), such that the energy function is written in terms of these. Though it's somewhat enlightening (I guess), I leave the derivation as an exercise for the reader.&#160;<a class="footnote-backref" href="#fnref-generalization" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+        <hr>
+        <div class="socials">
+            <li>Got any questions?</li>
+            <li><a href="https://twitter.com/intent/tweet?screen_name=guilleangeris" class="twitter-mention-button" data-size="large" data-show-count="false">Tweet to @guilleangeris</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></li>
+        </div>
+    </div>
+</div>
+    </div>
+</body>
+<footer>
+    Made with <a href="https://blog.getpelican.com">🐍</a> and hosted on <a href="https://neocities.org">neocities.org</a>.
+</footer>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-73543332-2', 'auto');
+    ga('send', 'pageview');
+</script>
+</html>

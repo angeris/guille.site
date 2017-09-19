@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h2><a href="/">&larr; Home</a></h2>
+        <h1>{{ article.title }}</h1>
+        <p>Category: <a href="/category/{{article.category}}.html">{{ article.category }}</a></p>
+        <p><label>Posted <strong>{{ article.date | strftime('%B %d, %Y') }}</strong></label></p>
+        {{ article.content }}
+        <hr>
+        <div class="socials">
+            <li>Got any questions?</li>
+            <li><a href="https://twitter.com/intent/tweet?screen_name=guilleangeris" class="twitter-mention-button" data-size="large" data-show-count="false">Tweet to @guilleangeris</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></li>
+        </div>
+    </div>
+</div>
+{% endblock %}

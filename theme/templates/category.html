@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Category: {{ category }}{% endblock %}
+{% block headgroup %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="nav">
+        <h2><a href="/">&larr; Home</a></h2>
+        <h1 style="text-align: center"><span class="lightemph">Category:</span> {{ category }}</h1>
+        <hr>
+        <div class="itemselect">
+            <li class="cell">
+                <a href="/pages/about-me.html">About</a>
+            </li>
+            <li class="cell">
+                <a href="https://github.com/guillean">Code</a>
+            </li>
+            <li class="cell">
+                <a href="/feeds/feed.rss">RSS Feed</a>
+            </li>
+            <li class="cell">
+                <a href="https://c.xkcd.com/random/comic/">Fun</a>
+            </li>
+        </div>
+        <hr>
+        {% for article in articles %}
+            <h2><a href="/{{ article.slug }}.html">{{ article.title }}</a></h2>
+            <label>Posted <strong>{{ article.date | strftime('%m/%d/%Y')}}</strong></label>
+            <p>{{ article.content | truncate(110) }}</p>
+            <p>Category: <a href="/category/{{article.category}}.html">{{ article.category }}</a></p>
+            {% if not loop.last %}
+            <hr>
+            {% endif %}
+        {% else %}
+            No posts yet!
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
