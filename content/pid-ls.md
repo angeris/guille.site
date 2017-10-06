@@ -1,6 +1,6 @@
 title: PID as least squares
 slug: pid-ls
-category: math
+category: least-squares
 tags: control-theory, math, least-squares
 date: 2017-09-13
 

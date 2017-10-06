@@ -8,4 +8,4 @@ Currently working on inverse design in the [Nanoscale and Quantum Photonics Lab]
 
 I [tweet <img src="/images/twitter.svg" alt="Tweet, tweet?" style="width: 20px;"/>](https://twitter.com/GuilleAngeris) (rarely), write some [Physics.SE](https://physics.stackexchange.com/users/26437/guillermo-angeris) and [Quora](https://www.quora.com/profile/Guillermo-Andres-Angeris) answers (occasionally), and answer my email (usually), so that's probably the best way to contact me.
 
-<p style="text-align:center;"><span class="slightemph">guille.[my last name]@stanford.edu</span></p>
+<p style="text-align:center;"><span class="slightemph"><i>guille.[my last name]@stanford.edu</i></span></p>

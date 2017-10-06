@@ -1,12 +1,12 @@
 title: Least-squares and image processing
 slug: ls-images
-category: math
+category: least-squares
 tags: math, least-squares, image-processing
-date: 2017-09-16
+date: 2017-09-19
 
 Least squares is one of those things that seems relatively simple once you first look at it (perhaps also because most linear algebra texts relegate it to nothing more than a page or two on their textbooks), but has surprisingly powerful implications that are quite nice, and, most importantly, that are easily computable.
 
-If you're interested in looking at the results first, I'd recommend skipping the following section and going immediately to the next one, which shows the application.
+*If you're interested in looking at the results first, I'd recommend skipping the following section and going immediately to the next one, which shows the application.*
 
 So, let's dive right in!
 
@@ -121,7 +121,7 @@ and here's the image, blurred with a 2D gaussian kernel of size 5, with $\sigma 
 <img src="/images/constrained-ls-intro/blurred_image.png" class="insert">
 *Blurred greyscale image. The vignetting comes from edge effects.*
 
-The kernel, for context looks like:
+The kernel, for context, looks like:
 
 <img src="/images/constrained-ls-intro/gaussian_kernel.png" class="insert">
 *2D Gaussian Kernel with $N=5, \sigma=3$*
@@ -133,7 +133,7 @@ Solving the problem, as given before, yields the final (almost identical) image:
 
 Which was nothing but solving a simple least squares problem (as we saw above)!
 
-Now, you might say, "why are we going through all of this trouble to write this problem as a least-squares problem, when we can just take the FFT of the kernel and the Gaussian and divide the former by the latter? Isn't convolution just multiplication in the Fourier domain?"
+Now, you might say, "why are we going through all of this trouble to write this problem as a least-squares problem, when we can just take the FFT of the image and the gaussian and divide the former by the latter? Isn't convolution just multiplication in the Fourier domain?"
 
 And I would usually agree!
 
@@ -149,10 +149,13 @@ $$
 \min_x \,\,\lVert Gx - y \lVert^2 + \lambda\left(\lVert D\_x x \lVert^2 + \lVert D\_y x \lVert^2\right)
 $$
 
-where $\lambda \ge 0$ is our 'smoothness' parameter. Note that, if we sent $\lambda \to \infty$ then we really care that our image is 'infinitely smooth' (what would that look like?[^smooth-image]), while if we send it to zero, we care that the reconstruction from the (possibly not great) approximation of $G^\text{real}$ is really good. Now, let's compare the two methods with a slightly corrupted image:
+where $\lambda \ge 0$ is our 'smoothness' parameter. Note that, if we send $\lambda \to \infty$ then we really care that our image is 'infinitely smooth' (what would that look like?[^smooth-image]), while if we send it to zero, we care that the reconstruction from the (possibly not great) approximation of $G^\text{real}$ is really good. Now, let's compare the two methods with a slightly corrupted image:
+
+<img src="/images/constrained-ls-intro/corrupted_blurred_image.png" class="insert">
+*The corrupted, blurred image we feed into the algorithm*
 
 <img src="/images/constrained-ls-intro/initial_image.png" class="insert">
-*Original greyscale image (again)*
+*Original greyscale image (again, for comparison)*
 
 <img src="/images/constrained-ls-intro/smoothed_corrupted_reconstructed_image_l=1e-07.png" class="insert">
 *Reconstruction with $\lambda = 10^{-7}$*
@@ -162,11 +165,24 @@ where $\lambda \ge 0$ is our 'smoothness' parameter. Note that, if we sent $\lam
 
 Though the normalized one has slightly larger grains, note that, unlike the original, the contrast isn't as heavily lost and the edges, etc, are quite a bit sharper.
 
-To that end, one could think of many more ways of characterizing a 'natural' image, all of which will yield successively better results, but I'll leave with saying that LS, though simple, is quite a powerful method for many cases. In particular, I'll cover fully-constrained LS (in a more theoretical post) in the future, but with an application to path-planning.
+We can also toy a bit with the parameter, to get some intuition as to what all happens:
+
+<img src="/images/constrained-ls-intro/smoothed_corrupted_reconstructed_image_l=0.001.png" class="insert">
+*Reconstruction with $\lambda = 10^{-3}$*
+
+<img src="/images/constrained-ls-intro/smoothed_corrupted_reconstructed_image_l=1e-05.png" class="insert">
+*Reconstruction with $\lambda = 10^{-5}$*
+
+<img src="/images/constrained-ls-intro/smoothed_corrupted_reconstructed_image_l=1e-10.png" class="insert">
+*Reconstruction with $\lambda = 10^{-10}$*
+
+Of course, as we make $\lambda$ large, note that the image becomes quite blurry (e.g. 'smoother'), and as we send $\lambda$ to be very small, we end up with the same solution as the original problem, since we're saying that we care very little about the smoothness and much more about the reconstruction approximation.
+
+To that end, one could think of many more ways of characterizing a 'natural' image (say, if we know what some colors should look like, what is our usual contrast, etc.), all of which will yield successively better results, but I'll leave with saying that LS, though relatively simple, is quite a powerful method for many cases. In particular, I'll cover fully-constrained LS (in a more theoretical post) in the future, but with an application to path-planning.
 
 Hopefully this was enough to convince you that even simple optimization methods are pretty useful! But if I didn't do my job, maybe you'll have to read some future posts. ;)
 
-The code for this post can be found [here]().
+If you'd like, the complete code for this post can be found [here](https://github.com/guillean/guille.site/tree/master/notebooks/constrained-ls-intro).
 
 
 [^sq-invertible]: If $A^TA x = 0$ then $x^TA^TAx = 0$, but $x^TA^TAx = (Ax)^T(Ax) = \lVert Ax \lVert^2 = 0$ which is zero only when $Ax = 0$. E.g. only if there is an $x$ in the nullspace of $A$.

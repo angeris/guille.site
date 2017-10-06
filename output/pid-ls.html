@@ -10,7 +10,7 @@
         MathJax.Hub.Config({
             tex2jax: {
                 inlineMath: [ ['$','$'], ['\\(','\\)'] ]
-            }
+            },
         });
     </script>
     
@@ -28,7 +28,7 @@
     <div class="col-md-8">
         <h2><a href="/">&larr; Home</a></h2>
         <h1>PID as least squares</h1>
-        <p>Category: <a href="/category/math.html">math</a></p>
+        <p>Category: <a href="/category/least-squares.html">least-squares</a></p>
         <p><label>Posted <strong>September 13, 2017</strong></label></p>
         <p>I want to say this is a folk theorem (borrowing terminology from game theory) in that everyone who does optimal control theory knows about this stuff, probably,<sup id="fnref-people"><a class="footnote-ref" href="#fn-people">1</a></sup> but I haven't really seen it stated explicitly anywhere. If anyone does indeed work on optimal control, I'd love to know your thoughts! (even if you don't, I'd still like to know your thoughts on it!)</p>
 <p>For context, I'm currently leading a team on path planning for fixed-wing UAVs (I still don't really know who put me in charge of this stuff, or <em>why</em> for that matter---overall, it seems pretty terrifying for them, but kinda fun for me), and I wondered why I hadn't actually seen least squares in many papers on fixed-wing control. I still haven't gotten an answer to the question, to be honest, but I did waste some potentially productive time showing that PID $\subset$ LS. Some quick definitions: let $u(t)$ be our control input and allow $\varepsilon(t)$ to be the error of the function (that is, $\varepsilon(t) = x(t) - \hat x(t)$ where $x(t)$ is the desired position and $\hat x(t)$ is the current position), then a PID controller is defined as</p>
