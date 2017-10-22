@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Some thoughts on global path optimization (Part 1/?)</title>
+    
+    <link rel="stylesheet" href="/theme/css/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Raleway:100,300,500" rel="stylesheet">
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [ ['$','$'], ['\\(','\\)'] ]
+            },
+        });
+    </script>
+    
+    <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">    	
+
+</head>
+<body>
+    <div class="container">
+<div class="row">
+    <div class="col-md-8">
+        <h2><a href="/">&larr; Home</a></h2>
+        <h1>Some thoughts on global path optimization (Part 1/?)</h1>
+        <p>Category: <a href="/category/auvsi-competition.html">auvsi-competition</a></p>
+        <p><label>Posted <strong>October 17, 2017</strong></label></p>
+        <p>I usually see path planning in some shape or form usually solved as a Bellman update, Dynamic Programming-style problem, where the given control is asymptotically stable and optimal; in general, this seems to work quite well, but when we have so much computational power available now-a-days, I do wonder if a global optimization approach is both feasible and maybe even better. There is some literature on this, but most of it is... I'll just say it's not really as interesting as I thought it would be, at first right.</p>
+<p>That being said, if anyone has any papers that I should <em>definitely</em> read, please do send them over to my Twitter (below) or email, etc.; whatever floats your boat. I feel like I have a very limited view of the current state of the field, so I'd always love to learn more! That being said, a cursory search through Google Scholar isn't as productive as I would've thought.</p>
+<p>Anyways, let's get to something more interesting. I believe I'll be splitting this post up into some small set (say, 3, though this may change) posts explaining individual parts and more prickly details of the algorithm, but for now I'll just share the big idea and dive into the last part (which I argue is the hardest case).</p>
+<p>Essentially the problem will be broken down into three basic steps (and a fourth "looping" step):</p>
+<ol>
+<li>
+<p>Discretize the space and goals into a graph problem which is guaranteed to be (a) <em>damn fast to solve</em> and (b) to always give a feasible result (minus a curvature constraint—that will come in later).</p>
+</li>
+<li>
+<p>Make the resulting path through the graph into an ordered set of points $x_i \in \mathbb{R}^2$ (or $\mathbb{R}^3$, depending on what problem needs to be solved) through actual Euclidean space.</p>
+</li>
+<li>
+<p>Perform continuous optimization starting at this resulting path in order to meet curvature constraints and add some 'finishing touches' (this will be formalized in a second, don't worry).</p>
+</li>
+<li>
+<p>Do $(3)$ for moving objects, for a while, as $(1) \to (2)$ are solved again, simultaneously.</p>
+</li>
+</ol>
+<p>In this post, I'll mostly focus on step $(3)$, which is actually all you need to truly optimize over a path (along with some cute other heuristics), though steps $(1)$ and $(2)$ are also really just fast heuristics so we don't get stuck in crappy minima that would take us through the middle of an obstacle. I'll show how this can happen in non-obvious ways which is kinda fun for the first few times and mostly infuriating for the rest of the time (which is why we end up going through $(1)$ and $(2)$ in the end!).</p>
+<h2>Smooth barriers</h2>
+<p>Perhaps the main idea of this step is that we can optimize over some function (which isn't quite a hard-wall constraint) and then slowly tune a parameter until it becomes a better and better approximation of a hard wall; for this example I've chosen the (reversed) logistic function</p>
+<p>$$
+\phi(x) = \frac{1}{1+e^{x}}
+$$</p>
+<p>such that two things happen: one, that $\phi(x) \to 0$ as $x\to \infty$ and $\phi(x) \to 1$ as $x\to -\infty$, and, two, that $\phi(Cx)$ approximates a hard wall as $C\to \infty$. Below is $\phi(Cx)$ plotted for a few different values of $C$:</p>
+<p><img src="/images/path-optimization-1/phi_curvature.png" class="plot">
+<em>Barrier functions for varying curvatures $C$.</em></p>
+<p>The idea is that the smooth problem should be easy to solve and we can get consistently better approximations by starting at the easy problem and solving a sequence of problems which, in the limit, give the desired path.</p>
+<p>More generally speaking, let the obstacles be centered at some set of points $\{c_j\}$, each with some radius $R_j$, then a single constraint corresponds to the barrier of curvature $C$ given by (where the object is at position $x$)</p>
+<p>$$
+\phi\left(C\left(\frac{\lVert x - c_j \lVert_2^2}{R_j^2} - 1\right)\right)
+$$</p>
+<p>which, if we assume that our path is characterized by an ordered set of points $\{x_i\}$, gives our complete energy function to be</p>
+<p>$$
+\mathcal{L}(x; c, R, C) = \sum_{ij}\phi\left(C\left(\frac{\lVert x_i - c_j \lVert_2^2}{R_j^2} - 1\right)\right)
+$$</p>
+<p>which is really just a fancy way of writing "each discretized point in my path should be outside of an obstacle." This is <em>close</em> to what we want, but it's not quite there yet: we aren't penalizing for being arbitrarily far away from other points—that is, if we just put all of our $\{x_i\}$ at infinity, we now have zero penalty!</p>
+<p>Of course, that's a pretty stupid path that no drone can take (especially if we're constrained to be in some particular region, which, in this case, we are), so we do the next straightforward thing: we also penalize any point being far away from its adjacent points. E.g. we add a penalty term of the form $\eta\lVert x_i - x_{i+1}\lVert_2^2$ for $\eta&gt;0$. </p>
+<p>In this case, our complete energy function then looks like</p>
+<p>$$
+\mathcal{L}(x; c, R, C) = \sum_{i}\left[\sum_j\phi\left(C\left(\frac{\lVert x_i - c_j \lVert_2^2}{R_j^2} - 1\right)\right) + \eta \lVert x_i - x_{i+1}\lVert_2^2\right]
+$$</p>
+<p>with a 'tunable' parameter $\eta$, and constraint wall 'hardness' $C$ which we send to infinity as we solve a sequence of problems. That is, let $\{C_k\}$ be a sequence such that $C_k\to \infty$ then we solve the sequence of problems</p>
+<p>$$
+x^{(k)} = \min_x\mathcal{L}(x; c, R, C_k) 
+$$</p>
+<p>and take the trajectory</p>
+<p>$$
+x^* = \lim_{k\to\infty} x^{(k)}
+$$</p>
+<p>in the limit. Why do we do this? Because the derivative of $\mathcal{L}$ vanishes as $C\to\infty$ for the hard constraints. This can be seen in the picture above, by looking at the left side; as $C$ becomes large, the function becomes essentially flat when $x&lt;0$ and $x&gt;0$. This is generally bad, since, if we were to optimize directly for some very large $C$ which goes through the interior of an obstacle, we would be near a point where the derivative nearly vanishes even though we're inside of an obstacle!</p>
+<p>This is totally infeasible for our problem and we cannot sidestep this issue in an obvious way using general optimization tools. So we're forced to do the Next Best Thing™, which is to perform this cooling schedule idea while optimizing over the objective.<sup id="fnref-shortestpath"><a class="footnote-ref" href="#fn-shortestpath">1</a></sup></p>
+<p>Anyways, optimizing this function somewhat successfully with some decent cooling schedule (which is the subject of the next post) yields a cute movie that looks like the following</p>
+<video controls>
+    <source src="/images/path-optimization-1/path_optimization.mp4" type="video/mp4">
+</video>
+
+<p>Don't be fooled, though: there's plenty of little experiments that didn't work out while making this. Robustness is a huge reason why optimizing just this objective would take way too long and, hence, why we require the heuristics mentioned above (and which I'll soon discuss!).</p>
+<p>A general overview of the code (with more details and implementation) can be found in the <a href="https://github.com/StanfordAIR/optimization-sandbox">StanfordAIR Github repo</a>.</p>
+<div class="footnote">
+<hr>
+<ol>
+<li id="fn-shortestpath">
+<p>As given before, we can create feasible trajectories which do not have this problem by discretization methods—this helps out quite a bit since, for complicated trajectories where a lot of the initial path intersects obstacles, most of the time is spent on either (a) making a good cooling schedule for $C$ or (b) escaping the minima which include local obstacles. I'll discuss these methods in a later post.&#160;<a class="footnote-backref" href="#fnref-shortestpath" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+        <hr>
+        <div class="socials">
+            <li>Got any questions?</li>
+            <li><a href="https://twitter.com/intent/tweet?screen_name=guilleangeris" class="twitter-mention-button" data-size="large" data-show-count="false">Tweet to @guilleangeris</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></li>
+        </div>
+    </div>
+</div>
+    </div>
+</body>
+<footer>
+    Made with <a href="https://blog.getpelican.com">🐍</a> and hosted on <a href="https://neocities.org">neocities.org</a>.
+</footer>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-73543332-2', 'auto');
+    ga('send', 'pageview');
+</script>
+</html>

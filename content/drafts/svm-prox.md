@@ -70,7 +70,7 @@ $$
 u^{i+1} = P_{\lambda^{i+1} |\cdot|}(u^i)
 $$
 
-and having $\lambda^i$ be a sequence that isn't summable but has $\lambda_i \to 0$ (for example, $\lambda_i = 1/i$) then correctly yields the minimum of the given convex function, i.e. 0. Of course, this isn't particularly surprising since we already know how to optimize the $\ell_1$ norm function (just set it to zero!), but it will help out quite a bit when considering more complicated functions.
+correctly yields the minimum of the given convex function, i.e. 0. Of course, this isn't particularly surprising since we already know how to optimize the $\ell\_1$ norm function, $\lVert x \lVert\_1$ (just set it to zero!), but it will help out quite a bit when considering more complicated functions.
 
 ## Proximal gradient update
 Now, given a problem of the form
