@@ -2,9 +2,9 @@ title: Optimizers, momentum, and cooling schedules (Part 2/?)
 slug: path-optimization-thoughts2
 category: auvsi-competition
 tags: control-theory, math, non-convex, path-planning
-date: 2017-10-21
+date: 2017-10-22
 
-This is the second post in a series of posts describing an intial approach to doing path-planning in real time on a small, embedded compute board. For the first in the series which describes the energy function used below, see the [first post](/path-optimization-thoughts.html).
+This is the second post in a series of posts describing an initial approach to doing path-planning in real-time on a small, embedded compute board. For the first in the series which describes the energy function used below, see the [first post](/path-optimization-thoughts.html).
 
 ## Quick recap
 
@@ -123,23 +123,31 @@ x\_{t+1} &= x\_t + v\_{t+1}
 \end{align}
 $$
 
-which is what we needed! Well, close to what we needed, really.
+which is what we needed! Well... close to what we needed, really.
 
-Anyways, just to give some perspective on the speed up: using momentum, the optimization problem took around 300 iterations to converge, more than 10 times less than the original given above. I'll give a picture of this soon, but I'm missing one more slight detail.
+Anyways, just to give some perspective on the speed up: using momentum, the optimization problem took around 600 iterations to converge, more than 8 times less than the original given above. I'll give a picture of this soon, but I'm missing one more slight detail.
 
 ## Cooling schemes
 
 Imagine we want to optimize some function $\ell(\cdot)$ that is, in general, extremely hard to solve. If we're lucky, we may be able to do the next best thing: take a series of functions parametrized by, say, $C$, such that $\ell_C(\cdot) \to \ell(\cdot)$ as $C\to\infty$,[^approaches] *and* where the problem is simple to solve for $C\_{k+1}$, given the solution for $C\_k$.
 
+Of course, given this and the above we can already solve the problem: we begin with some small $C\_0$ and then, after converging for $\ell\_{C\_0}(\cdot)$ we then continue to $\ell\_{C\_1}(\cdot)$, after converging to that, we then continue to solve for $\ell\_{C\_2}(\cdot)$, etc., until we reach some desired tolerance on the given result.
 
-<!-- <video controls>
-    <source src="/images/path-optimization-1/path_optimization.mp4" type="video/mp4">
-</video> -->
+Or... (of course, I'm writing this for a reason), we could do something fancy using the previous scheme:
+
+Every time we update our variable, we also increase $k$ such that both the problem sequence and the final solution converge at the same time. It is, of course, totally not obvious that this works (though with some decent choice of schedule, one could imagine it should); the video below shows this idea in action using both momentum and this particular choice of cooling scheme (note the number of iterations is much lower relative to the previous attempt's 5000, but also note that, while the scheme converged in the norm—that is, the variables were updated very little—it didn't actually converge to an optimal solution, but it was pretty close!).
+
+I'd highly recommend looking at the code in order to get a better understanding of how all this is implemented and the dirty deets.
+
+Anyways, optimizing the original likelihood presented in the first post (and in the first part of *this* post) using momentum and the above cooling schedule yields the following nice little video:
 
 
+<video controls>
+    <source src="/images/path-optimization-2/path_optimization_2.mp4" type="video/mp4">
+</video>
 
 
-As before, some code (with more details and implementation) can be found in the [StanfordAIR Github repo](https://github.com/StanfordAIR/optimization-sandbox).
+As before, this code (with more details and implementation) can be found in the [StanfordAIR Github repo](https://github.com/StanfordAIR/optimization-sandbox).
 
 <!-- Footnotes -->
 
@@ -153,4 +161,4 @@ v\_t = -k v\_{t-1}
 $$
 for some $k = \mu\gamma - 1>0$. Solving this yields $v\_{t} = (-1)^tk^t v\_{0}$. This is weird, because it means that our velocity will change directions every iteration even though there's no potential! This is definitely not expected (nor desirable) behaviour.
 
-[^approaches]: In some sense. Say: in the square error, or something of the like.
+[^approaches]: In some sense. Say: in the square error, or something of the like. This can be made entirely rigorous, but I choose not to do it here since it's not terribly essential.

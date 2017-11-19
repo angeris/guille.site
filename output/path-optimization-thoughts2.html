@@ -29,7 +29,7 @@
         <h2><a href="/">&larr; Home</a></h2>
         <h1>Optimizers, momentum, and cooling schedules (Part 2/?)</h1>
         <p>Category: <a href="/category/auvsi-competition.html">auvsi-competition</a></p>
-        <p><label>Posted <strong>October 21, 2017</strong></label></p>
+        <p><label>Posted <strong>October 22, 2017</strong></label></p>
         <p>This is the second post in a series of posts describing an intial approach to doing path-planning in real time on a small, embedded compute board. For the first in the series which describes the energy function used below, see the <a href="/path-optimization-thoughts.html">first post</a>.</p>
 <h2>Quick recap</h2>
 <p>Anyways, we left off on the idea that we now have a function which we wish to optimize, along with a sequence of constants $C$ which tends to a given solution—in particular, and perhaps most importantly, we only care about the solution in the limit $C\to\infty$.</p>
@@ -110,15 +110,20 @@ v_{t+1} &amp;= -\gamma \nabla V(x_t) + \beta v_t\\
 x_{t+1} &amp;= x_t + v_{t+1}
 \end{align}
 $$</p>
-<p>which is what we needed! Well, close to what we needed, really.</p>
-<p>Anyways, just to give some perspective on the speed up: using momentum, the optimization problem took around 300 iterations to converge, more than 10 times less than the original given above. I'll give a picture of this soon, but I'm missing one more slight detail.</p>
+<p>which is what we needed! Well... close to what we needed, really.</p>
+<p>Anyways, just to give some perspective on the speed up: using momentum, the optimization problem took around 600 iterations to converge, more than 8 times less than the original given above. I'll give a picture of this soon, but I'm missing one more slight detail.</p>
 <h2>Cooling schemes</h2>
 <p>Imagine we want to optimize some function $\ell(\cdot)$ that is, in general, extremely hard to solve. If we're lucky, we may be able to do the next best thing: take a series of functions parametrized by, say, $C$, such that $\ell_C(\cdot) \to \ell(\cdot)$ as $C\to\infty$,<sup id="fnref-approaches"><a class="footnote-ref" href="#fn-approaches">4</a></sup> <em>and</em> where the problem is simple to solve for $C_{k+1}$, given the solution for $C_k$.</p>
-<!-- <video controls>
-    <source src="/images/path-optimization-1/path_optimization.mp4" type="video/mp4">
-</video> -->
+<p>Of course, given this and the above we can already solve the problem: we begin with some small $C_0$ and then, after converging for $\ell_{C_0}(\cdot)$ we then continue to $\ell_{C_1}(\cdot)$, after converging to that, we then continue to solve for $\ell_{C_2}(\cdot)$, etc., until we reach some desired tolerance on the given result.</p>
+<p>Or... (of course, I'm writing this for a reason), we could do something fancy using the previous scheme:</p>
+<p>Every time we update our variable, we also increase $k$ such that both the problem sequence and the final solution converge at the same time. It is, of course, totally not obvious that this works (though with some decent choice of schedule, one could imagine it should); the video below shows this idea in action using both momentum and this particular choice of cooling scheme (note the number of iterations is much lower relative to the previous attempt's 5000, but also note that, while the scheme converged in the norm—that is, the variables were updated very little—it didn't actually converge to an optimal solution, but it was pretty close!).</p>
+<p>I'd highly recommend looking at the code in order to get a better understanding of how all this is implemented and the dirty deets.</p>
+<p>Anyways, optimizing the original likelihood presented in the first post (and in the first part of <em>this</em> post) using momentum and the above cooling schedule yields the following nice little video:</p>
+<video controls>
+    <source src="/images/path-optimization-2/path_optimization_2.mp4" type="video/mp4">
+</video>
 
-<p>As before, some code (with more details and implementation) can be found in the <a href="https://github.com/StanfordAIR/optimization-sandbox">StanfordAIR Github repo</a>.</p>
+<p>As before, this code (with more details and implementation) can be found in the <a href="https://github.com/StanfordAIR/optimization-sandbox">StanfordAIR Github repo</a>.</p>
 <!-- Footnotes -->
 
 <div class="footnote">
@@ -138,7 +143,7 @@ $$
 for some $k = \mu\gamma - 1&gt;0$. Solving this yields $v_{t} = (-1)^tk^t v_{0}$. This is weird, because it means that our velocity will change directions every iteration even though there's no potential! This is definitely not expected (nor desirable) behaviour.&#160;<a class="footnote-backref" href="#fnref-oscillations" title="Jump back to footnote 3 in the text">&#8617;</a></p>
 </li>
 <li id="fn-approaches">
-<p>In some sense. Say: in the square error, or something of the like.&#160;<a class="footnote-backref" href="#fnref-approaches" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+<p>In some sense. Say: in the square error, or something of the like. This can be made entirely rigorous, but I choose not to do it here since it's not terribly essential.&#160;<a class="footnote-backref" href="#fnref-approaches" title="Jump back to footnote 4 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>

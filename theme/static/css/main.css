@@ -71,6 +71,11 @@ video {
     font-weight: 100;
     line-height: 1;
 }
+img {
+    display: block;
+    margin: 0 auto;
+    width: 100%;
+}
 img.center {
     display: block;
     margin: 0 auto;
