@@ -1,7 +1,7 @@
 title: Optimizers, momentum, and cooling schedules (Part 2/?)
 slug: path-optimization-thoughts2
 category: auvsi-competition
-tags: control-theory, math, non-convex, path-planning
+tags: control-theory, math, non-convex, path-planning, auvsi
 date: 2017-10-22
 
 This is the second post in a series of posts describing an initial approach to doing path-planning in real-time on a small, embedded compute board. For the first in the series which describes the energy function used below, see the [first post](/path-optimization-thoughts.html).

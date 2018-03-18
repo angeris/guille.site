@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Comparing continuous optimization heuristics vs. reinforcement learning (Part 3/?)</title>
+    
+    <link rel="stylesheet" href="/theme/css/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Raleway:100,300,500" rel="stylesheet">
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [ ['$','$'], ['\\(','\\)'] ]
+            },
+        });
+    </script>
+    
+    <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">    	
+
+</head>
+<body>
+    <div class="container">
+<div class="row">
+    <div class="col-md-8">
+        <h2><a href="/">&larr; Home</a></h2>
+        <h1>Comparing continuous optimization heuristics vs. reinforcement learning (Part 3/?)</h1>
+        <p>Category: <a href="/category/auvsi-competition.html">auvsi-competition</a></p>
+        <p><label>Posted <strong>December 25, 2017</strong></label></p>
+        <p>This is the third post in a series of posts describing an approach to doing path-planning in real-time on a small, embedded compute board. Though this one is more of a standalone post (e.g. doesn't really require much reading of the previous), it compares the performance of the algorithms described in the <a href="/path-optimization-thoughts2.html">second</a> and <a href="/path-optimization-thoughts.html">first</a> posts to a standard approach using reinforcement learning (RL) with linear global approximations and RL with a neural-net approximator (e.g. deep RL).</p>
+<h2>Introduction and thank yous</h2>
+<p>The results presented in this post are those found in <a href="https://github.com/ischeinfeld/navigation229/blob/master/paper/methods-drone-obstacle.pdf">Delgeris, Kulgod, Scheinfeld, 2017</a>. Before this, though, I want to give a huge thank you to <a href="https://github.com/ischeinfeld">Isaach Scheinfeld</a> and Raja Ramesh for their work implementing all of the ideas presented previously into a complete (and usable!) framework—which they did using only the relatively poorly-written (even by my standards) iPython notebook I gave in the second post. Additionally, I note that many of the images used below are from the paper above; so, for further reference, it's worth reading the above paper.</p>
+<p>I'm sure you can guess which of DQN, Q-learning, or classical optimization wins (hint: it's none of the ones containing any buzzwords). And the question here, which I will attempt to answer is, why?</p>
+<p>First—and I'll just get this out of the way, right now—is that this is a class project and there is no expectation of peer review (i.e. much like everything in this blog). So, don't take anything I say here (or, really, anything I say in general) as gospel. There could've been some bugs in the implementation or things that can be improved. That being said, I'll cover why the overall results aren't so surprising in the first place and why it might take some pretty hard work to really beat a classical implementation in the tasks we're interested in.<sup id="fnref-andanotherreminder"><a class="footnote-ref" href="#fn-andanotherreminder">1</a></sup></p>
+<p>Okay, enough with the disclaimers. Let's take a look at the results!</p>
+<h2>Results</h2>
+<p>As mentioned in the <a href="/path-optimization-thoughts.html">first post</a> of the series, an important step of the algorithms is a discretization of the plane into a graph problem, from which we receive a feasible point for our optimization problem (assuming, say, that the wall constraints are hard rather than the relaxed constraints we use for optimization). The figure below (taken from the paper) shows a really nice image of the process:</p>
+<p><img src="/images/path-optimization-3/steps.png" class="insert" style="width: 100%">
+<em>Steps to construction of solution, from left to right: (1) graph discretization, (2) continuous problem, (3) local optimization. This latter step is a relaxation of the feasible path to a locally-optimal solution. From <a href="https://github.com/ischeinfeld/navigation229/blob/master/paper/methods-drone-obstacle.pdf">Delgeris, et al. 2017</a>.</em></p>
+<p>This algorithm is compared to two other cases: one, a linear global approximator which uses some user-defined basis functions. The main one used is (using slightly different terminology than the paper, such that hi)</p>
+<div class="footnote">
+<hr>
+<ol>
+<li id="fn-andanotherreminder">
+<p>I've been proven wrong before and would love to be proved wrong here as well!&#160;<a class="footnote-backref" href="#fnref-andanotherreminder" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+        <hr>
+        <div class="socials">
+            <li>Got any questions?</li>
+            <li><a href="https://twitter.com/intent/tweet?screen_name=guilleangeris" class="twitter-mention-button" data-size="large" data-show-count="false">Tweet to @guilleangeris</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></li>
+        </div>
+    </div>
+</div>
+    </div>
+</body>
+<footer>
+    Made with <a href="https://blog.getpelican.com">🐍</a> and hosted on <a href="https://neocities.org">neocities.org</a>.
+</footer>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-73543332-2', 'auto');
+    ga('send', 'pageview');
+</script>
+</html>

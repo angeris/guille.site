@@ -200,7 +200,7 @@ and plugging in the above (and simplifying) yields the program
 
 $$
 \begin{aligned}
-& \underset{y}{\text{maximize}}
+& \underset{\eta}{\text{maximize}}
 & & \eta^T(Ax-b) - \frac{1}{2}\lVert A^T\eta\lVert_2^2 \\\\
 & \text{subject to}
 & & \eta \ge 0
@@ -217,9 +217,9 @@ This program now has a nice prox step, since $\left(P\_{\eta \ge 0}(\eta)\right)
 
 ## Final Thoughts
 
-Putting the above together yields a complete way of optimizing the SVM program: first, take a single step of the above objective, then find the minimum projection on the polygon over the given inequality constraints by using the second method, and then take a new step on the original, first program presented.
+Putting the above together yields a complete way of optimizing the SVM program: first, take a single step of the initial objective, then find the minimum projection on the polygon over the given inequality constraints by using the second method, and then take a new step on the original, initial program presented.
 
-Of course, this serves as little more than an academic exercise (I'm not sure how thrilled either Boyd nor Lall would be at using dual programs in 104, even in a quasi-black-box optimizer), but it may be of interest to people who take interest in relatively uninteresting things (i.e. me) or to people who happen to have *really freaking fast* proximal gradient optimizers (not sure these exist, but we can pretend).
+Of course, this serves as little more than an academic exercise (I'm not sure how thrilled either Boyd nor Lall would be at using dual programs in 104, even in a quasi-black-box optimizer), but it may be of interest to people who take interest in relatively uninteresting things (e.g. me) or to people who happen to have *really freaking fast* proximal gradient optimizers (not sure these exist, but we can pretend).
 
 [^hyperparameter]: We're also finding this by using cross-validation, rather than a-priori, so it doesn't matter too much.
 

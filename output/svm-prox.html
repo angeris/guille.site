@@ -174,7 +174,7 @@ $$</p>
 <p>and plugging in the above (and simplifying) yields the program</p>
 <p>$$
 \begin{aligned}
-&amp; \underset{y}{\text{maximize}}
+&amp; \underset{\eta}{\text{maximize}}
 &amp; &amp; \eta^T(Ax-b) - \frac{1}{2}\lVert A^T\eta\lVert_2^2 \\
 &amp; \text{subject to}
 &amp; &amp; \eta \ge 0
@@ -186,8 +186,8 @@ y = x - A^T\eta.
 $$</p>
 <p>This program now has a nice prox step, since $\left(P_{\eta \ge 0}(\eta)\right)_i = \max\{0, \eta_i\}$ (the 'positive' part of $\eta_i$, in other words). This latter case is left as an exercise for the reader.</p>
 <h2>Final Thoughts</h2>
-<p>Putting the above together yields a complete way of optimizing the SVM program: first, take a single step of the above objective, then find the minimum projection on the polygon over the given inequality constraints by using the second method, and then take a new step on the original, first program presented.</p>
-<p>Of course, this serves as little more than an academic exercise (I'm not sure how thrilled either Boyd nor Lall would be at using dual programs in 104, even in a quasi-black-box optimizer), but it may be of interest to people who take interest in relatively uninteresting things (i.e. me) or to people who happen to have <em>really freaking fast</em> proximal gradient optimizers (not sure these exist, but we can pretend).</p>
+<p>Putting the above together yields a complete way of optimizing the SVM program: first, take a single step of the initial objective, then find the minimum projection on the polygon over the given inequality constraints by using the second method, and then take a new step on the original, initial program presented.</p>
+<p>Of course, this serves as little more than an academic exercise (I'm not sure how thrilled either Boyd nor Lall would be at using dual programs in 104, even in a quasi-black-box optimizer), but it may be of interest to people who take interest in relatively uninteresting things (e.g. me) or to people who happen to have <em>really freaking fast</em> proximal gradient optimizers (not sure these exist, but we can pretend).</p>
 <div class="footnote">
 <hr>
 <ol>

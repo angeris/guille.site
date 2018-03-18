@@ -1,7 +1,7 @@
 title: Some thoughts on global path optimization (Part 1/?)
 slug: path-optimization-thoughts
 category: auvsi-competition
-tags: control-theory, math, non-convex, path-planning
+tags: control-theory, math, non-convex, path-planning, auvsi
 date: 2017-10-17
 
 I usually see path planning in some shape or form usually solved as a Bellman update, Dynamic Programming-style problem, where the given control is asymptotically stable and optimal; in general, this seems to work quite well, but when we have so much computational power available now-a-days, I do wonder if a global optimization approach is both feasible and maybe even better. There is some literature on this, but most of it is... I'll just say it's not really as interesting as I thought it would be, at first right.

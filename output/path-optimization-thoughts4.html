@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Fast shortest paths for time-varying graphs (Part 4/?)</title>
+    
+    <link rel="stylesheet" href="/theme/css/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Raleway:100,300,500" rel="stylesheet">
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [ ['$','$'], ['\\(','\\)'] ]
+            },
+        });
+    </script>
+    
+    <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">    	
+
+</head>
+<body>
+    <div class="container">
+<div class="row">
+    <div class="col-md-8">
+        <h2><a href="/">&larr; Home</a></h2>
+        <h1>Fast shortest paths for time-varying graphs (Part 4/?)</h1>
+        <p>Category: <a href="/category/auvsi-competition.html">auvsi-competition</a></p>
+        <p><label>Posted <strong>March 17, 2018</strong></label></p>
+        <p>This is the fourth post in a series of posts describing an approach to doing path-planning in real-time on a small, embedded compute board. This is yet another relatively standalone post which mostly describes how to generate a (starting) path used in the <a href="/path-optimization-thoughts2.html">second</a> and <a href="/path-optimization-thoughts.html">first</a> posts to generate a feasible, smooth path that can be followed by a fixed-wing UAV.</p>
+<p>For more background on the general optimization case, check out the posts above. In general, I won't be using much content from the previous three posts, so they're not necessary reading other than for context.</p>
+<h2>Time-dependent shortest path search</h2>
+<p>First, as before, it's reasonable to ask for a fast heuristic to discover paths on a graph which are 'feasible' in a weak sense (i.e. a path where the UAV does not crash against an obstacle whose trajectory is known). This solution is then relaxed into a continuous problem inro $\mathbb{R}^2$ space and then optimized over. This latter trajectory is the one actually fed directly to the UAV controller and which is executed by the UAV. It should be noted that performing this weird relaxation is useful since it often takes quite a while for the algorithm to begin to converge to a feasible solution (and often can run into numerical stability problems while trying to do so). Anyways, for more of the details, check out the first <a href="/path-optimization-thoughts.html">first</a> and <a href="/path-optimization-thoughts2.html">second</a> posts (and the videos at the bottom, to observe the qualitative behavior).</p>
+<p>I should mention that, unlike the previous problems, there already exist some fun <a href="https://www.cs.ucsb.edu/~suri/psdir/soda11.pdf">results</a> on this notion of the shortest path (including a poly-time $(1+\varepsilon)OPT$ approximation!), but it's interesting enough to describe in a quick post anyways. In general, I assume no constraints on the possible curvature of a trajectory for this approximation, though it's straightforward include them in the general problem if the hit on run time performance isn't an issue.</p>
+<h3>Definition</h3>
+<p>The problem set up is the following: let's say we have a family of graphs $G_t\subseteq G$ parametrized by some time parameter $t\in \mathbb{R}^{\ge 0}$, where $G$ is the 'universal graph'; in other words, every graph at every point in time is a subset of both edges and vertices of that graph. One idea for constructing this $G$ is to set $G = \bigcup_{t\in \mathbb{R}^{\ge 0}} G_t$ and insist that $G$ be a finite graph.<sup id="fnref-union-graphs"><a class="footnote-ref" href="#fn-union-graphs">1</a></sup></p>
+<p>$G_t$ at each point encodes some constraints on the current position of the drone, which is indicated by some vertex $v\in V(G)$ (where $V(G)$ is the vertex set of $G$) and this position is <em>valid</em> at time $t$ if the vertex exists in $G_t$. In other words, position $v$ is valid at $t$ if $v\in V(G_t)$.</p>
+<p>Now, the question becomes: given some cost function $c: V(G)\times V(G) \to \mathbb{R}^{\ge 0}$ and some start and end nodes, construct a shortest valid path<sup id="fnref-valid-path"><a class="footnote-ref" href="#fn-valid-path">2</a></sup> from the start to the end nodes (where the start node is assumed to be at time $t=0$), if it exists.</p>
+<h3>A simple algorithm</h3>
+<p>With this definition and knowledge of the $A^*$ algorithm (hint, hint!), I encourage working out what the solution to this problem is, assuming we have a <a href="https://en.wikipedia.org/wiki/Consistent_heuristic">consistent heuristic</a> for the path.</p>
+<p>As a side note: a simple heuristic, which usually works quite well, is to take the $\ell^2$ distance between two nodes and divide it by the maximum velocity of the UAV—this is consistent since the UAV cannot travel between two points faster than being at its maximum velocity along the shortest possible line. In cases where many of the obstacles are small relative to the size of the graph and are sparse, this idea works extremely well because the approximation is fairly tight.</p>
+<p>With that in mind, here's the algorithm, which is really just a (slightly) modified version of $A^*$. (The code below is like quasi-Python pseudocode, but implementing directly shouldn't require too many changes. Additionally, some things can be easily stored instead of recomputed by exploiting the structure of the cost function.)</p>
+<div class="highlight"><pre><span></span><span class="n">q</span> <span class="o">&lt;-</span> <span class="n">priority</span> <span class="n">queue</span>
+<span class="n">start_node</span> <span class="o">&lt;-</span> <span class="n">start</span> <span class="n">node</span>
+<span class="n">end_node</span> <span class="o">&lt;-</span> <span class="n">end</span> <span class="n">node</span>
+
+<span class="n">c</span> <span class="o">&lt;-</span> <span class="n">edge</span><span class="o">-</span><span class="n">cost</span> <span class="n">function</span>
+<span class="n">h</span> <span class="o">&lt;-</span> <span class="n">heuristic</span> <span class="n">cost</span> <span class="n">function</span>
+
+<span class="n">G</span> <span class="o">&lt;-</span> <span class="n">graph</span> <span class="n">at</span> <span class="n">time</span> <span class="n">t</span>
+
+<span class="c1"># Algorithm begins here</span>
+<span class="n">add</span> <span class="p">([</span><span class="n">start_node</span><span class="p">],</span> <span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="n">to</span> <span class="n">q</span>
+
+<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+    <span class="n">curr_path</span><span class="p">,</span> <span class="n">curr_cost</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">pop_smallest</span><span class="p">()</span>
+    <span class="n">last_node</span> <span class="o">=</span> <span class="n">curr_path</span><span class="p">[</span><span class="n">end</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">last_node</span> <span class="ow">is</span> <span class="n">end_node</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">curr_path</span>
+
+    <span class="k">for</span> <span class="n">neighbor</span> <span class="ow">in</span> <span class="n">last_node</span><span class="o">.</span><span class="n">neighbors</span><span class="p">:</span>
+        <span class="n">new_path</span> <span class="o">=</span> <span class="n">curr_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">neighbor</span><span class="p">)</span>
+        <span class="n">new_cost</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="n">new_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">neighbor</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">G</span><span class="p">(</span><span class="n">new_cost</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="n">add</span> <span class="p">(</span><span class="n">new_path</span><span class="p">,</span> <span class="n">cost</span><span class="o">=</span><span class="p">(</span><span class="n">new_cost</span> <span class="o">+</span> <span class="n">h</span><span class="p">(</span><span class="n">neighbor</span><span class="p">,</span> <span class="n">end_node</span><span class="p">)))</span> <span class="n">to</span> <span class="n">q</span>
+
+
+<span class="k">return</span> <span class="bp">None</span>
+</pre></div>
+
+
+<p>This algorithm returns one of the optimal paths, since a path will only be returned if the total cost of the found path is at most as large as the next possible valid path to some point $v_t$ plus the heuristic cost $h(v_t, e)$. By assumption, the heuristic function is a global underestimator, which immediately implies that this return path must have had a minimum possible original cost. I should also point out that there's nothing preventing an exponential time solution (and it's certainly exponential in the worst case... if there doesn't exist a path between $s, e$, for example)! This is not great, but (as usual) this algorithm works much better than exponential time, in practice.</p>
+<p>Another thing to be careful of is that the above algorithm can also return paths which double back on themselves (e.g. if the UAV needs to 'wait' for an obstacle to pass). This may not be desired behavior (at least, definitely not in our case), so specific checks can be added to prevent this, depending on the application. Additionally, there is nothing restricting the cost function to be time-independent, so even this constraint can be relaxed while still maintaining optimality.</p>
+<p>Anyways, that's all for today. I wanted to keep this post (relatively) short and sweet since there's another one coming up quite soon on how to perform the optimization found in the previous posts: given a functional form for the position of the obstacles at some point in time—e.g., the next step after finding the approximation. Hopefully there will be some more time next week to write that out, but I make no major promises.</p>
+<div class="footnote">
+<hr>
+<ol>
+<li id="fn-union-graphs">
+<p>By the 'union' of graphs, I mean that the new graph should be
+$$
+\bigcup_{t} G_t = \left(\bigcup_{t} V(G_t), ~ \bigcup_t E(G_t)\right)
+$$
+where $V(G)$ is the set of vertices of $G$ and $E(G)$ is the set of edges of $G$.&#160;<a class="footnote-backref" href="#fnref-union-graphs" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn-valid-path">
+<p>A path $v = (v_t)$ is valid if it is a path from the start node to the end node and each $v_t \in G_t$ for every possible $t$. We also have that $t_{i+1} - t_i = c(v_{t}, v_{t+1})$. In other words, the time at action number $i$ is the sum of the times of all of the previous actions (this just gives a definition of 'time' in this problem).&#160;<a class="footnote-backref" href="#fnref-valid-path" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+        <hr>
+        <div class="socials">
+            <li>Got any questions?</li>
+            <li><a href="https://twitter.com/intent/tweet?screen_name=guilleangeris" class="twitter-mention-button" data-size="large" data-show-count="false">Tweet to @guilleangeris</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></li>
+        </div>
+    </div>
+</div>
+    </div>
+</body>
+<footer>
+    Made with <a href="https://blog.getpelican.com">🐍</a> and hosted on <a href="https://neocities.org">neocities.org</a>.
+</footer>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-73543332-2', 'auto');
+    ga('send', 'pageview');
+</script>
+</html>
