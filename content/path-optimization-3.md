@@ -3,6 +3,7 @@ slug: path-optimization-thoughts3
 category: auvsi-competition
 tags: control-theory, math, non-convex, path-planning, reinforcement-learning, dnn, auvsi
 date: 2017-12-25
+status: draft
 
 This is the third post in a series of posts describing an approach to doing path-planning in real-time on a small, embedded compute board. Though this one is more of a standalone post (e.g. doesn't really require much reading of the previous), it compares the performance of the algorithms described in the [second](/path-optimization-thoughts2.html) and [first](/path-optimization-thoughts.html) posts to a standard approach using reinforcement learning (RL) with linear global approximations and RL with a neural-net approximator (e.g. deep RL).
 
