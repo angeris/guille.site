@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Machine learning, information, and tail bounds</title>
+    
+    <link rel="stylesheet" href="/theme/css/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Raleway:100,300,500" rel="stylesheet">
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [ ['$','$'], ['\\(','\\)'] ]
+            },
+        });
+    </script>
+    
+    <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">    	
+
+</head>
+<body>
+    <div class="container">
+<div class="row">
+    <div class="col-md-8">
+        <h2><a href="/">&larr; Home</a></h2>
+        <h1>Machine learning, information, and tail bounds</h1>
+        <p>Category: <a href="/category/machine-learning.html">machine-learning</a></p>
+        <p><label>Posted <strong>September 04, 2018</strong></label></p>
+        <p>Usually, in explaining the connection between information theory and machine learning, I would begin by writing down the definition of entropy and deriving some useful results about it, and then come back to tell you that you can look at ML as an information problem, where nature picks some parameters and 'communicates them' through a noisy channel (e.g. via samples from some distribution or some other stochastic process), which you then have to infer (i.e., decode). While this approach is common, my explanations are likely to be far worse than <a href="http://www.cs.cmu.edu/~aarti/Class/10704_Spring15/lecs.html">the</a> <a href="https://www.princeton.edu/~eabbe/publications/tuto_slides_part1.pdf">many</a> <a href="http://www.inference.org.uk/itprnn/book.pdf">available</a> <a href="https://web.stanford.edu/~montanar/RESEARCH/book.html">texts</a>. So I'll try to do something mildly differently (and perhaps a bit backwards) and hope it's at least somewhat entertaining and, ideally, do it all without assuming much more than some comfort with statistics (e.g. the <a href="https://en.wikipedia.org/wiki/Law_of_large_numbers#Weak_law">weak law</a> and <a href="https://en.wikipedia.org/wiki/Markov%27s_inequality">Markov's inequality</a>).</p>
+<h2>Maximum-likelihood and KL-divergence</h2>
+<p>The maximum-likelihood estimator (MLE) is probably the simplest estimator, if you have a probability distribution $p(x|\theta)$ which models your data. In this case we try to pick the hypothesis $\theta$ which makes our observed data the most likely. In other words, we want to solve the optimization problem:
+$$
+\theta^\mathrm{MLE} = \underset{\theta}{\operatorname{argmax}}~~p(x~|~\theta).
+$$
+While this framework is quite general, we'll prove that this estimator is <a href="https://en.wikipedia.org/wiki/Consistent_estimator">consistent</a> in the case where our data points, $x = \{x^i\}$, are all independently drawn from $p(\cdot ~|~ \theta^*)$, where $\theta^*$ is the "true" hypothesis. In other words, when
+$$
+p(x~|~\theta) = \prod_i p(x^i~|~\theta)
+$$</p>
+<p>The proof that this estimator is consistent is relatively simple and assumes only the <a href="https://en.wikipedia.org/wiki/Law_of_large_numbers#Weak_law">weak law of large numbers</a>, which says that the empirical mean of a bunch of i.i.d variables ${Y_i}$ converges<sup id="fnref-in-probability"><a class="footnote-ref" href="#fn-in-probability">1</a></sup> to its expectation
+$$
+\frac{1}{n}\sum_i Y_i \overset{p}{\to} \mathbb{E}[Y_1].
+$$
+(from here on out, I will write 'converges in probability' just as $\to$, instead of $\overset{p}{\to}$).</p>
+<p>First, note that<sup id="fnref-trick"><a class="footnote-ref" href="#fn-trick">2</a></sup></p>
+<p>$$
+\underset{\theta}{\operatorname{argmax}}\left(\prod_i p(x^i~|~\theta)\right) = \underset{\theta}{\operatorname{argmax}}\left(\log \left(\prod_i p(x^i~|~\theta)\right)\right),
+$$
+since $0 &lt; x \le y \iff \log(x) \le \log(y)$ (i.e. $\log$ is monotonic<sup id="fnref-monotonicity"><a class="footnote-ref" href="#fn-monotonicity">3</a></sup>, so it preserves any maximum or minimum). We also have
+$$
+\log \left(\prod_i p(x^i~|~\theta)\right) = \sum_i \log p(x^i ~|~ \theta),
+$$
+and now we need some way of comparing the current hypothesis $\theta$, with the true hypothesis $\theta^*$. The simplest way is to subtract one from the other and show that the difference is less than zero whenever $\theta \ne \theta^*$, so this is what we will do.<sup id="fnref-sneaky"><a class="footnote-ref" href="#fn-sneaky">4</a></sup> In particular:
+$$
+\sum_i \log  p(x^i~|~\theta) - \sum_i \log p(x^i~|~\theta^*) = \sum_i \log\left(\frac{p(x^i~|~\theta)}{p(x^i~|~\theta^*)}\right).
+$$</p>
+<p>If we can prove the quantity above is negative with high probability, then we're set! So divide by $n$ on both sides and note that, by the weak law, we have
+$$
+\frac{1}{n}\sum_i \log\left(\frac{p(x^i~|~\theta)}{p(x^i~|~\theta^*)}\right) \to \mathbb{E}_{X}\left(\log\left(\frac{p(X~|~\theta)}{p(X~|~\theta^*)}\right)\right).
+$$
+(the expectation here is taken with respect to the true distribution $p(\cdot ~|~\theta^*)$). Now, $\log(x)$ is a concave function (proof: take the second derivative and note that it's always negative), so, this means that
+$$
+\mathbb{E}(\log(Y)) \le \log(\mathbb{E}(Y)),
+$$
+for any random variable $Y$ (this is <a href="https://en.wikipedia.org/wiki/Jensen%27s_inequality">Jensen's inequality</a>). In fact, in this case, equality can only happen if $Y$ takes on a single value, so in general, we have
+$$
+\mathbb{E}(\log(Y)) &lt; \log(\mathbb{E}(Y)).
+$$</p>
+<p>Applying this inequality to the previous line is the only magical part of the proof, which gives us
+$$
+\begin{aligned}
+\mathbb{E}_{X}\left(\log\left(\frac{p(X~|~\theta)}{p(X~|~\theta^*)}\right)\right) &amp;&lt; \log\mathbb{E}_{X}\left(\frac{p(X~|~\theta)}{p(X~|~\theta^*)}\right) \\
+&amp;= \log \int_S p(X~|~\theta^*)\frac{p(X~|~\theta)}{p(X~|~\theta^*)}~dX\\
+&amp;= \log \int_S p(X~|~\theta)~dX\\
+&amp;= \log 1\\
+&amp;= 0.
+\end{aligned}
+$$</p>
+<p>So, as $n \uparrow\infty$, we find that
+$$
+\frac{1}{n}\sum_i \log\left(\frac{p(x^i~|~\theta)}{p(x^i~|~\theta^*)}\right) &lt; 0
+$$
+or, multiplying by $n$ and rearranging,
+$$
+\sum_i \log p(x^i~|~\theta) &lt; \sum_i \log p(x^i~|~\theta^*)
+$$
+with high probability. So, any point which is not $\theta^*$ will have a lower likelihood than $\theta^*$.<sup id="fnref-immediate-bounds"><a class="footnote-ref" href="#fn-immediate-bounds">5</a></sup></p>
+<h2>Tail bounds on information</h2>
+<p>The next question, of course, is how many samples do we need to actually guess the right hypothesis? There are several ways of attacking this question, but let's start with a basic one: what is the probability that a wrong (empirical) likelihood is actually better than the true empirical likelihood? In other words, can we give an upper bound on
+$$
+P\left(\prod_i p(x^i~|~\theta) \ge \prod_i p(x^i~|~\theta^*)\right)
+$$
+that depends on some simple, known quantities? Applying <a href="https://en.wikipedia.org/wiki/Markov%27s_inequality">Markov's inequality</a> directly yields the trivial result
+$$
+P\left(\prod_i \frac{p(x^i~|~\theta)}{p(x^i~|~\theta^*)} \ge 1\right) \le \mathbb{E}_x\left(\prod_i \frac{p(x^i~|~\theta)}{p(x^i~|~\theta^*)}\right) = 1,
+$$
+that the probability is at most 1. So where do we go from here? Well, as before, we can turn the product into a sum by taking the log of both sides and dividing by $n$ (déjà vu, anyone?),
+$$
+P\left(\prod_i \frac{p(x^i~|~\theta)}{p(x^i~|~\theta^*)} \ge 1\right) = P\left(\frac1n\sum_i \log\left( \frac{p(x^i~|~\theta)}{p(x^i~|~\theta^*)}\right) \ge 0\right).
+$$
+Here, we can weaken the question a little bit by asking: how likely is it that our wrong hypothesis has a higher log-likelihood than the right one <em>by any amount</em>, $\varepsilon &gt; 0$. In other words, let's give a bound on
+$$
+P\left(\frac1n\sum_i \log\left( \frac{p(x^i~|~\theta)}{p(x^i~|~\theta^*)}\right) \ge \varepsilon\right).
+$$</p>
+<p>Here comes a little bit of magic, but this is a general method in what are known as Chernoff bounds. It's a good technique to keep in your toolbox if you haven't quite seen it before!</p>
+<p>Anyways, since $\log$ is a monotonic function, note that $\exp$ (its inverse) is also monotonic, so,
+$$
+P\left(\frac{1}{n}\sum_i \log\left(\frac{p(x^i~|~\theta)}{p(x^i~|~\theta^*)}\right) \ge \varepsilon\right) = P\left(\exp\left\{\sum_i \log\left( \frac{p(x^i~|~\theta)}{p(x^i~|~\theta^*)}\right)\right\} \ge e^{n\varepsilon}\right),
+$$
+and applying Markov's inequality to the right-hand-side yields
+$$
+P\left(\exp\left\{\sum_i \log\left(\frac{p(x^i~|~\theta)}{p(x^i~|~\theta^*)}\right)\right\} \ge e^{n\varepsilon}\right) \le e^{-n\varepsilon},
+$$
+so as the number of samples increases, our wrong hypothesis becomes exponentially unlikely to exceed the true hypothesis by more than $\varepsilon$.</p>
+<p>Of course, at any point in this proof, we could've multiplied both sides of the inequality by $\lambda &gt; 0$ and everything would've remained true, but note that then we would have a bound
+$$
+P\left(\frac1n\sum_i \log\left( \frac{p(x^i~|~\theta)}{p(x^i~|~\theta^*)}\right) \ge \varepsilon\right) \le \mathbb{E}_X\left[\left(\frac{p(X ~|~ \theta)}{p(X~|~\theta^*)}\right)^\lambda\right]~ e^{-\lambda n\varepsilon},
+$$
+which looks almost nice, except that we have no control over the tails of </p>
+<p>$$
+\left(\frac{p(X ~|~ \theta)}{p(X~|~\theta^*)}\right)^\lambda,
+$$</p>
+<p>since at no point have we assumed anything about the dependence of $p$ on $\theta$ or $X$ (apart from it being a correct probability distribution). More generally speaking, given $\lambda \ne 0, 1$, we can find a function such that this quantity blows up (exercise for the reader!), which makes our bound trivial.</p>
+<p>It is possible to make some assumptions about how these tails behave, but it's not entirely clear that these assumptions would be natural or useful. If anyone has further thoughts on this, I'd love to hear them!</p>
+<h2>On Fisher Information and Lower-Bounds</h2>
+<p>The second set of lower-bounds that are easy to derive and are surprisingly useful are the Cramér-Rao bounds on estimators. In particular, we can show that, for any estimator $\hat \theta$ whose expectation is $\mathbb{E}(\hat \theta) = \psi(\theta)$, with underlying probability distribution $p(\cdot~|~\theta)$, then<sup id="fnref-dimensions"><a class="footnote-ref" href="#fn-dimensions">6</a></sup>
+$$
+\operatorname{Var}(\theta) \ge \frac{[\psi ' (\theta)]^2}{I(\theta)},
+$$
+where $I(\theta) \ge 0$ is the Fisher information of $p(\cdot~|~\theta)$, which is something like the local curvature of $\log p(\cdot~|~\theta)$ around $\theta$. In particular, it is defined as
+$$
+I(\theta) = -\mathbb{E}_X\left(\frac{\partial^2 \log p(X~|~\theta)}{\partial \theta^2}\right).
+$$
+In other words, the inequality says that, the more flat $\log p$ is at $\theta$, the harder it is to correctly guess the right parameter. This makes sense, since the flatter the distribution is at this point, the harder it is for us to distinguish it from points around it.</p>
+<p>I'll give a simple proof of this statement soon (in another post, since this one has become quite a bit longer than expected), but, to see why this makes sense, let's go back to the original proof of the consistency of the MLE estimator for a given probability distribution. Note that assuming that $\psi(\theta) = \theta$ then gives us bounds on the variance of an unbiased estimator of $\theta$.</p>
+<p>At one point we used the fact that
+$$
+\frac{1}{n}\sum_i \log\left(\frac{p(x^i~|~\theta)}{p(x^i~|~\theta^*)}\right) \to \mathbb{E}_{X}\left(\log\left(\frac{p(X~|~\theta)}{p(X~|~\theta^*)}\right)\right) \equiv -D(\theta ~\Vert~\theta^*) \le 0.
+$$
+This quantity on the right is called the <a href="https://en.wikipedia.org/wiki/Kullback–Leibler_divergence">KL-divergence</a>, and it has some very nice information-theoretic interpretations, which I highly recommend you read about, but which I will not get into here. Anyways, assuming that $\theta$ is close to $\theta^*$, we can do a Taylor expansion around the true parameter $\theta^*$ to find</p>
+<p>$$
+\frac{1}{n}\sum_i \log\left(\frac{p(x^i~|~\theta)}{p(x^i~|~\theta^*)}\right) \approx \frac{1}{n}\sum_i \left(\underbrace{\log\left(\frac{p(x^i~|~\theta^*)}{p(x^i~|~\theta^*)}\right)}_{=0} + (\theta - \theta^*)\frac{\partial_\theta p(\cdot ~|~\theta^*)}{p(\cdot ~|~ \theta^*)} + \dots\right)
+$$
+and the quantity on the right hand side goes to, as $n\uparrow \infty$,
+$$
+\begin{aligned}
+\frac{1}{n}\sum_i \left((\theta - \theta^*)\frac{\partial_\theta p(\cdot ~|~\theta^*)}{p(\cdot ~|~ \theta^*)} + O((\theta - \theta^*)^2)\right) &amp;\to (\theta - \theta^*)\mathbb{E}_X\left(\frac{\partial_\theta p(X ~|~\theta^*)}{p(X ~|~ \theta^*)}\right) \\
+&amp;= (\theta - \theta^*)\int_S \frac{\partial_\theta p(X~|~\theta^*)}{p(X~|~\theta^*)}p(X~|~\theta^*)~dX\\
+&amp;=(\theta - \theta^*)\int_S \partial_\theta p(X~|~\theta^*)~dX\\
+&amp;=(\theta - \theta^*)\partial_\theta\left(\int_S p(X~|~\theta^*)~dX\right)\\
+&amp;= (\theta - \theta^*)\partial_\theta (1)\\
+&amp;= 0
+\end{aligned}
+$$
+...zero?!<sup id="fnref-dominated-convergence"><a class="footnote-ref" href="#fn-dominated-convergence">7</a></sup> Well, the expectation of the first derivative of the log-likelihood vanishes, so taking the second term in the Taylor expansion yields
+$$
+\frac{1}{2}(\theta - \theta^*)^2\mathbb{E}_X\left(\partial_\theta^2 \log(p(X~|~\theta^*)\right)) = -\frac12(\theta - \theta^*)^2I(\theta^*).
+$$</p>
+<p>Putting it all together, we have that
+$$
+\frac{1}{n}\sum_i \log\left(\frac{p(x^i~|~\theta)}{p(x^i~|~\theta^*)}\right) \to -D(\theta \Vert \theta^*) \approx -\frac12(\theta - \theta^*)^2I(\theta^*) + O((\theta - \theta^*)^3),
+$$
+or that the curvature of the KL-divergence around $\theta^*$ is the Fisher information! In this case, it shouldn't be entirely surprising that there is some connection between how well we can measure a parameter's value and the Fisher information of that parameter, since the likelihood's noise around that parameter is given by the Fisher information.</p>
+<p>On the other hand, I haven't been able to find a direct proof of the above bound (or, even, any other nice bounds) given <em>only</em> the above observation. So, while the connection might make sense, it turns out the proof of the Cramér-Rao bound uses a slightly different technique, which I will present later (along with some other fun results!).</p>
+<div class="footnote">
+<hr>
+<ol>
+<li id="fn-in-probability">
+<p>In probability. I.e., the probability that the empirical mean differs from the expectation by some amount, $\left|\frac{1}{n}\sum_i Y_i - \mathbb{E}[Y_1]\right| &gt; \varepsilon$, goes to zero as $n\uparrow \infty$. A simple proof in the finite-variance case follows from Chebyshev's inequality (exercise for the reader!).&#160;<a class="footnote-backref" href="#fnref-in-probability" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn-trick">
+<p>It's often easier to deal with log-probabilities than it is to deal with probabilities, so this trick is relatively common.&#160;<a class="footnote-backref" href="#fnref-trick" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn-monotonicity">
+<p>In fact, the logarithm is <em>strictly</em> monotonic, so it preserves minima uniquely. In other words, for any function $\phi: S\to \mathbb{R}^{&gt; 0}$, $\phi$ and $\log \circ\, \phi$ have minima and maxima at exactly the same points.&#160;<a class="footnote-backref" href="#fnref-monotonicity" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn-sneaky">
+<p>I am, of course, being sneaky: the subtraction <em>happens</em> to work since this just <em>happens</em> to yield the KL-divergence in expectation—but that's how it goes. Additionally, the requirement really is not that $\theta \ne \theta^*$, but rather that $p(x~|~\theta^*) \ne p(x~|~\theta)$, just in case there happen to be multiple hypotheses with equivalent distributions. Since you're reading this then just assume throughout that $p(\cdot~|~\theta) \ne p(\cdot~|~\theta^*)$ on some set with nonzero probability (in the base distribution) whenever $\theta \ne \theta^*$.&#160;<a class="footnote-backref" href="#fnref-sneaky" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn-immediate-bounds">
+<p>While it may seem that there should be easy bounds to give immediately based on this proof, the problem is that we do <em>not</em> have good control of the second moment of $\log(p(\cdot~|~\theta^*)/p(\cdot~|~\theta))$ (this quantity may not even converge in a nice way). This makes giving any kind of convergence rate quite difficult, since the proof of the weak law given only a first-moment guarantee uses the dominated convergence theorem to give non-constructive bounds.&#160;<a class="footnote-backref" href="#fnref-immediate-bounds" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+<li id="fn-dimensions">
+<p>This is a derivation of the one-dimensional case, but the $n$-dimensional case is almost identical.&#160;<a class="footnote-backref" href="#fnref-dimensions" title="Jump back to footnote 6 in the text">&#8617;</a></p>
+</li>
+<li id="fn-dominated-convergence">
+<p>All I will say about changing the derivative and integral around is that it is well-justified by dominated convergence.&#160;<a class="footnote-backref" href="#fnref-dominated-convergence" title="Jump back to footnote 7 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+        <hr>
+        <div class="socials">
+            <li>Got any questions?</li>
+            <li><a href="https://twitter.com/intent/tweet?screen_name=guilleangeris" class="twitter-mention-button" data-size="large" data-show-count="false">Tweet to @guilleangeris</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></li>
+        </div>
+    </div>
+</div>
+    </div>
+</body>
+<footer>
+    Made with <a href="https://blog.getpelican.com">🐍</a> and hosted on <a href="https://neocities.org">neocities.org</a>.
+</footer>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-73543332-2', 'auto');
+    ga('send', 'pageview');
+</script>
+</html>
