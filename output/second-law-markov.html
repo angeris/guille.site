@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Markov processes and the second law</title>
+    
+    <link rel="stylesheet" href="/theme/css/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Raleway:100,300,500" rel="stylesheet">
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [ ['$','$'], ['\\(','\\)'] ]
+            },
+        });
+    </script>
+    
+    <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">    	
+
+</head>
+<body>
+    <div class="container">
+<div class="row">
+    <div class="col-md-8">
+        <h2><a href="/">&larr; Home</a></h2>
+        <h1>Markov processes and the second law</h1>
+        <p>Category: <a href="/category/math.html">math</a></p>
+        <p><label>Posted <strong>September 13, 2018</strong></label></p>
+        <p><em>Note:</em> This is another one of those "quick" posts about a topic I've found to be fascinating, but which is almost never discussed.</p>
+<p>Physics has this nice little law called the <a href="https://en.wikipedia.org/wiki/Second_law_of_thermodynamics">second law of thermodynamics</a>, which governs every physical thermodynamical system in question. The second law is usually phrased as the nice quote "everything tends to disorder," or some other variation thereof which sounds intuitive but is as opaque as a concrete wall when applied in practice.</p>
+<p>As usual, I won't really touch this or other similar discussions with a 10 foot pole (though <a href="https://plato.stanford.edu/entries/time-thermo/">here</a> is a good place to start), but I'll be giving some thoughts on a similar mathematical principle which arises from statistical systems.</p>
+<h2>Markov chains</h2>
+<p>Since this is a short post, I won't be describing <a href="https://en.wikipedia.org/wiki/Markov_chain">Markov chains</a> in detail, but as a refresher, a Markov chain (or Markov process) is a process in which the next state of the process depends only on the current state. In other words, it's a little like the game <a href="https://en.wikipedia.org/wiki/Snakes_and_Ladders">Snakes and Ladders</a>, where your next position depends only on where you are in the current square and your next dice throw (independent of it being the 1st or 5th time you've landed on the same square).</p>
+<p>In particular, we know probability of being at a new square, $x_{t+1}$ at time $t+1$, given that we were in square $x_t$ at time $t$. In other words, we know $p(X_{t+1}=x~|~X_{t}=x')$. Similarly, if we weren't sure of our position at time $t$, but rather we have a probability distribution over positions, say $p(X_t = x)$ (which I will call $p_t(x)$, for convenience), then the probability of being at position $x$ at time $t+1$ given our belief about possible positions, $x'$ at time $t$ is
+$$
+p_{t+1}(x) = \sum_{x'} p(X_{t+1}=x~|~X_{t}=x')p_t(x').\tag{1}
+$$</p>
+<p>In other words, we just multiply these two probabilities and sum over all possible states $x'$ at time $t$. The defining trait of (stationary) Markov processes is that $p(X_{t+1}=x~|~X_{t}=x')$, which I will call $K(x, x')$ from now on, is the <em>same</em> for all $t$, and equation (1), now written as
+$$
+p_{t+1}(x) = \sum_{x'} K(x, x')p_t(x),
+$$
+holds for any $t$.</p>
+<p>It's probably not hard to believe that Markov chains are used <a href="https://www.cs.cmu.edu/~katef/DeepRLControlCourse/lectures/lecture2_mdps.pdf">absolutely</a> <a href="https://twitter.com/captain_markov?lang=en">everywhere</a>, since they make for mathematically simple, but surprisingly powerful models of,  well, everything.</p>
+<p>This is all I will mention about Markov chains, in general. If you'd like a bit of a deeper dive, <a href="http://setosa.io/ev/markov-chains/">this blog post</a> is a beautiful (and interactive!) reference. I highly recommend it.</p>
+<h2>A variation on a theme</h2>
+<p>Let $p_t$ be the distribution of a process at time $t$, then the second law says that (and I will use statistics notation, rather than physics notation, from here on out!),
+$$
+H(p_t) \equiv -\sum_x p_t(x) \log p_t(x),
+$$
+is non-decreasing as time, $t$, increases. Note that I'll be dealing with discrete time and space here, but all of these statements with some modifications hold for continuous processes. Anyways, more generally, we can write
+$$
+H(p_{t+1}) \ge H(p_t),
+$$
+but it turns out this law, as stated, doesn't quite hold for many Markov processes. It does, on the other hand, hold for a set of processes where the transition probabilities are symmetric (more generally, this holds iff the transitions are doubly-stochastic. <a href="https://pdfs.semanticscholar.org/332c/1c7bab1a9a7a43d34d5a1784cf2454e0a7f1.pdf">Cover</a> has a slick, few-line proof of this which relies on some properties of the KL-divergence).</p>
+<p>In this case, the probability of going from state $A$ to state $B$ is the same as the probability of going from state $B$ to state $A$. Writing this out mathematically, it says:</p>
+<p>$$
+K(x, x') = K(x', x).
+$$</p>
+<p>I should note that this is a <em>very</em> strong condition, but it can be quite useful in giving a simple proof of the above law. To prove this, first note that the KL-divergence is nonnegative, since the negative log is convex, thus by <a href="https://en.wikipedia.org/wiki/Jensen's_inequality">Jensen's inequality</a> (this is the same proof as the <a href="/ml-information-bounds.html">previous post</a>):</p>
+<p>$$
+\begin{aligned}
+D(p_t\lVert p_{t'})&amp;=-\sum_x p_t(x) \log \frac{p_{t'}(x)}{p_t(x)} \\
+&amp;\ge -\log\left(\sum_x p_t(x)\frac{p_{t'}(x)}{p_t(x)}\right) \\
+&amp;= -\log\left(\sum_x p_{t'}(x)\right) \\
+&amp; = -\log 1 \\
+&amp;= 0,
+\end{aligned}
+$$</p>
+<p>since $p_{t'}, p_t$ are probability distributions (i.e., nonnegative and sum to one).</p>
+<p>Here is the magical trick to proving the above. Note that
+$$
+D(p_t \lVert p_{t+2}) \ge 0,
+$$
+so
+$$
+-\sum_x p_t(x) \log \frac{p_{t+2}(x)}{p_t(x)} \ge 0,
+$$
+which means
+$$
+-\sum_x p_t(x) \log p_{t+2}(x) \ge -\sum_x p_t(x) \log p_t(x).
+$$
+But, by definition, we have that
+$$
+p_{t+2}(x) = \sum_{x'}K(x, x')p_{t+1}(x'),
+$$
+so
+$$
+-\sum_x p_t(x) \log \left(\sum_{x'} K(x, x')p_{t+1}(x')\right) \ge -\sum_x p_t(x) \log p_t(x),
+$$
+but, by Jensen's inequality (again!) on the left hand side we get,
+$$
+-\sum_x p_t(x) \log \left(\sum_{x'} K(x, x')p_{t+1}(x')\right) \le -\sum_{x, x'} p_t(x)K(x, x') \log p_{t+1}(x').
+$$</p>
+<p>Since we know $K(x, x') = K(x', x)$, then we immediately have that
+$$
+\sum_x p_t(x)K(x, x') = p_{t+1}(x'),
+$$
+so, putting it all together
+$$
+\begin{aligned}
+H(p_{t+1}) &amp;= -\sum_{x'} p_{t+1}(x') \log p_{t+1}(x') \\
+&amp;= -\sum_{x, x'} p_t(x)K(x, x') \log p_{t+1}(x')\\
+&amp;\ge -\sum_x p_t(x) \log p_t(x) \\
+&amp;= H(p_t),
+\end{aligned}
+$$
+which is what we wished to prove.</p>
+<h2>More general Markov processes</h2>
+<p>So, while it turns out this law doesn't hold for general Markov processes, a very similar law <em>does</em> hold. If a Markov process has a stationary distribution, $p$, then:
+$$
+D(p_{t+1}\lVert p) \le D(p_t \lVert p),
+$$
+so, as the Markov chain continues evolving, the KL divergence between the current distribution and the equilibrium distribution <em>never decreases</em>.</p>
+<p>In fact, more generally, for <em>any</em> two initial probability distributions $p_0, q_0$, we have that
+$$
+D(p_{t+1} \lVert q_{t+1}) \le D(p_{t} \lVert q_{t}),
+$$
+so any two distributions undergoing the same (Markovian) dynamics never decrease in KL-divergence! Even if the Markov process does <em>not</em> have a unique stationary distribution, there is still a type of second law which holds, in a very general sense.</p>
+<p>As before, <a href="https://pdfs.semanticscholar.org/332c/1c7bab1a9a7a43d34d5a1784cf2454e0a7f1.pdf">Cover</a> has a fantastic, slick proof of the above, which I highly recommend you read!</p>
+        <hr>
+        <div class="socials">
+            <li>Got any questions?</li>
+            <li><a href="https://twitter.com/intent/tweet?screen_name=guilleangeris" class="twitter-mention-button" data-size="large" data-show-count="false">Tweet to @guilleangeris</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></li>
+        </div>
+    </div>
+</div>
+    </div>
+</body>
+<footer>
+    Made with <a href="https://blog.getpelican.com">🐍</a> and hosted on <a href="https://neocities.org">neocities.org</a>.
+</footer>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-73543332-2', 'auto');
+    ga('send', 'pageview');
+</script>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Physics, optimization, and impossibility</title>
+    
+    <link rel="stylesheet" href="/theme/css/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Raleway:100,300,500" rel="stylesheet">
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [ ['$','$'], ['\\(','\\)'] ]
+            },
+        });
+    </script>
+    
+    <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">    	
+
+</head>
+<body>
+    <div class="container">
+<div class="row">
+    <div class="col-md-8">
+        <h2><a href="/">&larr; Home</a></h2>
+        <h1>Physics, optimization, and impossibility</h1>
+        <p>Category: <a href="/category/physics.html">physics</a></p>
+        <p><label>Posted <strong>December 15, 2018</strong></label></p>
+        <p><em>Note:</em> this post is based on the results of <a href="https://arxiv.org/abs/1811.12936">this arXiv paper</a> which I've been working on with Stephen Boyd and Jelena Vuckovic.</p>
+<p>The main result of the above paper is kind of weird: essentially, it turns out that you can say what devices are physically <em>impossible</em> by phrasing certain problems as optimization problems and then using some basic tools of optimization to derive lower bounds.</p>
+<p>To illustrate: imagine you want to generate an engine which is as efficient as possible, then we know the best you could possibly hope to do is given by the <a href="">Second law of thermodynamics</a>. Now, what if (and bear with me here) we want something a little weirder? Say, what if we want a heat sink that has a particular dissipation pattern? Or what if you want a photonic crystal that traps light of a given wavelength in some region? Or a horn which has specific resonances?</p>
+<p>We can write down the optimization problems corresponding to each of these circumstances: in general, these problems are very hard to solve in ways that aren't just "try all possible designs and pick the best one." (And there are a <em>lot</em> of possible designs.) By using some simple heuristics—gradient descent, for example—we appear to do quite well relative to what almost anyone can do by hand. This approach brings up a few questions with no obvious answers.</p>
+<ol>
+<li>Maybe there is some design that is really complicated that these heuristics almost always miss.</li>
+<li>It is possible that the objective we are requesting is physically impossible to achieve.</li>
+<li>Many heuristics depend heavily on the initial design we provide. Physical intuition sometimes appears to provide good initializations, but often the final design is unintuitive, so perhaps there are better approaches.</li>
+</ol>
+<p>The paper provides (some) answers to these questions. In particular, it answers point (2) as its main goal, which gives a partial answer to (1) (namely that the heuristics we use appear to be often close to the global optimum, at least for the problems we tested), and an answer to (3), since the impossibility result suggests an initial design as a byproduct of computing the certificate of impossibility.</p>
+<p>I'll explain the interesting parts of this paper in more detail below, since the paper (for the sake of brevity) simply references the reader to derivations of the results (and leaves some as exercises).</p>
+<h2>Lagrange duality</h2>
+<p>In optimization theory, there is a beautiful idea called <em>Lagrange duality</em>, which gives lower bounds to any optimization problem you can write down (at least theoretically speaking).</p>
+<p>Let's say we have the following optimization problem,
+$$
+\begin{array}{ll}
+\text{minimize} &amp; f(x)\\
+\text{subject to} &amp; h(x) \le 0,
+\end{array}
+$$
+(this encompasses essentially every optimization problem ever) with objective function $f: \mathbb{R}^n \to \mathbb{R}$ and constraint function $h: \mathbb{R}^n \to \mathbb{R}^m$, and the inequality is taken elementwise. Call the optimal value of the objective of the optimization problem $p^\star$, which we will see again soon.</p>
+<p>Continuing, we can then formulate the <em>Lagrangian</em> of the problem,
+$$
+\mathcal{L}(x, \lambda) = f(x) + \lambda^Th(x),
+$$
+with $\lambda \ge 0$. Finally, we formulate the dual <em>function</em>
+$$
+g(\lambda) = \inf_x \left(f(x) + \lambda^Th(x)\right).
+$$
+Now, and here's the magic, this dual function $g(\lambda)$ at any $\lambda \ge 0$ is always a lower bound for the optimal objective $p^\star$. Why? Well,
+$$
+g(\lambda) = \inf_x \mathcal{L}(x, \lambda),
+$$
+and, by definition of $\inf$,
+$$
+\inf_x \mathcal{L}(x, \lambda) \le \mathcal{L}(x, \lambda),
+$$
+for every $x$. Now, every feasible point $x^\mathrm{feas}$ of the optimization problem satisfies $h(x) \le 0$ (this is the definition of 'feasible'), so, since $\lambda \ge 0$,
+$$
+\mathcal{L}(x^\mathrm{feas}, \lambda) = f(x^\mathrm{feas}) + \underbrace{\lambda^Th(x^\mathrm{feas})}_{\le 0} \le f(x^\mathrm{feas}).
+$$
+In other words, for any feasible point, $\mathcal{L}(x^\mathrm{feas}, \lambda)$ is always smaller than the objective value at that point. But, since $g(\lambda)$ is smaller than $\mathcal{L}(x, \lambda)$ for <em>any</em> $x$, not just the feasible ones, we have
+$$
+g(\lambda) \le f(x^\mathrm{feas}),
+$$
+for any feasible point. This means that it is also at most as large as the optimal value (since every optimal point of this optimization problem is feasible). That is,
+$$
+g(\lambda) \le p^\star.
+$$
+Therefore, for any $\lambda\ge 0$, we know that $g(\lambda)$ is always a lower bound to the optimal objective value!</p>
+<p>Of course, sometimes computing $g(\lambda)$ is at least as difficult as solving the original problem (due to the $\inf$ we have in the definition of $g$). It just so happens that many physical equations and objectives we care about are of a form elegant enough to give an explicit formula for $g$, which is the main point of this paper.</p>
+<h3>Best lower bound</h3>
+<p>Of course, we often want the best (largest) lower bound, not just <em>a</em> lower bound (which can often be quite bad). In other words, we want to maximize our lower bound. We can phrase this as the new optimization problem,
+$$
+\begin{array}{ll}
+\text{maximize} &amp; g(\lambda)\\
+\text{subject to} &amp; \lambda \ge 0.
+\end{array}
+$$
+What is interesting, is that this optimization problem is always convex—e.g., it is almost always easy to compute the optimal value, if we can explicitly write down what $g$ is. (I won't prove this here, but the proof is very straightforward. Take a peek at 5.1.2 in Boyd's <a href="https://web.stanford.edu/~boyd/cvxbook/"><em>Convex Optimization</em></a>.)</p>
+<h2>Explicit dual function for $g$</h2>
+        <hr>
+        <div class="socials">
+            <li>Got any questions?</li>
+            <li><a href="https://twitter.com/intent/tweet?screen_name=guilleangeris" class="twitter-mention-button" data-size="large" data-show-count="false">Tweet to @guilleangeris</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></li>
+        </div>
+    </div>
+</div>
+    </div>
+</body>
+<footer>
+    Made with <a href="https://blog.getpelican.com">🐍</a> and hosted on <a href="https://neocities.org">neocities.org</a>.
+</footer>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-73543332-2', 'auto');
+    ga('send', 'pageview');
+</script>
+</html>
