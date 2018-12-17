@@ -32,7 +32,7 @@
         <p><label>Posted <strong>December 15, 2018</strong></label></p>
         <p><em>Note:</em> this post is based on the results of <a href="https://arxiv.org/abs/1811.12936">this arXiv paper</a> which I've been working on with Stephen Boyd and Jelena Vuckovic.</p>
 <p>The main result of the above paper is kind of weird: essentially, it turns out that you can say what devices are physically <em>impossible</em> by phrasing certain problems as optimization problems and then using some basic tools of optimization to derive lower bounds.</p>
-<p>To illustrate: imagine you want to generate an engine which is as efficient as possible, then we know the best you could possibly hope to do is given by the <a href="">Second law of thermodynamics</a>. Now, what if (and bear with me here) we want something a little weirder? Say, what if we want a heat sink that has a particular dissipation pattern? Or what if you want a photonic crystal that traps light of a given wavelength in some region? Or a horn which has specific resonances?</p>
+<p>To illustrate: imagine you want to generate an engine which is as efficient as possible, then we know the best you could possibly hope to do is given by the <a href="https://en.wikipedia.org/wiki/Second_law_of_thermodynamics">second law of thermodynamics</a>. Now, what if (and bear with me here) we want something a little weirder? Say, what if we want a heat sink that has a particular dissipation pattern? Or what if you want a photonic crystal that traps light of a given wavelength in some region? Or a horn which has specific resonances?</p>
 <p>We can write down the optimization problems corresponding to each of these circumstances: in general, these problems are very hard to solve in ways that aren't just "try all possible designs and pick the best one." (And there are a <em>lot</em> of possible designs.) By using some simple heuristics—gradient descent, for example—we appear to do quite well relative to what almost anyone can do by hand. This approach brings up a few questions with no obvious answers.</p>
 <ol>
 <li>Maybe there is some design that is really complicated that these heuristics almost always miss.</li>
@@ -165,7 +165,7 @@ Now that we have an analytic form for $g$ (our set of lower bounds), we can now 
 <p>Additionally (I might discuss how this is done in a later post), we receive an initial design that is qualitatively quite similar to the final, locally-optimized design. See the image below.</p>
 <p><img src="/images/physics-impossibility-results/primal-dual-comparison.png" class="insert" style="width: 100%">
 <em>Comparison between the design suggested by the lower bound and the locally-optimized design.</em></p>
-<p>As always, for more information, I highly recommend checking out the <a href="https://arxiv.org/abs/1811.12936">pre-print that is up on arXiv</a> for more info. Also, if you spot any mistakes, please do @ me!</p>
+<p>I highly recommend checking out the <a href="https://arxiv.org/abs/1811.12936">pre-print that is up on arXiv</a> for more info. Also, if you spot any mistakes (in either the post or the paper), please do @ me!</p>
 <div class="footnote">
 <hr>
 <ol>

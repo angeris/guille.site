@@ -8,7 +8,7 @@ date: 2018-12-15
 
 The main result of the above paper is kind of weird: essentially, it turns out that you can say what devices are physically *impossible* by phrasing certain problems as optimization problems and then using some basic tools of optimization to derive lower bounds.
 
-To illustrate: imagine you want to generate an engine which is as efficient as possible, then we know the best you could possibly hope to do is given by the [Second law of thermodynamics](). Now, what if (and bear with me here) we want something a little weirder? Say, what if we want a heat sink that has a particular dissipation pattern? Or what if you want a photonic crystal that traps light of a given wavelength in some region? Or a horn which has specific resonances?
+To illustrate: imagine you want to generate an engine which is as efficient as possible, then we know the best you could possibly hope to do is given by the [second law of thermodynamics](https://en.wikipedia.org/wiki/Second_law_of_thermodynamics). Now, what if (and bear with me here) we want something a little weirder? Say, what if we want a heat sink that has a particular dissipation pattern? Or what if you want a photonic crystal that traps light of a given wavelength in some region? Or a horn which has specific resonances?
 
 We can write down the optimization problems corresponding to each of these circumstances: in general, these problems are very hard to solve in ways that aren't just "try all possible designs and pick the best one." (And there are a *lot* of possible designs.) By using some simple heuristics—gradient descent, for example—we appear to do quite well relative to what almost anyone can do by hand. This approach brings up a few questions with no obvious answers.
 
@@ -164,7 +164,7 @@ Additionally (I might discuss how this is done in a later post), we receive an i
 <img src="/images/physics-impossibility-results/primal-dual-comparison.png" class="insert" style="width: 100%">
 *Comparison between the design suggested by the lower bound and the locally-optimized design.*
 
-As always, for more information, I highly recommend checking out the [pre-print that is up on arXiv](https://arxiv.org/abs/1811.12936) for more info. Also, if you spot any mistakes, please do @ me!
+I highly recommend checking out the [pre-print that is up on arXiv](https://arxiv.org/abs/1811.12936) for more info. Also, if you spot any mistakes (in either the post or the paper), please do @ me!
 
 
 [^maxwell]: This is... almost accurate, but not quite. It turns out a small modification to the problem is needed for Maxwell's equations in two and three dimensions. For specifics, see the appendix in the paper.
