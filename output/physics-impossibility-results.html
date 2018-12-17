@@ -89,8 +89,89 @@ $$
 \text{subject to} &amp; \lambda \ge 0.
 \end{array}
 $$
-What is interesting, is that this optimization problem is always convex—e.g., it is almost always easy to compute the optimal value, if we can explicitly write down what $g$ is. (I won't prove this here, but the proof is very straightforward. Take a peek at 5.1.2 in Boyd's <a href="https://web.stanford.edu/~boyd/cvxbook/"><em>Convex Optimization</em></a>.)</p>
+What is interesting is that this optimization problem is always convex—<em>e.g.</em>, it is almost always easy to compute the optimal value, <em>if</em> we can explicitly write down what $g$ is. (I won't prove this here, but the proof is very straightforward. Take a peek at section 5.1.2 in Boyd's <a href="https://web.stanford.edu/~boyd/cvxbook/"><em>Convex Optimization</em></a>.)</p>
 <h2>Explicit dual function for $g$</h2>
+<h3>Problem formulation</h3>
+<p>Many of the problems we're interested in (including design in photonics via Maxwell's equations,<sup id="fnref-maxwell"><a class="footnote-ref" href="#fn-maxwell">1</a></sup> acoustics via Helmholtz's equations, quantum mechanics via Schrodinger's equation, and heat engineering via the heat equation) have physics equations of the form (once discretized)
+$$
+(A + \mathrm{diag}(\theta))z = b,
+$$
+where $\theta \in \mathbb{R}^n$ are the design parameters (<em>e.g.</em> permittivity in the case of photonics, or speed of sound in the material in the case of acoustics) and $z \in \mathbb{R}^n$ is the field (<em>e.g.</em> the electric field in photonics, or the amplitude of the wave in acoustics).</p>
+<p>More specifically, if you take a peek at Helmholtz's equation:
+$$
+\nabla^2 a(x) + \left(\frac{\omega^2}{c(x)^2}\right)a(x) = u(x),
+$$
+where $c: \mathbb{R}^3 \to \mathbb{R}_{&gt; 0}$ is a function specifying the speed of sound at every point in the material, while $a: \mathbb{R}^3 \to \mathbb{R}$ is a function specifying the amplitude at each point, $u: \mathbb{R}^3 \to \mathbb{R}$ is a function specifying an excitation, and $\omega \in \mathbb{R}_{\ge 0}$ is the frequency of the wave. We can make some simple correspondences:
+$$
+\Bigg(\underbrace{\nabla^2}_{A} + \underbrace{\bigg(\frac{\omega^2}{c(x)^2}\bigg)}_{\mathrm{diag}(\theta)}\Bigg)\underbrace{a(x)}_{z} = \underbrace{u(x)}_{b}.
+$$</p>
+<p>Now, we usually want the field ($z$) to look similar to a desired field (which we will call $\hat z$), while satisfying the physics equation described above. We can phrase this in several ways, but a <a href="/ls-images.html">particularly natural one</a> is by attempting to minimize the objective $\left|z - \hat z\right|_2^2$.</p>
+<p>Finally, we are only able to choose materials within a specific range: that is, $\theta^\mathrm{min} \le \theta \le \theta^\mathrm{max}$.</p>
+<p>Putting all of this together, we can write the optimization problem as
+$$
+\begin{array}{ll}
+\text{minimize} &amp; \frac12\left|z - \hat z\right|_2^2\\
+\text{subject to} &amp; (A + \mathrm{diag}(\theta))z = b\\
+&amp; \theta^\mathrm{min} \le \theta \le \theta^\mathrm{max}.
+\end{array}
+$$
+which is exactly problem (1) in the paper, in the special case where $W = I$, the identity matrix.</p>
+<h3>Deriving the dual</h3>
+<p>Here is essentially the only 'magic' part of the paper. First, we can write the Lagrangian of the problem as,
+$$
+\mathcal{L}(z, \theta, \nu) = \frac12\left|z - \hat z\right|_2^2 + \nu^T((A + \mathrm{diag}(\theta))z - b).
+$$
+Now, there is something weird here: notice that I sneakily dropped the term containing the lower and upper limits for $\theta$—this idea is, in fact, what saves the entire approach. What we will first do is the usual thing: we'll minimize the Lagrangian over all possible $z$, which we can easily do since the Lagrangian is a convex quadratic over $z$. In particular, taking the gradient over $z$ and setting it to zero (which is necessary and sufficient by convexity and differentiability) gives us that the optimal $z$ is
+$$
+z = \hat z - (A + \mathrm{diag(\theta)})^T\nu,
+$$
+which means that
+$$
+\inf_z \mathcal{L}(z, \theta, \nu) = - \frac12\left|\hat z - (A + \mathrm{diag(\theta)})^T\nu\right|_2^2 - \nu^Tb + \frac12|\hat z|_2^2.
+$$
+The next step is then finding the infimum of $\mathcal{L}$ over $\theta$. That is, finding
+$$
+\inf_\theta \left(\inf_z \mathcal{L}(z, \theta, \nu)\right).
+$$
+Now, of course, minimization over all $\theta$ is a lower bound (but not a very good one), since, unless $\nu = 0$, we can send the whole thing to negative infinity. (Why?)</p>
+<p>What we can do instead is minimize over $\theta$, constrained to its feasible range, $\theta^\mathrm{min} \le \theta \le \theta^\mathrm{max}$. I'll leave it as an exercise for the reader as to why this is still a lower bound, but you should ponder this very carefully, because it is the main point of the paper. Take a peek at the proof above for why the Lagrangian is a lower bound in the first place. Of course, a second hint can be found in the paper which gives a somewhat-natural construction (sometimes called the "partial Lagrangian"), but I highly recommend sitting down with a bit of wine (or something stronger) and thinking about it!<sup id="fnref-wine"><a class="footnote-ref" href="#fn-wine">2</a></sup></p>
+<p>If you've convinced yourself of this (or haven't yet, but want to continue), we now have the following minimization problem:
+$$
+\begin{aligned}
+g(\nu) &amp;= \inf_{\theta^\mathrm{min} \le \theta \le \theta^\mathrm{max}} \left(\inf_z \mathcal{L}(z, \theta, \nu)\right)\\
+&amp;= \inf_{\theta^\mathrm{min} \le \theta \le \theta^\mathrm{max}} \left(- \frac12\left|\hat z - (A + \mathrm{diag(\theta)})^T\nu\right|_2^2 - \nu^Tb + \frac12|\hat z|_2^2\right)
+\end{aligned}
+$$
+The trick is to notice two things. One, that the objective is concave in $\theta$ and, two, that the objective is <em>separable</em> over each component of $\theta$. </p>
+<p>First off, let's say a function $v: \mathbb{R} \to \mathbb{R}$ is concave over the interval $[L, U]$, then it achieves its minimum value at the boundaries of the interval. Why? Well, the definition of concavity says, for every $0 \le \gamma \le 1$,
+$$
+f(\gamma L + (1- \gamma)U) \ge \gamma f(L) + (1-\gamma)f(U) \ge \min\{f(L), f(U)\}.
+$$
+but any point in the interval $[L, U]$ is a convex combination of $L$ or $U$! So every point inside of the interval is at least as large as the smallest endpoint of the interval, which completes the proof.</p>
+<p>This solves our problem: since the objective is separable, then we only need to consider each component of $\theta$, and, because it's concave, then we know that an optimal $\theta_i$ is one of either $\theta^\mathrm{min}_i$ or $\theta^\mathrm{max}_i$. Replacing the complicated $\inf$ with this (much simpler) $\min$ gives the analytic solution for $g$:
+$$
+\begin{multline}
+g(\nu) = \sum_i \min\bigg\{-\frac12 (\hat z_i - a_i^T\nu + \theta_i^\mathrm{min} \nu_i)^2, - \frac12 (\hat z_i - a_i^T\nu + \theta_i^\mathrm{max} \nu_i)^2\bigg\} \\- \nu^Tb + \frac12|\hat z|_2^2,
+\end{multline}
+$$
+or, writing it in the same way as the paper, by pulling out the $-1/2$,
+$$
+g(\nu) = -\frac12 \sum_i \max\bigg\{ (\hat z_i - a_i^T\nu + \theta_i^\mathrm{min} \nu_i)^2, (\hat z_i - a_i^T\nu + \theta_i^\mathrm{max} \nu_i)^2\bigg\} - \nu^Tb + \frac12|\hat z|_2^2.
+$$</p>
+<h2>Results</h2>
+<p>The results are, of course, in the paper, but I'll give a quick summary.</p>
+<p>For a relatively complex design, we found that a simple, commonly used heuristic finds a design with an objective value lying around 9% above the lower bound, and, therefore has objective value at most 9% above the best possible design. (In general, though, we suspect that the true optimum lies closer to the designs that the heuristics give than the lower bound we come up with.) In other words, it is physically impossible to improve upon the heuristic design more than marginally.</p>
+<div class="footnote">
+<hr>
+<ol>
+<li id="fn-maxwell">
+<p>This is... almost accurate, but not quite. It turns out a small modification to the problem is needed for Maxwell's equations in two and three dimensions. For specifics, see the appendix in the paper.&#160;<a class="footnote-backref" href="#fnref-maxwell" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn-wine">
+<p>Honestly, I <em>only</em> recommend reading this blog with wine (or whatever you have at hand). Not sure it's bearable, otherwise.&#160;<a class="footnote-backref" href="#fnref-wine" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
         <hr>
         <div class="socials">
             <li>Got any questions?</li>
