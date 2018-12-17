@@ -2,7 +2,7 @@ title: Physics, optimization, and impossibility
 slug: physics-impossibility-results
 category: physics
 tags: statistics, math, physics
-date: 2018-12-15
+date: 2018-12-17
 
 *Note:* this post is based on the results of [this arXiv paper](https://arxiv.org/abs/1811.12936) which I've been working on with Stephen Boyd and Jelena Vuckovic.
 
