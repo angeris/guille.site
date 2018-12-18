@@ -1,7 +1,7 @@
 title: Physics, optimization, and impossibility
 slug: physics-impossibility-results
 category: physics
-tags: statistics, math, physics
+tags: optimization, math, physics, research
 date: 2018-12-17
 
 *Note:* this post is based on the results of [this arXiv paper](https://arxiv.org/abs/1811.12936) which I've been working on with Stephen Boyd and Jelena Vuckovic.
@@ -10,13 +10,13 @@ The main result of the above paper is kind of weird: essentially, it turns out t
 
 To illustrate: imagine you want to generate an engine which is as efficient as possible, then we know the best you could possibly hope to do is given by the [second law of thermodynamics](https://en.wikipedia.org/wiki/Second_law_of_thermodynamics). Now, what if (and bear with me here) we want something a little weirder? Say, what if we want a heat sink that has a particular dissipation pattern? Or what if you want a photonic crystal that traps light of a given wavelength in some region? Or a horn which has specific resonances?
 
-We can write down the optimization problems corresponding to each of these circumstances: in general, these problems are very hard to solve in ways that aren't just "try all possible designs and pick the best one." (And there are a *lot* of possible designs.) By using some simple heuristics—gradient descent, for example—we appear to do quite well relative to what almost anyone can do by hand. This approach brings up a few questions with no obvious answers.
+We can write down the optimization problems corresponding to each of these circumstances: in general, these problems are very hard to solve in ways that aren't just "try all possible designs and pick the best one." (And there are a *lot* of possible designs.) On the other hand, by using some simple heuristics—gradient descent, for example—we appear to give much better devices than what almost anyone can do by hand. This approach, while it appears to work well in practice, brings up a few questions with no obvious answers.
 
-1. Maybe there is some design that is really complicated that these heuristics almost always miss.
-2. It is possible that the objective we are requesting is physically impossible to achieve.
+1. Maybe there is some design that is really complicated that these heuristics almost always miss, but that is much better than the current ones.
+2. It is possible that the objective we are requesting is physically impossible to achieve and we will never find a good design.
 3. Many heuristics depend heavily on the initial design we provide. Physical intuition sometimes appears to provide good initializations, but often the final design is unintuitive, so perhaps there are better approaches.
 
-The paper provides (some) answers to these questions. In particular, it answers point (2) as its main goal, which gives a partial answer to (1) (namely that the heuristics we use appear to be often close to the global optimum, at least for the problems we tested), and an answer to (3), since the impossibility result suggests an initial design as a byproduct of computing the certificate of impossibility.
+The paper provides (some) answers to these questions. In particular, it answers point (2) as its main goal, which gives a partial answer to (1) (namely that the heuristics we use appear to give designs that are often close to the best possible design, at least for the problems we tested), and an answer to (3), since the impossibility result suggests an initial design as a byproduct of computing the certificate of impossibility.
 
 I'll explain the interesting parts of this paper in more detail below, since the paper (for the sake of brevity) simply references the reader to derivations of the results (and leaves some as exercises).
 
@@ -30,7 +30,7 @@ $$
 \text{subject to} & h(x) \le 0,
 \end{array}
 $$
-(this encompasses essentially every optimization problem ever) with objective function $f: \mathbb{R}^n \to \mathbb{R}$ and constraint function $h: \mathbb{R}^n \to \mathbb{R}^m$, and the inequality is taken elementwise. Call the optimal value of the objective of the optimization problem $p^\star$, which we will see again soon.
+(this encompasses essentially every optimization problem ever) with objective function $f: \mathbb{R}^n \to \mathbb{R}$ and constraint function $h: \mathbb{R}^n \to \mathbb{R}^m$, where the inequality is taken elementwise. Call the optimal value of the objective of the optimization problem $p^\star$, which we will see again soon.
 
 Continuing, we can then formulate the *Lagrangian* of the problem,
 $$
