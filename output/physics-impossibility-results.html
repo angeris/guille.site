@@ -50,7 +50,7 @@ $$
 \text{subject to} &amp; h(x) \le 0,
 \end{array}
 $$
-(this encompasses essentially every optimization problem ever) with objective function $f: \mathbb{R}^n \to \mathbb{R}$ and constraint function $h: \mathbb{R}^n \to \mathbb{R}^m$, and the inequality is taken elementwise. Call the optimal value of the objective of the optimization problem $p^\star$, which we will see again soon.</p>
+(this encompasses essentially every optimization problem ever) with objective function $f: \mathbb{R}^n \to \mathbb{R}$ and constraint function $h: \mathbb{R}^n \to \mathbb{R}^m$, where the inequality is taken elementwise. Call the optimal value of the objective of the optimization problem $p^\star$, which we will see again soon.</p>
 <p>Continuing, we can then formulate the <em>Lagrangian</em> of the problem,
 $$
 \mathcal{L}(x, \lambda) = f(x) + \lambda^Th(x),
@@ -96,8 +96,8 @@ What is interesting is that this optimization problem is always convex—<em>e.g
 $$
 (A + \mathrm{diag}(\theta))z = b,
 $$
-where $\theta \in \mathbb{R}^n$ are the design parameters (<em>e.g.</em> permittivity in the case of photonics, or speed of sound in the material in the case of acoustics) and $z \in \mathbb{R}^n$ is the field (<em>e.g.</em> the electric field in photonics, or the amplitude of the wave in acoustics).</p>
-<p>More specifically, if you take a peek at Helmholtz's equation:
+where $\theta \in \mathbb{R}^n$ are the design parameters (<em>e.g.</em> permittivity in the case of photonics, or speed of sound in the material in the case of acoustics) and $z \in \mathbb{R}^n$ is the field (<em>e.g.</em> the electric field in photonics, or the amplitude of the wave in acoustics). $A \in \mathbb{R}^{n\times n}$ is a matrix encoding the physics (the curl of the curl in Maxwell's equations, or a discretized Laplacian in Helmholtz's) and $b \in \mathbb{R}^n$ is an excitation of the field.</p>
+<p>More specifically, take a peek at Helmholtz's equation:
 $$
 \nabla^2 a(x) + \left(\frac{\omega^2}{c(x)^2}\right)a(x) = u(x),
 $$
@@ -134,7 +134,7 @@ $$
 \inf_\theta \left(\inf_z \mathcal{L}(z, \theta, \nu)\right).
 $$
 Now, of course, minimization over all $\theta$ is a lower bound (but not a very good one), since, unless $\nu = 0$, we can send the whole thing to negative infinity. (Why?)</p>
-<p>What we can do instead is minimize over $\theta$, constrained to its feasible range, $\theta^\mathrm{min} \le \theta \le \theta^\mathrm{max}$. I'll leave it as an exercise for the reader as to why this is still a lower bound, but you should ponder this very carefully, because it is the main point of the paper. Take a peek at the proof above for why the Lagrangian is a lower bound in the first place. Of course, a second hint can be found in the paper which gives a somewhat-natural construction (sometimes called the "partial Lagrangian"), but I highly recommend sitting down with a bit of wine (or something stronger) and thinking about it!<sup id="fnref-wine"><a class="footnote-ref" href="#fn-wine">2</a></sup></p>
+<p>What we can do instead is minimize over $\theta$, constrained to its feasible range, $\theta^\mathrm{min} \le \theta \le \theta^\mathrm{max}$. I'll leave it as an exercise for the reader as to why this is still a lower bound, but you should ponder this very carefully, because it is the main point of the paper. As an initial hint, take a second look at the proof above for why the Lagrangian is a lower bound in the first place. Of course, a second hint can be found in the paper which gives a somewhat-natural construction (sometimes called the "partial Lagrangian"), but I highly recommend sitting down with a bit of wine (or something stronger) and thinking about it!<sup id="fnref-wine"><a class="footnote-ref" href="#fn-wine">2</a></sup></p>
 <p>If you've convinced yourself of this (or haven't yet, but want to continue), we now have the following minimization problem:
 $$
 \begin{aligned}
@@ -158,10 +158,10 @@ or, writing it in the same way as the paper, by pulling out the $-1/2$ (and usin
 $$
 g(\nu) = -\frac12 \sum_i \max\bigg\{ (\hat z_i - a_i^T\nu + \nu_i)^2, (\hat z_i - a_i^T\nu + \theta_i^\mathrm{max} \nu_i)^2\bigg\} - \nu^Tb + \frac12\|\hat z\|_2^2.
 $$
-Now that we have an analytic form for $g$ (our set of lower bounds), we can now maximize the function to get the best lower bound. As discussed before, this is a convex optimization problem which can be formulated by <a href="https://www.cvxpy.org">CVXPY</a> and solved using one of the many available solvers for <a href="https://osqp.org">convex quadratically-constrained quadratic programs</a> (QCQPs) or <a href="https://www.embotech.com/ECOS">second-order conic programs</a> (SOCPs).</p>
+Now that we have an analytic form for $g$ (our set of lower bounds), we can maximize the function to get the best lower bound. As discussed before, this is a convex optimization problem which can be formulated by <a href="https://www.cvxpy.org">CVXPY</a> and solved using one of the many available solvers for <a href="https://osqp.org">convex quadratically-constrained quadratic programs</a> (QCQPs) or <a href="https://www.embotech.com/ECOS">second-order conic programs</a> (SOCPs).</p>
 <h2>Results</h2>
 <p>I'll give a quick summary of the results of the paper, but this is the section I would recommend checking out. (There's pretty pictures!)</p>
-<p>For a relatively complex design, we found that a simple, commonly used heuristic finds a design with an objective value lying around 9% above the lower bound, and, therefore has objective value at most 9% above the <em>best possible</em> design. (In general, though, we suspect that the true optimum lies closer to the designs that the heuristics give than the lower bound we come up with.) In other words, it is physically impossible to more than marginally improve upon this design.</p>
+<p>For a relatively complex design, we found that a simple, commonly used heuristic finds a design with an objective value lying around 9% above the lower bound, and, therefore has objective value at most 9% above the <em>best possible</em> design. (In general, though, we suspect that the true optimum lies closer to the designs that the heuristics give than the lower bound we come up with.) In other words, it is physically impossible to more-than-marginally improve upon this design.</p>
 <p>Additionally (I might discuss how this is done in a later post), we receive an initial design that is qualitatively quite similar to the final, locally-optimized design. See the image below.</p>
 <p><img src="/images/physics-impossibility-results/primal-dual-comparison.png" class="insert" style="width: 100%">
 <em>Comparison between the design suggested by the lower bound and the locally-optimized design.</em></p>

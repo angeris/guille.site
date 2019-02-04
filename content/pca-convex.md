@@ -4,7 +4,7 @@ category: convex-optimization
 tags: math, pca, non-convex, convex
 date: 2018-05-16
 
-It's been a while since I last posted (my posting has been less once every two weeks and more like one every two months), but here's a post I've been sitting on for a while that I never got around to finishing. As per [rachelbythebay's advice](https://rachelbythebay.com/w/2018/03/13/write/), I decided to just finish it and post it up. It's likely to be a little rough, but feel free to [tweet](https://twitter.com/GuilleAngeris) any questions or things that you'd like more fleshed out (as usual!).
+It's been a while since I last posted (my posting has been less once every two weeks and more like once every two months), but here's a post I've been sitting on for a while that I never got around to finishing. As per [rachelbythebay's advice](https://rachelbythebay.com/w/2018/03/13/write/), I decided to just finish it and post it up. It's likely to be a little rough, but feel free to [tweet](https://twitter.com/GuilleAngeris) any questions or things that you'd like more fleshed out (as usual!).
 
 ## Quick introduction to PCA
 
@@ -29,7 +29,7 @@ $$
 X^\* = U^\*\Sigma^\* (V^\*)^T
 $$
 
-with orthogonal $U^\* \in \mathbb{R}^{m\times k}, V^*\in \mathbb{R}^{n\times k}$ and diagonal $\Sigma^\* \in \mathbb{R}^{k\times k}$. Then the columns of $V^\*$ represent the $k$ most important features of $A$ (assuming that each row of $A$ ia a point of the dataset). This may seem slightly redundant if you already know the punchline, but we'll get there in a second. 
+with orthogonal $U^\* \in \mathbb{R}^{m\times k}, V^*\in \mathbb{R}^{n\times k}$ and diagonal $\Sigma^\* \in \mathbb{R}^{k\times k}$. Then the columns of $V^\*$ represent the $k$ most important features of $A$ (assuming that each row of $A$ is a point of the dataset). This may seem slightly redundant if you already know the punchline, but we'll get there in a second. 
 
 For now, define the SVD of $A$ in a similar way to the above
 
@@ -85,7 +85,7 @@ in other words, this is a program over projection matrices $P$. This can then be
 
 $$
 \begin{aligned}
-& \underset{P}{\text{minimize}}
+& \underset{P}{\text{maximize}}
 & & \text{tr}(FP)  \\\\
 & \text{subject to}
 & & \text{rank}(P) = k,\\\\
@@ -98,7 +98,7 @@ for some matrix $F$, and it can be relaxed into the following SDP, let's call it
 
 $$
 \begin{aligned}
-& \underset{P}{\text{minimize}}
+& \underset{P}{\text{maximize}}
 & & \text{tr}(FP)  \\\\
 & \text{subject to}
 & & \text{tr}(P) = k,\\\\
@@ -115,7 +115,7 @@ The two interesting points of the whole proof are (a) to realize that any soluti
 
 $$
 \begin{aligned}
-& \underset{x}{\text{minimize}}
+& \underset{x}{\text{maximize}}
 & & c^Tx  \\\\
 & \text{subject to}
 & & 1^Tx = k,\\\\

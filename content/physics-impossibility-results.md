@@ -81,9 +81,9 @@ Many of the problems we're interested in (including design in photonics via Maxw
 $$
 (A + \mathrm{diag}(\theta))z = b,
 $$
-where $\theta \in \mathbb{R}^n$ are the design parameters (*e.g.* permittivity in the case of photonics, or speed of sound in the material in the case of acoustics) and $z \in \mathbb{R}^n$ is the field (*e.g.* the electric field in photonics, or the amplitude of the wave in acoustics).
+where $\theta \in \mathbb{R}^n$ are the design parameters (*e.g.* permittivity in the case of photonics, or speed of sound in the material in the case of acoustics) and $z \in \mathbb{R}^n$ is the field (*e.g.* the electric field in photonics, or the amplitude of the wave in acoustics). $A \in \mathbb{R}^{n\times n}$ is a matrix encoding the physics (the curl of the curl in Maxwell's equations, or a discretized Laplacian in Helmholtz's) and $b \in \mathbb{R}^n$ is an excitation of the field.
 
-More specifically, if you take a peek at Helmholtz's equation:
+More specifically, take a peek at Helmholtz's equation:
 $$
 \nabla^2 a(x) + \left(\frac{\omega^2}{c(x)^2}\right)a(x) = u(x),
 $$
@@ -125,7 +125,7 @@ $$
 $$
 Now, of course, minimization over all $\theta$ is a lower bound (but not a very good one), since, unless $\nu = 0$, we can send the whole thing to negative infinity. (Why?)
 
-What we can do instead is minimize over $\theta$, constrained to its feasible range, $\theta^\mathrm{min} \le \theta \le \theta^\mathrm{max}$. I'll leave it as an exercise for the reader as to why this is still a lower bound, but you should ponder this very carefully, because it is the main point of the paper. Take a peek at the proof above for why the Lagrangian is a lower bound in the first place. Of course, a second hint can be found in the paper which gives a somewhat-natural construction (sometimes called the "partial Lagrangian"), but I highly recommend sitting down with a bit of wine (or something stronger) and thinking about it![^wine]
+What we can do instead is minimize over $\theta$, constrained to its feasible range, $\theta^\mathrm{min} \le \theta \le \theta^\mathrm{max}$. I'll leave it as an exercise for the reader as to why this is still a lower bound, but you should ponder this very carefully, because it is the main point of the paper. As an initial hint, take a second look at the proof above for why the Lagrangian is a lower bound in the first place. Of course, a second hint can be found in the paper which gives a somewhat-natural construction (sometimes called the "partial Lagrangian"), but I highly recommend sitting down with a bit of wine (or something stronger) and thinking about it![^wine]
 
 If you've convinced yourself of this (or haven't yet, but want to continue), we now have the following minimization problem:
 $$
@@ -138,7 +138,7 @@ The trick is to notice two things. One, that the objective is concave in $\theta
 
 First off, let's say a function $v: \mathbb{R} \to \mathbb{R}$ is concave over the interval $[L, U]$, then it achieves its minimum value at the boundaries of the interval. Why? Well, the definition of concavity says, for every $0 \le \gamma \le 1$,
 $$
-f(\gamma L + (1- \gamma)U) \ge \gamma f(L) + (1-\gamma)f(U) \ge \min\\{f(L), f(U)\\}.
+v(\gamma L + (1- \gamma)U) \ge \gamma v(L) + (1-\gamma)v(U) \ge \min\\{v(L), v(U)\\}.
 $$
 but any point in the interval $[L, U]$ is a convex combination of $L$ or $U$! So every point inside of the interval is at least as large as the smallest endpoint of the interval, which completes the proof.
 
@@ -152,12 +152,12 @@ or, writing it in the same way as the paper, by pulling out the $-1/2$ (and usin
 $$
 g(\nu) = -\frac12 \sum_i \max\bigg\\{ (\hat z\_i - a\_i^T\nu + \nu_i)^2, (\hat z\_i - a\_i^T\nu + \theta\_i^\mathrm{max} \nu_i)^2\bigg\\} - \nu^Tb + \frac12\\|\hat z\\|\_2^2.
 $$
-Now that we have an analytic form for $g$ (our set of lower bounds), we can now maximize the function to get the best lower bound. As discussed before, this is a convex optimization problem which can be formulated by [CVXPY](https://www.cvxpy.org) and solved using one of the many available solvers for [convex quadratically-constrained quadratic programs](https://osqp.org) (QCQPs) or [second-order conic programs](https://www.embotech.com/ECOS) (SOCPs).
+Now that we have an analytic form for $g$ (our set of lower bounds), we can maximize the function to get the best lower bound. As discussed before, this is a convex optimization problem which can be formulated by [CVXPY](https://www.cvxpy.org) and solved using one of the many available solvers for [convex quadratically-constrained quadratic programs](https://osqp.org) (QCQPs) or [second-order conic programs](https://www.embotech.com/ECOS) (SOCPs).
 
 ## Results
 I'll give a quick summary of the results of the paper, but this is the section I would recommend checking out. (There's pretty pictures!)
 
-For a relatively complex design, we found that a simple, commonly used heuristic finds a design with an objective value lying around 9% above the lower bound, and, therefore has objective value at most 9% above the *best possible* design. (In general, though, we suspect that the true optimum lies closer to the designs that the heuristics give than the lower bound we come up with.) In other words, it is physically impossible to more than marginally improve upon this design.
+For a relatively complex design, we found that a simple, commonly used heuristic finds a design with an objective value lying around 9% above the lower bound, and, therefore has objective value at most 9% above the *best possible* design. (In general, though, we suspect that the true optimum lies closer to the designs that the heuristics give than the lower bound we come up with.) In other words, it is physically impossible to more-than-marginally improve upon this design.
 
 Additionally (I might discuss how this is done in a later post), we receive an initial design that is qualitatively quite similar to the final, locally-optimized design. See the image below.
 

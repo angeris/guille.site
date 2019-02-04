@@ -30,7 +30,7 @@
         <h1>PCA as a convex optimization problem</h1>
         <p>Category: <a href="/category/convex-optimization.html">convex-optimization</a></p>
         <p><label>Posted <strong>May 16, 2018</strong></label></p>
-        <p>It's been a while since I last posted (my posting has been less once every two weeks and more like one every two months), but here's a post I've been sitting on for a while that I never got around to finishing. As per <a href="https://rachelbythebay.com/w/2018/03/13/write/">rachelbythebay's advice</a>, I decided to just finish it and post it up. It's likely to be a little rough, but feel free to <a href="https://twitter.com/GuilleAngeris">tweet</a> any questions or things that you'd like more fleshed out (as usual!).</p>
+        <p>It's been a while since I last posted (my posting has been less once every two weeks and more like once every two months), but here's a post I've been sitting on for a while that I never got around to finishing. As per <a href="https://rachelbythebay.com/w/2018/03/13/write/">rachelbythebay's advice</a>, I decided to just finish it and post it up. It's likely to be a little rough, but feel free to <a href="https://twitter.com/GuilleAngeris">tweet</a> any questions or things that you'd like more fleshed out (as usual!).</p>
 <h2>Quick introduction to PCA</h2>
 <p>Most people know <a href="https://en.wikipedia.org/wiki/Principal_component_analysis">Principal Component Analysis</a> (PCA) as a fast, and easily-scalable dimensionality-reduction technique used quite frequently in machine learning and data exploration—in fact, it's often mentioned that one-layer, linear neural network<sup id="fnref-loss-type"><a class="footnote-ref" href="#fn-loss-type">1</a></sup> applied on some data-set recovers the result from PCA.</p>
 <p>It's (also) often mentioned that PCA is one of the <a href="https://groups.google.com/forum/#!topic/10725-f12/P9e8BsqaAok">few non-convex problems that we can solve efficiently</a>, though a (let's say 'non-constructive') answer showing this problem is convex is given in <a href="https://stats.stackexchange.com/questions/301532/is-pca-optimization-convex">this Stats.SE thread</a>, which requires knowing the eigenvectors of $X^TX$, a priori. It turns out it's possible to create a fairly natural semi-definite program which actually constructs the solution in its entirety.</p>
@@ -47,7 +47,7 @@ $$</p>
 <p>$$
 X^* = U^*\Sigma^* (V^*)^T
 $$</p>
-<p>with orthogonal $U^* \in \mathbb{R}^{m\times k}, V^*\in \mathbb{R}^{n\times k}$ and diagonal $\Sigma^* \in \mathbb{R}^{k\times k}$. Then the columns of $V^*$ represent the $k$ most important features of $A$ (assuming that each row of $A$ ia a point of the dataset). This may seem slightly redundant if you already know the punchline, but we'll get there in a second. </p>
+<p>with orthogonal $U^* \in \mathbb{R}^{m\times k}, V^*\in \mathbb{R}^{n\times k}$ and diagonal $\Sigma^* \in \mathbb{R}^{k\times k}$. Then the columns of $V^*$ represent the $k$ most important features of $A$ (assuming that each row of $A$ is a point of the dataset). This may seem slightly redundant if you already know the punchline, but we'll get there in a second. </p>
 <p>For now, define the SVD of $A$ in a similar way to the above</p>
 <p>$$
 A = U\Sigma V^T.
@@ -86,7 +86,7 @@ $$</p>
 <p>in other words, this is a program over projection matrices $P$. This can then be put into the form</p>
 <p>$$
 \begin{aligned}
-&amp; \underset{P}{\text{minimize}}
+&amp; \underset{P}{\text{maximize}}
 &amp; &amp; \text{tr}(FP)  \\
 &amp; \text{subject to}
 &amp; &amp; \text{rank}(P) = k,\\
@@ -97,7 +97,7 @@ $$</p>
 <p>for some matrix $F$, and it can be relaxed into the following SDP, let's call it <em>problem Z</em>,</p>
 <p>$$
 \begin{aligned}
-&amp; \underset{P}{\text{minimize}}
+&amp; \underset{P}{\text{maximize}}
 &amp; &amp; \text{tr}(FP)  \\
 &amp; \text{subject to}
 &amp; &amp; \text{tr}(P) = k,\\
@@ -110,7 +110,7 @@ $$</p>
 <p>The two interesting points of the whole proof are (a) to realize that any solution of the original problem (program Y) can be written as a solution $X = AP'$ for some projection matrix $P'$ (which, of course, will turn out to be the projection matrix $P$ which solves program Z, namely $P' = V_kV_k^T$), and (b) to note that we can prove that program Z has zero integrality gap since, if we have a solution to the SDP given by $P^* = UDU^T$, then we can 'fix' non-integral eigenvalues via solving the problem</p>
 <p>$$
 \begin{aligned}
-&amp; \underset{x}{\text{minimize}}
+&amp; \underset{x}{\text{maximize}}
 &amp; &amp; c^Tx  \\
 &amp; \text{subject to}
 &amp; &amp; 1^Tx = k,\\
