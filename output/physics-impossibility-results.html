@@ -4,7 +4,6 @@
     <title>Physics, optimization, and impossibility</title>
     
     <link rel="stylesheet" href="/theme/css/main.css">
-    <link href="https://fonts.googleapis.com/css?family=Raleway:100,300,500" rel="stylesheet">
 
     <script type="text/x-mathjax-config">
         MathJax.Hub.Config({
@@ -145,7 +144,7 @@ $$
 The trick is to notice two things. One, that the objective is concave in $\theta$ and, two, that the objective is <em>separable</em> over each component of $\theta$. </p>
 <p>First off, let's say a function $v: \mathbb{R} \to \mathbb{R}$ is concave over the interval $[L, U]$, then it achieves its minimum value at the boundaries of the interval. Why? Well, the definition of concavity says, for every $0 \le \gamma \le 1$,
 $$
-f(\gamma L + (1- \gamma)U) \ge \gamma f(L) + (1-\gamma)f(U) \ge \min\{f(L), f(U)\}.
+v(\gamma L + (1- \gamma)U) \ge \gamma v(L) + (1-\gamma)v(U) \ge \min\{v(L), v(U)\}.
 $$
 but any point in the interval $[L, U]$ is a convex combination of $L$ or $U$! So every point inside of the interval is at least as large as the smallest endpoint of the interval, which completes the proof.</p>
 <p>This solves our problem: since the objective is separable, then we only need to consider each component of $\theta$, and, because it's concave, then we know that an optimal $\theta_i$ is one of either $\theta^\mathrm{min}_i$ or $\theta^\mathrm{max}_i$. Replacing the complicated $\inf$ with this (much simpler) $\min$ gives the analytic solution for $g$:
@@ -160,7 +159,7 @@ g(\nu) = -\frac12 \sum_i \max\bigg\{ (\hat z_i - a_i^T\nu + \nu_i)^2, (\hat z_i 
 $$
 Now that we have an analytic form for $g$ (our set of lower bounds), we can maximize the function to get the best lower bound. As discussed before, this is a convex optimization problem which can be formulated by <a href="https://www.cvxpy.org">CVXPY</a> and solved using one of the many available solvers for <a href="https://osqp.org">convex quadratically-constrained quadratic programs</a> (QCQPs) or <a href="https://www.embotech.com/ECOS">second-order conic programs</a> (SOCPs).</p>
 <h2>Results</h2>
-<p>I'll give a quick summary of the results of the paper, but this is the section I would recommend checking out. (There's pretty pictures!)</p>
+<p>I'll give a quick summary of the results of the paper, but this is the section I would recommend checking out in the paper itself. (There are pretty pictures!)</p>
 <p>For a relatively complex design, we found that a simple, commonly used heuristic finds a design with an objective value lying around 9% above the lower bound, and, therefore has objective value at most 9% above the <em>best possible</em> design. (In general, though, we suspect that the true optimum lies closer to the designs that the heuristics give than the lower bound we come up with.) In other words, it is physically impossible to more-than-marginally improve upon this design.</p>
 <p>Additionally (I might discuss how this is done in a later post), we receive an initial design that is qualitatively quite similar to the final, locally-optimized design. See the image below.</p>
 <p><img src="/images/physics-impossibility-results/primal-dual-comparison.png" class="insert" style="width: 100%">

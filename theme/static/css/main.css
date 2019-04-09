@@ -12,8 +12,8 @@ h1 {
 }
 h1, h2, h3 {
     line-height: 1;
-    font-family: 'Raleway', sans-serif;
-    font-weight: 300;
+    font-family: 'Helvetica', sans-serif;
+    font-weight: 100;
 }
 a {
     color: #628D9B;
@@ -79,12 +79,12 @@ table td {
     margin-left: 0px;
     padding-left: 10px;
     padding-right: 10px;
-    font-family: 'Raleway', sans-serif;
+    font-family: 'Helvetica', sans-serif;
     font-weight: 500;
     font-size: 16px;
 }
 .webtitle {
-    font-family: 'Raleway', sans-serif;
+    font-family: 'Helvetica', sans-serif;
     color: #888;
     font-weight: 100;
     line-height: 1;
@@ -127,6 +127,6 @@ span.lightemph {
 p.tagline {
     text-align: center;
     color: #666;
-    font-family: 'Raleway', sans-serif;
+    font-family: 'Helvetica', sans-serif;
     font-weight: 300;
 }

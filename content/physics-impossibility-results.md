@@ -155,7 +155,7 @@ $$
 Now that we have an analytic form for $g$ (our set of lower bounds), we can maximize the function to get the best lower bound. As discussed before, this is a convex optimization problem which can be formulated by [CVXPY](https://www.cvxpy.org) and solved using one of the many available solvers for [convex quadratically-constrained quadratic programs](https://osqp.org) (QCQPs) or [second-order conic programs](https://www.embotech.com/ECOS) (SOCPs).
 
 ## Results
-I'll give a quick summary of the results of the paper, but this is the section I would recommend checking out. (There's pretty pictures!)
+I'll give a quick summary of the results of the paper, but this is the section I would recommend checking out in the paper itself. (There are pretty pictures!)
 
 For a relatively complex design, we found that a simple, commonly used heuristic finds a design with an objective value lying around 9% above the lower bound, and, therefore has objective value at most 9% above the *best possible* design. (In general, though, we suspect that the true optimum lies closer to the designs that the heuristics give than the lower bound we come up with.) In other words, it is physically impossible to more-than-marginally improve upon this design.
 
