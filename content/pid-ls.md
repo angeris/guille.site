@@ -20,7 +20,7 @@ Anyways, I'll likely make a separate (more introductory) post to least squares b
 $$
 \begin{aligned}
 & \underset{u}{\text{minimize}}
-& & \sum_j \lambda_j \lVert A_j u - b_j\lVert_2^2 \\\\
+& & \sum_j \lambda_j \lVert A_j u - b_j\lVert_2^2 \\
 & \text{subject to}
 & & Cu = d
 \end{aligned}
@@ -48,9 +48,9 @@ which allows the following correspondence between the original PID and the LS pr
 
 $$
 \begin{align}
-K &= K_p + K_i + K_d\\\\
-\lambda_p &= \frac{K_p}{K}\\\\
-\lambda_i &= \frac{K_i}{K}\\\\
+K &= K_p + K_i + K_d\\
+\lambda_p &= \frac{K_p}{K}\\
+\lambda_i &= \frac{K_i}{K}\\
 \lambda_d &= \frac{K_d}{K}.
 \end{align}
 $$

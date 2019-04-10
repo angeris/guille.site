@@ -5,7 +5,7 @@
     
     <link rel="stylesheet" href="/theme/css/main.css">
 
-    <script type="text/x-mathjax-config">
+    <!-- <script type="text/x-mathjax-config">
         MathJax.Hub.Config({
             tex2jax: {
                 inlineMath: [ ['$','$'], ['\\(','\\)'] ]
@@ -15,7 +15,7 @@
     
     <script type="text/javascript" async
     src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
-    </script>
+    </script> -->
     
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">    	
@@ -30,41 +30,41 @@
         <p>Category: <a href="/category/least-squares.html">least-squares</a></p>
         <p><label>Posted <strong>September 13, 2017</strong></label></p>
         <p>I want to say this is a folk theorem (borrowing terminology from game theory) in that everyone who does optimal control theory knows about this stuff, probably,<sup id="fnref-people"><a class="footnote-ref" href="#fn-people">1</a></sup> but I haven't really seen it stated explicitly anywhere. If anyone does indeed work on optimal control, I'd love to know your thoughts! (even if you don't, I'd still like to know your thoughts on it!)</p>
-<p>For context, I'm currently leading a team on path planning for fixed-wing UAVs (I still don't really know who put me in charge of this stuff, or <em>why</em> for that matter---overall, it seems pretty terrifying for them, but kinda fun for me), and I wondered why I hadn't actually seen least squares in many papers on fixed-wing control. I still haven't gotten an answer to the question, to be honest, but I did waste some potentially productive time showing that PID $\subset$ LS. Some quick definitions: let $u(t)$ be our control input and allow $\varepsilon(t)$ to be the error of the function (that is, $\varepsilon(t) = x(t) - \hat x(t)$ where $x(t)$ is the desired position and $\hat x(t)$ is the current position), then a PID controller is defined as</p>
-<p>$$
+<p>For context, I'm currently leading a team on path planning for fixed-wing UAVs (I still don't really know who put me in charge of this stuff, or <em>why</em> for that matter---overall, it seems pretty terrifying for them, but kinda fun for me), and I wondered why I hadn't actually seen least squares in many papers on fixed-wing control. I still haven't gotten an answer to the question, to be honest, but I did waste some potentially productive time showing that PID <span class="math">\(\subset\)</span> LS. Some quick definitions: let <span class="math">\(u(t)\)</span> be our control input and allow <span class="math">\(\varepsilon(t)\)</span> to be the error of the function (that is, <span class="math">\(\varepsilon(t) = x(t) - \hat x(t)\)</span> where <span class="math">\(x(t)\)</span> is the desired position and <span class="math">\(\hat x(t)\)</span> is the current position), then a PID controller is defined as</p>
+<div class="math">$$
 u(t) = K_p \varepsilon(t) + K_i \int_0^t d\tau\,\varepsilon(\tau) + K_d\frac{\partial\varepsilon(t)}{\partial t}
-$$</p>
-<p>where each of the $K_{(\cdot)}$ variables are a gain or proportionality constant. Say $K_p$ is the proportional constant (i.e. how much of $u$ is proportional to the current error), $K_i$ is the integral proportionality constant (i.e. how much of $u$ is proportional to the integral of the error), and $K_d$ is the derivative constant (i.e. ditto). For a more thorough explanation for what each of these means intuitively, see the <a href="https://en.wikipedia.org/wiki/PID_controller">PID wikipedia page</a>.</p>
-<p>Anyways, I'll likely make a separate (more introductory) post to least squares but, for now, I define an LS problem to be an optimization problem of the form, for arbitrary but given $A, b, \lambda_j&gt;0, C, d$</p>
-<p>$$
+$$</div>
+<p>where each of the <span class="math">\(K_{(\cdot)}\)</span> variables are a gain or proportionality constant. Say <span class="math">\(K_p\)</span> is the proportional constant (i.e. how much of <span class="math">\(u\)</span> is proportional to the current error), <span class="math">\(K_i\)</span> is the integral proportionality constant (i.e. how much of <span class="math">\(u\)</span> is proportional to the integral of the error), and <span class="math">\(K_d\)</span> is the derivative constant (i.e. ditto). For a more thorough explanation for what each of these means intuitively, see the <a href="https://en.wikipedia.org/wiki/PID_controller">PID wikipedia page</a>.</p>
+<p>Anyways, I'll likely make a separate (more introductory) post to least squares but, for now, I define an LS problem to be an optimization problem of the form, for arbitrary but given <span class="math">\(A, b, \lambda_j&gt;0, C, d\)</span></p>
+<div class="math">$$
 \begin{aligned}
 &amp; \underset{u}{\text{minimize}}
 &amp; &amp; \sum_j \lambda_j \lVert A_j u - b_j\lVert_2^2 \\
 &amp; \text{subject to}
 &amp; &amp; Cu = d
 \end{aligned}
-$$</p>
-<p>where the $\lVert \cdot \lVert_2^2$ norm is the usual $\ell_2$-norm (i.e. $\lVert x \lVert_2^2 = \sum_i x_i^2$). It's notable that this problem has an analytical solution (not that you'd necessarily <em>want</em> the analytical solution for most big-enough scenarios) and is extremely well-behaved for most optimization methods.<sup id="fnref-politifact"><a class="footnote-ref" href="#fn-politifact">2</a></sup> Now, consider the following objective function with trivial equality constraints (e.g. $0=0$, for convenience, by setting $C = (0,0,…,0)^T,\, d = 0$) and $K$ being some proportionality constant (I'll make the connection to the original $K_{(\cdot)}$ variables above, soon):</p>
-<p>$$
+$$</div>
+<p>where the <span class="math">\(\lVert \cdot \lVert_2^2\)</span> norm is the usual <span class="math">\(\ell_2\)</span>-norm (i.e. <span class="math">\(\lVert x \lVert_2^2 = \sum_i x_i^2\)</span>). It's notable that this problem has an analytical solution (not that you'd necessarily <em>want</em> the analytical solution for most big-enough scenarios) and is extremely well-behaved for most optimization methods.<sup id="fnref-politifact"><a class="footnote-ref" href="#fn-politifact">2</a></sup> Now, consider the following objective function with trivial equality constraints (e.g. <span class="math">\(0=0\)</span>, for convenience, by setting <span class="math">\(C = (0,0,…,0)^T,\, d = 0\)</span>) and <span class="math">\(K\)</span> being some proportionality constant (I'll make the connection to the original <span class="math">\(K_{(\cdot)}\)</span> variables above, soon):</p>
+<div class="math">$$
 E(u, \varepsilon) = \lambda_p \left\lVert u - K\varepsilon (t)\right\lVert_2^2 + \lambda_i \left\lVert u - K\int d\tau\, \varepsilon(t)\right\lVert_2^2 + \lambda_d\left\lVert u - K \frac{\partial\varepsilon(t)}{\partial t}\right\lVert_2^2
-$$</p>
-<p>Minimizing this function by setting its gradient to zero (this is necessary and sufficient by differentiability, convexity, and coerciveness [that is, $E(u) \to \infty$, whenever $\lVert u\lVert \to \infty$]) gives the solution<sup id="fnref-generalization"><a class="footnote-ref" href="#fn-generalization">3</a></sup></p>
-<p>$$
-\nabla E(u, \varepsilon) = \lambda_p \left(u - K\varepsilon (t)\right) + \lambda_i \left( u - K\int d\tau\, \varepsilon(t)\right) + \lambda_d\left(u - K \frac{\partial\varepsilon(t)}{\partial t}\right) = 0,
-$$</p>
+$$</div>
+<p>Minimizing this function by setting its gradient to zero (this is necessary and sufficient by differentiability, convexity, and coerciveness [that is, <span class="math">\(E(u) \to \infty\)</span>, whenever <span class="math">\(\lVert u\lVert \to \infty\)</span>]) gives the solution<sup id="fnref-generalization"><a class="footnote-ref" href="#fn-generalization">3</a></sup></p>
+<div class="math">$$
+\nabla E(u, \varepsilon) = \lambda_p \left(u - K\varepsilon (t)\right\) + \lambda_i \left( u - K\int d\tau\, \varepsilon(t)\right) + \lambda_d\left(u - K \frac{\partial\varepsilon(t)}{\partial t}\right) = 0,
+$$</div>
 <p>or, after rearranging</p>
-<p>$$
+<div class="math">$$
 u = \frac{K}{\lambda_p + \lambda_i + \lambda_d}\left(\lambda_p \varepsilon(t) + \lambda_i\int d\tau\, \varepsilon(t) + \lambda_d \frac{\partial\varepsilon(t)}{\partial t}\right),
-$$</p>
+$$</div>
 <p>which allows the following correspondence between the original PID and the LS problem to be</p>
-<p>$$
+<div class="math">$$
 \begin{align}
 K &amp;= K_p + K_i + K_d\\
 \lambda_p &amp;= \frac{K_p}{K}\\
 \lambda_i &amp;= \frac{K_i}{K}\\
 \lambda_d &amp;= \frac{K_d}{K}.
 \end{align}
-$$</p>
+$$</div>
 <p>So, now we've given the condition we wanted and we're done!</p>
 <p>Anyways, you may ask, why is this useful? I guess it kind of extends the framework to add constraints from your control surface, or secondary objectives. To be completely honest, though? I have no idea.</p>
 <!-- [^gametheory]: See, for example, (https://en.wikipedia.org/wiki/Folk_theorem_(game_theory)). -->
@@ -79,10 +79,65 @@ $$</p>
 <p><strong>PolitiFact</strong>: <em>Mostly true.</em> I mean the usual cases (e.g. first-order methods, second-order methods, or conjugate gradient/quasi-newton methods). It's horribly behaved in conic program (SOCP) solvers.&#160;<a class="footnote-backref" href="#fnref-politifact" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
 <li id="fn-generalization">
-<p>There's an immediate generalization here: any control of the form $\sum_i \gamma_i\left(u - C_i\right), \gamma_i&gt;0$ can be immediately written as the minimizer to an energy function $E(u) = \sum_i \eta_i\lVert u - \xi C_i\lVert^2_2$. We can actually go further and note there's yet another generalization to any control of the form $\sum_i \left(S_iu - C_i\right)$, where each $S_i$ is symmetric and (strictly) positive definite. This is true as each $S_i$ has an inverse and a 'square root' matrix (e.g. let, $S$ be some positive-definite matrix. We know $SV =  V\Lambda$ for $V^TV = VV^T = I$ and diagonal $\Lambda &gt; 0$, thus $S^{1/2}=V\Lambda^{1/2}V^T$), such that the energy function is written in terms of these. Though it's somewhat enlightening (I guess), I leave the derivation as an exercise for the reader.&#160;<a class="footnote-backref" href="#fnref-generalization" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+<p>There's an immediate generalization here: any control of the form <span class="math">\(\sum_i \gamma_i\left(u - C_i\right), \gamma_i&gt;0\)</span> can be immediately written as the minimizer to an energy function <span class="math">\(E(u) = \sum_i \eta_i\lVert u - \xi C_i\lVert^2_2\)</span>. We can actually go further and note there's yet another generalization to any control of the form <span class="math">\(\sum_i \left(S_iu - C_i\right)\)</span>, where each <span class="math">\(S_i\)</span> is symmetric and (strictly) positive definite. This is true as each <span class="math">\(S_i\)</span> has an inverse and a 'square root' matrix (e.g. let, <span class="math">\(S\)</span> be some positive-definite matrix. We know <span class="math">\(SV =  V\Lambda\)</span> for <span class="math">\(V^TV = VV^T = I\)</span> and diagonal <span class="math">\(\Lambda &gt; 0\)</span>, thus <span class="math">\(S^{1/2}=V\Lambda^{1/2}V^T\)</span>), such that the energy function is written in terms of these. Though it's somewhat enlightening (I guess), I leave the derivation as an exercise for the reader.&#160;<a class="footnote-backref" href="#fnref-generalization" title="Jump back to footnote 3 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "left",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'blue ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
         <hr>
         <div class="socials">
             <li>Got any questions?</li>

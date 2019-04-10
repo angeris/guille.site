@@ -5,7 +5,7 @@
     
     <link rel="stylesheet" href="/theme/css/main.css">
 
-    <script type="text/x-mathjax-config">
+    <!-- <script type="text/x-mathjax-config">
         MathJax.Hub.Config({
             tex2jax: {
                 inlineMath: [ ['$','$'], ['\\(','\\)'] ]
@@ -15,7 +15,7 @@
     
     <script type="text/javascript" async
     src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
-    </script>
+    </script> -->
     
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">    	
@@ -32,47 +32,47 @@
         <p>It's been a while since I last posted (my posting has been less once every two weeks and more like once every two months), but here's a post I've been sitting on for a while that I never got around to finishing. As per <a href="https://rachelbythebay.com/w/2018/03/13/write/">rachelbythebay's advice</a>, I decided to just finish it and post it up. It's likely to be a little rough, but feel free to <a href="https://twitter.com/GuilleAngeris">tweet</a> any questions or things that you'd like more fleshed out (as usual!).</p>
 <h2>Quick introduction to PCA</h2>
 <p>Most people know <a href="https://en.wikipedia.org/wiki/Principal_component_analysis">Principal Component Analysis</a> (PCA) as a fast, and easily-scalable dimensionality-reduction technique used quite frequently in machine learning and data exploration—in fact, it's often mentioned that one-layer, linear neural network<sup id="fnref-loss-type"><a class="footnote-ref" href="#fn-loss-type">1</a></sup> applied on some data-set recovers the result from PCA.</p>
-<p>It's (also) often mentioned that PCA is one of the <a href="https://groups.google.com/forum/#!topic/10725-f12/P9e8BsqaAok">few non-convex problems that we can solve efficiently</a>, though a (let's say 'non-constructive') answer showing this problem is convex is given in <a href="https://stats.stackexchange.com/questions/301532/is-pca-optimization-convex">this Stats.SE thread</a>, which requires knowing the eigenvectors of $X^TX$, a priori. It turns out it's possible to create a fairly natural semi-definite program which actually constructs the solution in its entirety.</p>
-<p>Since I'll only give a short overview of the topic of PCA itself, I won't go too much into depth on methods of solving this. But, the general idea of PCA is to find the best low-rank approximation of a given matrix $A$. In other words, we want, for some given $k$:</p>
-<p>$$
+<p>It's (also) often mentioned that PCA is one of the <a href="https://groups.google.com/forum/#!topic/10725-f12/P9e8BsqaAok">few non-convex problems that we can solve efficiently</a>, though a (let's say 'non-constructive') answer showing this problem is convex is given in <a href="https://stats.stackexchange.com/questions/301532/is-pca-optimization-convex">this Stats.SE thread</a>, which requires knowing the eigenvectors of <span class="math">\(X^TX\)</span>, a priori. It turns out it's possible to create a fairly natural semi-definite program which actually constructs the solution in its entirety.</p>
+<p>Since I'll only give a short overview of the topic of PCA itself, I won't go too much into depth on methods of solving this. But, the general idea of PCA is to find the best low-rank approximation of a given matrix <span class="math">\(A\)</span>. In other words, we want, for some given <span class="math">\(k\)</span>:</p>
+<div class="math">$$
 \begin{aligned}
 &amp; \underset{X}{\text{minimize}}
 &amp; &amp; \| A - X \|_F^2  \\
 &amp; \text{subject to}
 &amp; &amp; \text{rank}(X) = k,
 \end{aligned}
-$$</p>
-<p>where $\| B \|_F^2$ is the square of the Frobenius norm of $B$ (i.e. it is the sum of the squares of each entry of $B$). Why is this useful? Well, in the general formulation, we can write the SVD decomposition of some optimal $X^* \in \mathbb{R}^{m\times n}$,</p>
-<p>$$
+$$</div>
+<p>where <span class="math">\(\| B \|_F^2\)</span> is the square of the Frobenius norm of <span class="math">\(B\)</span> (i.e. it is the sum of the squares of each entry of <span class="math">\(B\)</span>). Why is this useful? Well, in the general formulation, we can write the SVD decomposition of some optimal <span class="math">\(X^* \in \mathbb{R}^{m\times n}\)</span>,</p>
+<div class="math">$$
 X^* = U^*\Sigma^* (V^*)^T
-$$</p>
-<p>with orthogonal $U^* \in \mathbb{R}^{m\times k}, V^*\in \mathbb{R}^{n\times k}$ and diagonal $\Sigma^* \in \mathbb{R}^{k\times k}$. Then the columns of $V^*$ represent the $k$ most important features of $A$ (assuming that each row of $A$ is a point of the dataset). This may seem slightly redundant if you already know the punchline, but we'll get there in a second. </p>
-<p>For now, define the SVD of $A$ in a similar way to the above</p>
-<p>$$
+$$</div>
+<p>with orthogonal <span class="math">\(U^* \in \mathbb{R}^{m\times k}, V^*\in \mathbb{R}^{n\times k}\)</span> and diagonal <span class="math">\(\Sigma^* \in \mathbb{R}^{k\times k}\)</span>. Then the columns of <span class="math">\(V^*\)</span> represent the <span class="math">\(k\)</span> most important features of <span class="math">\(A\)</span> (assuming that each row of <span class="math">\(A\)</span> is a point of the dataset). This may seem slightly redundant if you already know the punchline, but we'll get there in a second. </p>
+<p>For now, define the SVD of <span class="math">\(A\)</span> in a similar way to the above</p>
+<div class="math">$$
 A = U\Sigma V^T.
-$$</p>
-<p>with orthogonal $U, V$ and diagonal $\Sigma$.</p>
-<p>For convenience, it's easiest to define the diagonal of $\Sigma$ (the singular values of $A$) to be sorted with the top-left value being the largest and bottom-right value being the smallest. Then let $U_k$ be the matrix which contains only the first $k$ columns of $U$ (and similarly for $V_k$), while $\Sigma_k$ is the $k$ by $k$  diagonal sub-matrix of $\Sigma$ containing only the first $k$ values of the diagonal (as usual, starting from the top left).</p>
-<p>Now we can get to the punchline I was talking about earlier: it turns out that the SVD of $X^*$ is the <em>truncated</em> SVD of $A$, in other words, if the SVD of $A$ is $U\Sigma V^T$, then the optimal solution is</p>
-<p>$$
+$$</div>
+<p>with orthogonal <span class="math">\(U, V\)</span> and diagonal <span class="math">\(\Sigma\)</span>.</p>
+<p>For convenience, it's easiest to define the diagonal of <span class="math">\(\Sigma\)</span> (the singular values of <span class="math">\(A\)</span>) to be sorted with the top-left value being the largest and bottom-right value being the smallest. Then let <span class="math">\(U_k\)</span> be the matrix which contains only the first <span class="math">\(k\)</span> columns of <span class="math">\(U\)</span> (and similarly for <span class="math">\(V_k\)</span>), while <span class="math">\(\Sigma_k\)</span> is the <span class="math">\(k\)</span> by <span class="math">\(k\)</span>  diagonal sub-matrix of <span class="math">\(\Sigma\)</span> containing only the first <span class="math">\(k\)</span> values of the diagonal (as usual, starting from the top left).</p>
+<p>Now we can get to the punchline I was talking about earlier: it turns out that the SVD of <span class="math">\(X^*\)</span> is the <em>truncated</em> SVD of <span class="math">\(A\)</span>, in other words, if the SVD of <span class="math">\(A\)</span> is <span class="math">\(U\Sigma V^T\)</span>, then the optimal solution is</p>
+<div class="math">$$
 X^* = U_k\Sigma_kV_k^T.
-$$</p>
-<p>This is the usual way of computing the PCA decomposition of $A$: simply take the SVD and then look at the first $k$ columns of $V$.<sup id="fnref-truncated-svd"><a class="footnote-ref" href="#fn-truncated-svd">2</a></sup> We'll make use of this fact to show that the optimal values are equal, but it won't be necessary to actually <em>compute</em> the result.</p>
+$$</div>
+<p>This is the usual way of computing the PCA decomposition of <span class="math">\(A\)</span>: simply take the SVD and then look at the first <span class="math">\(k\)</span> columns of <span class="math">\(V\)</span>.<sup id="fnref-truncated-svd"><a class="footnote-ref" href="#fn-truncated-svd">2</a></sup> We'll make use of this fact to show that the optimal values are equal, but it won't be necessary to actually <em>compute</em> the result.</p>
 <h2>Construction of the SDP</h2>
 <p>In general, semi-definite programs (i.e. optimization over symmetric, positive-semidefinite matrices with convex objectives and constraints) are convex problems. Here, we'll construct a (relatively) simple reduction of the non-convex problem of PCA, as presented above, to the SDP.</p>
 <h3>Quick overview of method</h3>
 <p>This entire idea was interesting to me, since it was mentioned in <a href="http://www.stat.cmu.edu/~ryantibs/convexopt-S15/scribes/26-nonconvex-scribed.pdf">this lecture</a> which was a result I didn't know about. There aren't any complete proofs of this online, other than a quick mention in <a href="https://papers.nips.cc/paper/5136-fantope-projection-and-selection-a-near-optimal-convex-relaxation-of-sparse-pca">Vu, et al. (2013)</a>, though it's not hard to show the final result given the general ideas. I highly encourage you to try the proof out after reading only the main ideas, if you're interested!</p>
 <p>First, we'll start with the usual program, call it <em>program Y</em>:</p>
-<p>$$
+<div class="math">$$
 \begin{aligned}
 &amp; \underset{X}{\text{minimize}}
 &amp; &amp; \| A - X \|_F^2  \\
 &amp; \text{subject to}
 &amp; &amp; \text{rank}(X) = k,
 \end{aligned}
-$$</p>
-<p>and construct the equivalent program (this step can be skipped with a cute trick below), with $F = A^TA$,</p>
-<p>$$
+$$</div>
+<p>and construct the equivalent program (this step can be skipped with a cute trick below), with <span class="math">\(F = A^TA\)</span>,</p>
+<div class="math">$$
 \begin{aligned}
 &amp; \underset{P}{\text{minimize}}
 &amp; &amp; \| F - P \|_F^2  \\
@@ -81,9 +81,9 @@ $$</p>
 &amp;&amp;&amp; P^2 = P,\\
 &amp;&amp;&amp; P^T = P,
 \end{aligned}
-$$</p>
-<p>in other words, this is a program over projection matrices $P$. This can then be put into the form</p>
-<p>$$
+$$</div>
+<p>in other words, this is a program over projection matrices <span class="math">\(P\)</span>. This can then be put into the form</p>
+<div class="math">$$
 \begin{aligned}
 &amp; \underset{P}{\text{maximize}}
 &amp; &amp; \text{tr}(FP)  \\
@@ -92,9 +92,9 @@ $$</p>
 &amp;&amp;&amp; P^2 = P,\\
 &amp;&amp;&amp; P^T = P.
 \end{aligned}
-$$</p>
-<p>for some matrix $F$, and it can be relaxed into the following SDP, let's call it <em>problem Z</em>,</p>
-<p>$$
+$$</div>
+<p>for some matrix <span class="math">\(F\)</span>, and it can be relaxed into the following SDP, let's call it <em>problem Z</em>,</p>
+<div class="math">$$
 \begin{aligned}
 &amp; \underset{P}{\text{maximize}}
 &amp; &amp; \text{tr}(FP)  \\
@@ -102,12 +102,12 @@ $$</p>
 &amp; &amp; \text{tr}(P) = k,\\
 &amp;&amp;&amp; 0\preceq P \preceq I,
 \end{aligned}
-$$</p>
-<p>where $A \preceq B$ is an inequality with respect to the semi-definite cone (i.e. $A \preceq B \iff B - A$ is positive semi-definite). You can then show that this SDP has <em>zero integrality gap</em> with the above program over the projection matrices. More specifically, any solution to the relaxation can be easily turned into a solution of the original program.</p>
+$$</div>
+<p>where <span class="math">\(A \preceq B\)</span> is an inequality with respect to the semi-definite cone (i.e. <span class="math">\(A \preceq B \iff B - A\)</span> is positive semi-definite). You can then show that this SDP has <em>zero integrality gap</em> with the above program over the projection matrices. More specifically, any solution to the relaxation can be easily turned into a solution of the original program.</p>
 <p>Just a random side-note: if you took or followed Stanford's EE364A course for the previous quarter (Winter 2018), the latter part of this proof idea may seem familiar—it was a problem written for the final exam. My original intent with it was to guide the students through the complete proof, but better judgement prevailed and the question was cut down to only that last part with some hints.</p>
 <h2>Complete (if somewhat short!) steps</h2>
-<p>The two interesting points of the whole proof are (a) to realize that any solution of the original problem (program Y) can be written as a solution $X = AP'$ for some projection matrix $P'$ (which, of course, will turn out to be the projection matrix $P$ which solves program Z, namely $P' = V_kV_k^T$), and (b) to note that we can prove that program Z has zero integrality gap since, if we have a solution to the SDP given by $P^* = UDU^T$, then we can 'fix' non-integral eigenvalues via solving the problem</p>
-<p>$$
+<p>The two interesting points of the whole proof are (a) to realize that any solution of the original problem (program Y) can be written as a solution <span class="math">\(X = AP'\)</span> for some projection matrix <span class="math">\(P'\)</span> (which, of course, will turn out to be the projection matrix <span class="math">\(P\)</span> which solves program Z, namely <span class="math">\(P' = V_kV_k^T\)</span>), and (b) to note that we can prove that program Z has zero integrality gap since, if we have a solution to the SDP given by <span class="math">\(P^* = UDU^T\)</span>, then we can 'fix' non-integral eigenvalues via solving the problem</p>
+<div class="math">$$
 \begin{aligned}
 &amp; \underset{x}{\text{maximize}}
 &amp; &amp; c^Tx  \\
@@ -115,20 +115,75 @@ $$</p>
 &amp; &amp; 1^Tx = k,\\
 &amp;&amp;&amp; 0\le x_i \le 1, ~~\forall i,
 \end{aligned}
-$$</p>
-<p>where $c_i = (U^TAU)_{ii}$. This LP has an integral solution $x^*$ (what should this solution be?) which preserves the objective value of the original problem, so $\bar P^* = U\text{diag}(x^*)U^T$ is a feasible, integral solution to the original problem, with the same objective value as the previous so the SDP relaxation is tight!</p>
+$$</div>
+<p>where <span class="math">\(c_i = (U^TAU)_{ii}\)</span>. This LP has an integral solution <span class="math">\(x^*\)</span> (what should this solution be?) which preserves the objective value of the original problem, so <span class="math">\(\bar P^* = U\text{diag}(x^*)U^T\)</span> is a feasible, integral solution to the original problem, with the same objective value as the previous so the SDP relaxation is tight!</p>
 <p>Using all of this, then we've converted the PCA problem into a purely convex one, without computing the actual solution beforehand.</p>
 <div class="footnote">
 <hr>
 <ol>
 <li id="fn-loss-type">
-<p>More specifically, a one-layer, linear NN with $\ell_2$ loss.&#160;<a class="footnote-backref" href="#fnref-loss-type" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<p>More specifically, a one-layer, linear NN with <span class="math">\(\ell_2\)</span> loss.&#160;<a class="footnote-backref" href="#fnref-loss-type" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
 <li id="fn-truncated-svd">
-<p>As usual, there are smarter ways of doing this. It turns out one can run a truncated or partial SVD decomposition, which doesn't require constructing all singular values and all the columns of $U, V$. This is far more efficient whenever $k\ll \min\{m, n\}$, where $m,n$ are the dimensions of the data. This latter condition is usually the case for practical purposes.&#160;<a class="footnote-backref" href="#fnref-truncated-svd" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+<p>As usual, there are smarter ways of doing this. It turns out one can run a truncated or partial SVD decomposition, which doesn't require constructing all singular values and all the columns of <span class="math">\(U, V\)</span>. This is far more efficient whenever <span class="math">\(k\ll \min\{m, n\}\)</span>, where <span class="math">\(m,n\)</span> are the dimensions of the data. This latter condition is usually the case for practical purposes.&#160;<a class="footnote-backref" href="#fnref-truncated-svd" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "left",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'blue ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
         <hr>
         <div class="socials">
             <li>Got any questions?</li>

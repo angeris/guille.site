@@ -46,7 +46,7 @@ by noting that (say, with two variables, though the idea extends to any number o
 $$
 \lVert a\lVert^2 + \lVert b \lVert^2 = \left \lVert 
 \begin{bmatrix}
-a\\\\
+a\\
 b
 \end{bmatrix}
 \right\lVert^2.
@@ -57,13 +57,13 @@ So we can rewrite the above multi-objective problem as
 $$
 \lambda_1\lVert A_1x - b_1 \lVert^2 + \lambda_2\lVert A_2x - b_2 \lVert^2  = \left\lVert 
 \begin{bmatrix}
-\sqrt{\lambda_1} A_1\\\\
+\sqrt{\lambda_1} A_1\\
 \sqrt{\lambda_2} A_2
 \end{bmatrix}
 x
 -
 \begin{bmatrix}
-\sqrt{\lambda_1}b_1\\\\
+\sqrt{\lambda_1}b_1\\
 \sqrt{\lambda_2}b_2
 \end{bmatrix}\right\lVert^2.
 $$
@@ -73,7 +73,7 @@ Where the new matrices above are defined as the 'stacked' (appended) matrix of $
 $$
 \bar A \equiv 
 \begin{bmatrix}
-\sqrt{\lambda_1} A_1\\\\
+\sqrt{\lambda_1} A_1\\
 \sqrt{\lambda_2} A_2
 \end{bmatrix}
 $$
@@ -83,7 +83,7 @@ and
 $$
 \bar b \equiv
 \begin{bmatrix}
-\sqrt{\lambda_1} b_1\\\\
+\sqrt{\lambda_1} b_1\\
 \sqrt{\lambda_2} b_2
 \end{bmatrix},
 $$
@@ -227,9 +227,9 @@ If you'd like, the complete code for this post can be found [here](https://githu
 [^derivative-mat]: These are slightly tricker to form for 2D images, but, as with the previous, we make heavy use of the Kronecker product. The derivative matrix for a 1D $m$-vector is the one formed by (let's call it $L$ with dimensions $(m-1)\times m$)
 $$
 L=\begin{bmatrix}
-1 & -1 & 0 & 0 & \dots\\\\
-0 & 1 & -1 & 0 & \dots\\\\
-0 & 0 & 1 & -1 & \dots\\\\
+1 & -1 & 0 & 0 & \dots\\
+0 & 1 & -1 & 0 & \dots\\
+0 & 0 & 1 & -1 & \dots\\
 \vdots & \vdots & \vdots & \vdots & \ddots
 \end{bmatrix}
 $$

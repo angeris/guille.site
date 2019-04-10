@@ -12,19 +12,19 @@ Anyways, we left off on the idea that we now have a function which we wish to op
 
 As before, though, we can't just optimize the function
 $$
-\mathcal{L}(x; c, R, C) = \sum_{i}\left[\sum_j\phi\left(C\left(\frac{\lVert x_i - c_j \lVert_2^2}{R_j^2} - 1\right)\right) + \eta \lVert x\_i - x\_{i+1}\lVert_2^2\right]
+\mathcal{L}(x; c, R, C) = \sum_{i}\left[\sum_j\phi\left(C\left(\frac{\lVert x_i - c_j \lVert_2^2}{R_j^2} - 1\right)\right) + \eta \lVert x_i - x_{i+1}\lVert_2^2\right]
 $$
 
 over some large $C$, since we've noted that the objective becomes almost-everywhere flat in the limit[^measure-theory] and thus becomes very difficult to optimize using typical methods. Instead, we optimize over the sequence of functions, for $C_k \to \infty$,
 
 $$
-x^{(k)} = \min\_x\mathcal{L}(x; c, R, C_k) 
+x^{(k)} = \min_x\mathcal{L}(x; c, R, C_k) 
 $$
 
 picking only
 
 $$
-x^* = \lim\_{k\to\infty} x^{(k)}
+x^* = \lim_{k\to\infty} x^{(k)}
 $$
 
 as our final trajectory. The goal of this post is to explore some methods for optimizing this function in the constrained, embedded environment which we'll be using for the competition.
@@ -62,19 +62,19 @@ $$
 Discretizing this equation by noting that, by definition of the derivative, we have
 
 $$
-\dot x(t\_{i+1}) \approx \frac{x\_{i+1} - x\_i}{h}
+\dot x(t_{i+1}) \approx \frac{x_{i+1} - x_i}{h}
 $$
 
 then gives us (by plugging this into the above)
 
 $$
-\frac{x\_{i+1} - x\_i}{h} = -\frac{1}{\mu}\nabla V(x),
+\frac{x_{i+1} - x_i}{h} = -\frac{1}{\mu}\nabla V(x),
 $$
 
 or, after rearranging (and setting $\mu=1$, since we can control $h$ however we like, say by defining $h := \frac{h}{\mu}$)
 
 $$
-x\_{i+1} = x\_i - h\nabla V(x).
+x_{i+1} = x_i - h\nabla V(x).
 $$
 
 In other words, gradient descent corresponds to the discretization of Newton's equations in the *overdamped* limit (e.g. in the limit of small mass and large friction).
@@ -88,7 +88,7 @@ The next idea is to, instead of taking $m\to 0$, just write out the full discret
 
 $$
 \begin{align}
-m\dot v &= -\nabla V(x) - \mu v\\\\
+m\dot v &= -\nabla V(x) - \mu v\\
 \dot x(t) &= v(t)
 \end{align}
 $$
@@ -96,21 +96,21 @@ $$
 discretizing the second equation with some step-size $h'$ (as above) we get
 
 $$
-x\_{t+1} = x\_t + h'v_{t+1}
+x_{t+1} = x_t + h'v_{t+1}
 $$
 
 where the former equation is, when discretized with some step size $h$
 
 $$
-m\frac{v\_{t+1} - v\_t}{h} = -\nabla V(x\_t) - \mu v\_t
+m\frac{v_{t+1} - v_t}{h} = -\nabla V(x_t) - \mu v_t
 $$
 
 or after rearranging, and defining $\gamma \equiv \frac{h}{m}$ (which we can make as small as we'd like)
 
 $$
 \begin{align}
-v\_{t+1} &= -\gamma \nabla V(x\_t) + (1-\mu \gamma) v\_t\\\\
-x\_{t+1} &= x\_t + h'v_{t+1}
+v_{t+1} &= -\gamma \nabla V(x_t) + (1-\mu \gamma) v_t\\
+x_{t+1} &= x_t + h'v_{t+1}
 \end{align}
 $$
 
@@ -118,8 +118,8 @@ usually we take $h' = 1$, and, to prevent $v_t$ from having weird behaviour, we 
 
 $$
 \begin{align}
-v\_{t+1} &= -\gamma \nabla V(x\_t) + \beta v\_t\\\\
-x\_{t+1} &= x\_t + v\_{t+1}
+v_{t+1} &= -\gamma \nabla V(x_t) + \beta v_t\\
+x_{t+1} &= x_t + v_{t+1}
 \end{align}
 $$
 
@@ -129,9 +129,9 @@ Anyways, just to give some perspective on the speed up: using momentum, the opti
 
 ## Cooling schemes
 
-Imagine we want to optimize some function $\ell(\cdot)$ that is, in general, extremely hard to solve. If we're lucky, we may be able to do the next best thing: take a series of functions parametrized by, say, $C$, such that $\ell_C(\cdot) \to \ell(\cdot)$ as $C\to\infty$,[^approaches] *and* where the problem is simple to solve for $C\_{k+1}$, given the solution for $C\_k$.
+Imagine we want to optimize some function $\ell(\cdot)$ that is, in general, extremely hard to solve. If we're lucky, we may be able to do the next best thing: take a series of functions parametrized by, say, $C$, such that $\ell_C(\cdot) \to \ell(\cdot)$ as $C\to\infty$,[^approaches] *and* where the problem is simple to solve for $C_{k+1}$, given the solution for $C_k$.
 
-Of course, given this and the above we can already solve the problem: we begin with some small $C\_0$ and then, after converging for $\ell\_{C\_0}(\cdot)$ we then continue to $\ell\_{C\_1}(\cdot)$, after converging to that, we then continue to solve for $\ell\_{C\_2}(\cdot)$, etc., until we reach some desired tolerance on the given result.
+Of course, given this and the above we can already solve the problem: we begin with some small $C_0$ and then, after converging for $\ell_{C_0}(\cdot)$ we then continue to $\ell_{C_1}(\cdot)$, after converging to that, we then continue to solve for $\ell_{C_2}(\cdot)$, etc., until we reach some desired tolerance on the given result.
 
 Or... (of course, I'm writing this for a reason), we could do something fancy using the previous scheme:
 
@@ -155,10 +155,10 @@ As before, this code (with more details and implementation) can be found in the 
 
 [^momentum]: Of course, there are many reasons why we'll want momentum, but those will come soon.
 
-[^oscillations]: Consider $V(x) = 0$, with some initial condition, $v\_0 > 0$, say, then we'll have
+[^oscillations]: Consider $V(x) = 0$, with some initial condition, $v_0 > 0$, say, then we'll have
 $$
-v\_t = -k v\_{t-1}
+v_t = -k v_{t-1}
 $$
-for some $k = \mu\gamma - 1>0$. Solving this yields $v\_{t} = (-1)^tk^t v\_{0}$. This is weird, because it means that our velocity will change directions every iteration even though there's no potential! This is definitely not expected (nor desirable) behaviour.
+for some $k = \mu\gamma - 1>0$. Solving this yields $v_{t} = (-1)^tk^t v_{0}$. This is weird, because it means that our velocity will change directions every iteration even though there's no potential! This is definitely not expected (nor desirable) behaviour.
 
 [^approaches]: In some sense. Say: in the square error, or something of the like. This can be made entirely rigorous, but I choose not to do it here since it's not terribly essential.

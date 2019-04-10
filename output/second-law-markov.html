@@ -5,7 +5,7 @@
     
     <link rel="stylesheet" href="/theme/css/main.css">
 
-    <script type="text/x-mathjax-config">
+    <!-- <script type="text/x-mathjax-config">
         MathJax.Hub.Config({
             tex2jax: {
                 inlineMath: [ ['$','$'], ['\\(','\\)'] ]
@@ -15,7 +15,7 @@
     
     <script type="text/javascript" async
     src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
-    </script>
+    </script> -->
     
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">    	
@@ -34,33 +34,40 @@
 <p>As usual, I won't really touch this or other similar discussions with a 10 foot pole (though <a href="https://plato.stanford.edu/entries/time-thermo/">here</a> is a good place to start), but I'll be giving some thoughts on a similar mathematical principle which arises from statistical systems.</p>
 <h2>Markov chains</h2>
 <p>Since this is a short post, I won't be describing <a href="https://en.wikipedia.org/wiki/Markov_chain">Markov chains</a> in detail, but as a refresher, a Markov chain (or Markov process) is a process in which the next state of the process depends only on the current state. In other words, it's a little like the game <a href="https://en.wikipedia.org/wiki/Snakes_and_Ladders">Snakes and Ladders</a>, where your next position depends only on where you are in the current square and your next dice throw (independent of it being the 1st or 5th time you've landed on the same square).</p>
-<p>In particular, we know probability of being at a new square, $x_{t+1}$ at time $t+1$, given that we were in square $x_t$ at time $t$. In other words, we know $p(X_{t+1}=x~|~X_{t}=x')$. Similarly, if we weren't sure of our position at time $t$, but rather we have a probability distribution over positions, say $p(X_t = x)$ (which I will call $p_t(x)$, for convenience), then the probability of being at position $x$ at time $t+1$ given our belief about possible positions, $x'$ at time $t$ is
-$$
+<p>In particular, we know probability of being at a new square, <span class="math">\(x_{t+1}\)</span> at time <span class="math">\(t+1\)</span>, given that we were in square <span class="math">\(x_t\)</span> at time <span class="math">\(t\)</span>. In other words, we know <span class="math">\(p(X_{t+1}=x~|~X_{t}=x')\)</span>. Similarly, if we weren't sure of our position at time <span class="math">\(t\)</span>, but rather we have a probability distribution over positions, say <span class="math">\(p(X_t = x)\)</span> (which I will call <span class="math">\(p_t(x)\)</span>, for convenience), then the probability of being at position <span class="math">\(x\)</span> at time <span class="math">\(t+1\)</span> given our belief about possible positions, <span class="math">\(x'\)</span> at time <span class="math">\(t\)</span> is
+</p>
+<div class="math">$$
 p_{t+1}(x) = \sum_{x'} p(X_{t+1}=x~|~X_{t}=x')p_t(x').\tag{1}
-$$</p>
-<p>In other words, we just multiply these two probabilities and sum over all possible states $x'$ at time $t$. The defining trait of (stationary) Markov processes is that $p(X_{t+1}=x~|~X_{t}=x')$, which I will call $K(x, x')$ from now on, is the <em>same</em> for all $t$, and equation (1), now written as
-$$
+$$</div>
+<p>In other words, we just multiply these two probabilities and sum over all possible states <span class="math">\(x'\)</span> at time <span class="math">\(t\)</span>. The defining trait of (stationary) Markov processes is that <span class="math">\(p(X_{t+1}=x~|~X_{t}=x')\)</span>, which I will call <span class="math">\(K(x, x')\)</span> from now on, is the <em>same</em> for all <span class="math">\(t\)</span>, and equation (1), now written as
+</p>
+<div class="math">$$
 p_{t+1}(x) = \sum_{x'} K(x, x')p_t(x),
-$$
-holds for any $t$.</p>
+$$</div>
+<p>
+holds for any <span class="math">\(t\)</span>.</p>
 <p>It's probably not hard to believe that Markov chains are used <a href="https://www.cs.cmu.edu/~katef/DeepRLControlCourse/lectures/lecture2_mdps.pdf">absolutely</a> <a href="https://twitter.com/captain_markov?lang=en">everywhere</a>, since they make for mathematically simple, but surprisingly powerful models of,  well, everything.</p>
 <p>This is all I will mention about Markov chains, in general. If you'd like a bit of a deeper dive, <a href="http://setosa.io/ev/markov-chains/">this blog post</a> is a beautiful (and interactive!) reference. I highly recommend it.</p>
 <h2>A variation on a theme</h2>
-<p>Let $p_t$ be the distribution of a process at time $t$, then the second law says that (and I will use statistics notation, rather than physics notation, from here on out!),
-$$
+<p>Let <span class="math">\(p_t\)</span> be the distribution of a process at time <span class="math">\(t\)</span>, then the second law says that (and I will use statistics notation, rather than physics notation, from here on out!),
+</p>
+<div class="math">$$
 H(p_t) \equiv -\sum_x p_t(x) \log p_t(x),
-$$
-is non-decreasing as time, $t$, increases. Note that I'll be dealing with discrete time and space here, but all of these statements with some modifications hold for continuous processes. Anyways, more generally, we can write
-$$
+$$</div>
+<p>
+is non-decreasing as time, <span class="math">\(t\)</span>, increases. Note that I'll be dealing with discrete time and space here, but all of these statements with some modifications hold for continuous processes. Anyways, more generally, we can write
+</p>
+<div class="math">$$
 H(p_{t+1}) \ge H(p_t),
-$$
+$$</div>
+<p>
 but it turns out this law, as stated, doesn't quite hold for many Markov processes. It does, on the other hand, hold for a set of processes where the transition probabilities are symmetric (more generally, this holds iff the transitions are doubly-stochastic. <a href="https://pdfs.semanticscholar.org/332c/1c7bab1a9a7a43d34d5a1784cf2454e0a7f1.pdf">Cover</a> has a slick, few-line proof of this which relies on some properties of the KL-divergence).</p>
-<p>In this case, the probability of going from state $A$ to state $B$ is the same as the probability of going from state $B$ to state $A$. Writing this out mathematically, it says:</p>
-<p>$$
+<p>In this case, the probability of going from state <span class="math">\(A\)</span> to state <span class="math">\(B\)</span> is the same as the probability of going from state <span class="math">\(B\)</span> to state <span class="math">\(A\)</span>. Writing this out mathematically, it says:</p>
+<div class="math">$$
 K(x, x') = K(x', x).
-$$</p>
+$$</div>
 <p>I should note that this is a <em>very</em> strong condition, but it can be quite useful in giving a simple proof of the above law. To prove this, first note that the KL-divergence is nonnegative, since the negative log is convex, thus by <a href="https://en.wikipedia.org/wiki/Jensen's_inequality">Jensen's inequality</a> (this is the same proof as the <a href="/ml-information-bounds.html">previous post</a>):</p>
-<p>$$
+<div class="math">$$
 \begin{aligned}
 D(p_t\lVert p_{t'})&amp;=-\sum_x p_t(x) \log \frac{p_{t'}(x)}{p_t(x)} \\
 &amp;\ge -\log\left(\sum_x p_t(x)\frac{p_{t'}(x)}{p_t(x)}\right) \\
@@ -68,58 +75,132 @@ D(p_t\lVert p_{t'})&amp;=-\sum_x p_t(x) \log \frac{p_{t'}(x)}{p_t(x)} \\
 &amp; = -\log 1 \\
 &amp;= 0,
 \end{aligned}
-$$</p>
-<p>since $p_{t'}, p_t$ are probability distributions (i.e., nonnegative and sum to one).</p>
+$$</div>
+<p>since <span class="math">\(p_{t'}, p_t\)</span> are probability distributions (i.e., nonnegative and sum to one).</p>
 <p>Here is the magical trick to proving the above. Note that
-$$
+</p>
+<div class="math">$$
 D(p_t \lVert p_{t+2}) \ge 0,
-$$
+$$</div>
+<p>
 so
-$$
+</p>
+<div class="math">$$
 -\sum_x p_t(x) \log \frac{p_{t+2}(x)}{p_t(x)} \ge 0,
-$$
+$$</div>
+<p>
 which means
-$$
+</p>
+<div class="math">$$
 -\sum_x p_t(x) \log p_{t+2}(x) \ge -\sum_x p_t(x) \log p_t(x).
-$$
+$$</div>
+<p>
 But, by definition, we have that
-$$
+</p>
+<div class="math">$$
 p_{t+2}(x) = \sum_{x'}K(x, x')p_{t+1}(x'),
-$$
+$$</div>
+<p>
 so
-$$
+</p>
+<div class="math">$$
 -\sum_x p_t(x) \log \left(\sum_{x'} K(x, x')p_{t+1}(x')\right) \ge -\sum_x p_t(x) \log p_t(x),
-$$
+$$</div>
+<p>
 but, by Jensen's inequality (again!) on the left hand side we get,
-$$
+</p>
+<div class="math">$$
 -\sum_x p_t(x) \log \left(\sum_{x'} K(x, x')p_{t+1}(x')\right) \le -\sum_{x, x'} p_t(x)K(x, x') \log p_{t+1}(x').
-$$</p>
-<p>Since we know $K(x, x') = K(x', x)$, then we immediately have that
-$$
+$$</div>
+<p>Since we know <span class="math">\(K(x, x') = K(x', x)\)</span>, then we immediately have that
+</p>
+<div class="math">$$
 \sum_x p_t(x)K(x, x') = p_{t+1}(x'),
-$$
+$$</div>
+<p>
 so, putting it all together
-$$
+</p>
+<div class="math">$$
 \begin{aligned}
 H(p_{t+1}) &amp;= -\sum_{x'} p_{t+1}(x') \log p_{t+1}(x') \\
 &amp;= -\sum_{x, x'} p_t(x)K(x, x') \log p_{t+1}(x')\\
 &amp;\ge -\sum_x p_t(x) \log p_t(x) \\
 &amp;= H(p_t),
 \end{aligned}
-$$
+$$</div>
+<p>
 which is what we wished to prove.</p>
 <h2>More general Markov processes</h2>
-<p>So, while it turns out this law doesn't hold for general Markov processes, a very similar law <em>does</em> hold. If a Markov process has a stationary distribution, $p$, then:
-$$
+<p>So, while it turns out this law doesn't hold for general Markov processes, a very similar law <em>does</em> hold. If a Markov process has a stationary distribution, <span class="math">\(p\)</span>, then:
+</p>
+<div class="math">$$
 D(p_{t+1}\lVert p) \le D(p_t \lVert p),
-$$
+$$</div>
+<p>
 so, as the Markov chain continues evolving, the KL divergence between the current distribution and the equilibrium distribution <em>never decreases</em>.</p>
-<p>In fact, more generally, for <em>any</em> two initial probability distributions $p_0, q_0$, we have that
-$$
+<p>In fact, more generally, for <em>any</em> two initial probability distributions <span class="math">\(p_0, q_0\)</span>, we have that
+</p>
+<div class="math">$$
 D(p_{t+1} \lVert q_{t+1}) \le D(p_{t} \lVert q_{t}),
-$$
+$$</div>
+<p>
 so any two distributions undergoing the same (Markovian) dynamics never decrease in KL-divergence! Even if the Markov process does <em>not</em> have a unique stationary distribution, there is still a type of second law which holds, in a very general sense.</p>
 <p>As before, <a href="https://pdfs.semanticscholar.org/332c/1c7bab1a9a7a43d34d5a1784cf2454e0a7f1.pdf">Cover</a> has a fantastic, slick proof of the above, which I highly recommend you read!</p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "left",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'blue ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
         <hr>
         <div class="socials">
             <li>Got any questions?</li>

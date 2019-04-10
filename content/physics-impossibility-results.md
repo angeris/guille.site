@@ -26,7 +26,7 @@ In optimization theory, there is a beautiful idea called *Lagrange duality*, whi
 Let's say we have the following optimization problem,
 $$
 \begin{array}{ll}
-\text{minimize} & f(x)\\\\
+\text{minimize} & f(x)\\
 \text{subject to} & h(x) \le 0,
 \end{array}
 $$
@@ -68,7 +68,7 @@ Of course, sometimes computing $g(\lambda)$ is at least as difficult as solving 
 Of course, we often want the best (largest) lower bound, not just *a* lower bound (which can often be quite bad). In other words, we want to maximize our lower bound. We can phrase this as the new optimization problem,
 $$
 \begin{array}{ll}
-\text{maximize} & g(\lambda)\\\\
+\text{maximize} & g(\lambda)\\
 \text{subject to} & \lambda \ge 0.
 \end{array}
 $$
@@ -99,8 +99,8 @@ Finally, we are only able to choose materials within a specific range: that is, 
 Putting all of this together, we can write the optimization problem as
 $$
 \begin{array}{ll}
-\text{minimize} & \frac12\left\\|z - \hat z\right\\|\_2^2\\\\
-\text{subject to} & (A + \mathrm{diag}(\theta))z = b\\\\
+\text{minimize} & \frac12\left\\|z - \hat z\right\\|\_2^2\\
+\text{subject to} & (A + \mathrm{diag}(\theta))z = b\\
 & \theta^\mathrm{min} \le \theta \le \theta^\mathrm{max}.
 \end{array}
 $$
@@ -130,7 +130,7 @@ What we can do instead is minimize over $\theta$, constrained to its feasible ra
 If you've convinced yourself of this (or haven't yet, but want to continue), we now have the following minimization problem:
 $$
 \begin{aligned}
-g(\nu) &= \inf_{\theta^\mathrm{min} \le \theta \le \theta^\mathrm{max}} \left(\inf_z \mathcal{L}(z, \theta, \nu)\right)\\\\
+g(\nu) &= \inf_{\theta^\mathrm{min} \le \theta \le \theta^\mathrm{max}} \left(\inf_z \mathcal{L}(z, \theta, \nu)\right)\\
 &= \inf_{\theta^\mathrm{min} \le \theta \le \theta^\mathrm{max}} \left(- \frac12\left\\|\hat z - (A + \mathrm{diag(\theta)})^T\nu\right\\|\_2^2 - \nu^Tb + \frac12\\|\hat z\\|\_2^2\right)
 \end{aligned}
 $$
@@ -145,7 +145,7 @@ but any point in the interval $[L, U]$ is a convex combination of $L$ or $U$! So
 This solves our problem: since the objective is separable, then we only need to consider each component of $\theta$, and, because it's concave, then we know that an optimal $\theta_i$ is one of either $\theta^\mathrm{min}_i$ or $\theta^\mathrm{max}_i$. Replacing the complicated $\inf$ with this (much simpler) $\min$ gives the analytic solution for $g$:
 $$
 \begin{multline}
-g(\nu) = \sum_i \min\bigg\\{-\frac12 (\hat z\_i - a\_i^T\nu + \theta\_i^\mathrm{min} \nu_i)^2, - \frac12 (\hat z\_i - a\_i^T\nu + \theta\_i^\mathrm{max} \nu_i)^2\bigg\\} \\\\- \nu^Tb + \frac12\\|\hat z\\|\_2^2,
+g(\nu) = \sum_i \min\bigg\\{-\frac12 (\hat z\_i - a\_i^T\nu + \theta\_i^\mathrm{min} \nu_i)^2, - \frac12 (\hat z\_i - a\_i^T\nu + \theta\_i^\mathrm{max} \nu_i)^2\bigg\\} \\- \nu^Tb + \frac12\\|\hat z\\|\_2^2,
 \end{multline}
 $$
 or, writing it in the same way as the paper, by pulling out the $-1/2$ (and using $\theta^\mathrm{min} = 0$),

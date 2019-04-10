@@ -5,7 +5,7 @@
     
     <link rel="stylesheet" href="/theme/css/main.css">
 
-    <script type="text/x-mathjax-config">
+    <!-- <script type="text/x-mathjax-config">
         MathJax.Hub.Config({
             tex2jax: {
                 inlineMath: [ ['$','$'], ['\\(','\\)'] ]
@@ -15,7 +15,7 @@
     
     <script type="text/javascript" async
     src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
-    </script>
+    </script> -->
     
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">    	
@@ -30,67 +30,69 @@
         <p>Category: <a href="/category/optimization-methods.html">optimization-methods</a></p>
         <p><label>Posted <strong>December 22, 2017</strong></label></p>
         <p>For a class that's currently being written (<em>ahem</em>, EE104), Prof. Boyd posed an interesting problem of writing a (relatively general, but ideally simple) proximal-gradient optimizer. The idea is that would act as a black-box way for students to plug in machine learning models of a specific form and have the optimizer do all of the hard work immediately, while appearing as transparent as possible.</p>
-<p>This led to a rabbit hole of asking what loss functions should be included in the optimization package (huber, square, $\ell_1$, etc.), many of which are relatively straightforward to implement—except, of course, SVM. Almost all of the other cases have few problems in implementation, since computing their proximal gradient is a direct computation (e.g. $\ell_1$ corresponds immediately to a <a href="https://en.wikipedia.org/wiki/Proximal_gradient_methods_for_learning#Solving_for_%7F'&quot;UNIQ--postMath-0000002A-QINU&quot;'%7F_proximity_operator">shrinkage operator</a> as we'll see below), yet the SVM loss has a set of hard constraints which I haven't found a nice way of stuffing into the prox-gradient step (and I suspect that there are no such nice ways, but I'd love to be proven wrong, here); thus, every step requires finding a projection into a polygon, which is, itself, a second optimization problem that has to be solved.</p>
+<p>This led to a rabbit hole of asking what loss functions should be included in the optimization package (huber, square, <span class="math">\(\ell_1\)</span>, etc.), many of which are relatively straightforward to implement—except, of course, SVM. Almost all of the other cases have few problems in implementation, since computing their proximal gradient is a direct computation (e.g. <span class="math">\(\ell_1\)</span> corresponds immediately to a <a href="https://en.wikipedia.org/wiki/Proximal_gradient_methods_for_learning#Solving_for_%7F'&quot;UNIQ--postMath-0000002A-QINU&quot;'%7F_proximity_operator">shrinkage operator</a> as we'll see below), yet the SVM loss has a set of hard constraints which I haven't found a nice way of stuffing into the prox-gradient step (and I suspect that there are no such nice ways, but I'd love to be proven wrong, here); thus, every step requires finding a projection into a polygon, which is, itself, a second optimization problem that has to be solved.</p>
 <p>Prox gradients are (generally) really well-behaved and I've been having some fun trying to really understand how well they work as general optimizers—I write a few of those thoughts below along with an odd solution to the original problem.</p>
 <h2>Proximal gradients</h2>
 <p>Proximal gradients are a nice idea emerging from convex analysis which provide useful ways of dealing with tricky, non-differentiable convex functions. In particular, you can think of the proximal gradient of a given function as an optimization problem that penalizes taking steps "too far" in a given direction. Better yet (and perhaps one of the main useful points) is that most functions we care about have relatively nice proximal gradient operators!</p>
-<p>Anyways, for now, let's define the proximal gradient of a function $g$ at some point $x$ (usually denoted $\text{prox}_g(x)$, though I will simply call it $P_g(x)$ for shorter notation) to be</p>
-<p>$$
+<p>Anyways, for now, let's define the proximal gradient of a function <span class="math">\(g\)</span> at some point <span class="math">\(x\)</span> (usually denoted <span class="math">\(\text{prox}_g(x)\)</span>, though I will simply call it <span class="math">\(P_g(x)\)</span> for shorter notation) to be</p>
+<div class="math">$$
 P_g(x) \equiv \mathop{\arg\!\min}\limits_y \left(g(y) + \frac{1}{2}\lVert x- y\lVert_2^2\right)
-$$</p>
-<p>the definition is useful only because, if we allow $\partial g(u)$ to be the subdifferential of $g$ at $u$, then optimality guarantees that, if $y = P_g(x)$, then (by knowing that the subdifferential must be zero at the optimum) we have</p>
-<p>$$
+$$</div>
+<p>the definition is useful only because, if we allow <span class="math">\(\partial g(u)\)</span> to be the subdifferential of <span class="math">\(g\)</span> at <span class="math">\(u\)</span>, then optimality guarantees that, if <span class="math">\(y = P_g(x)\)</span>, then (by knowing that the subdifferential must be zero at the optimum) we have</p>
+<div class="math">$$
 x - y \in \partial g(y).
-$$</p>
-<p>In other words, $0 \in \partial g(y)$ iff $y$ is a fixed point of $P_g$—that is, we have reached a minimizer of $g$ iff</p>
-<p>$$
+$$</div>
+<p>In other words, <span class="math">\(0 \in \partial g(y)\)</span> iff <span class="math">\(y\)</span> is a fixed point of <span class="math">\(P_g\)</span>—that is, we have reached a minimizer of <span class="math">\(g\)</span> iff</p>
+<div class="math">$$
 y = P_g(y).
-$$</p>
-<p>Additionally, there's no weird trickery that has to be done with subdifferentials since the result of $P_g$ is always unique, which is a nice side-benefit. Using just this, we can already begin to do some optimization. For example, let's consider the (somewhat boring, but enlightening) example of minimization of the $\ell_1$-norm. Using the fact that</p>
-<p>$$
+$$</div>
+<p>Additionally, there's no weird trickery that has to be done with subdifferentials since the result of <span class="math">\(P_g\)</span> is always unique, which is a nice side-benefit. Using just this, we can already begin to do some optimization. For example, let's consider the (somewhat boring, but enlightening) example of minimization of the <span class="math">\(\ell_1\)</span>-norm. Using the fact that</p>
+<div class="math">$$
 u = P_{\lambda |\cdot|}(x) \iff x - u \in \partial |u|
-$$</p>
-<p>and using the fact that the $\ell_1$-norm is separable, we have, whenever $u&gt;0$ (I'm considering a single term of the sum, here)</p>
-<p>$$
+$$</div>
+<p>and using the fact that the <span class="math">\(\ell_1\)</span>-norm is separable, we have, whenever <span class="math">\(u&gt;0\)</span> (I'm considering a single term of the sum, here)</p>
+<div class="math">$$
 x - u = \lambda \implies u = x-\lambda\text{ whenever } x-\lambda &gt; 0
-$$</p>
-<p>similarly for the $u=0$ case we have (where $\lambda S$ for some set $S$ is just multiplication of every element in the set by $\lambda$)</p>
-<p>$$
+$$</div>
+<p>similarly for the <span class="math">\(u=0\)</span> case we have (where <span class="math">\(\lambda S\)</span> for some set <span class="math">\(S\)</span> is just multiplication of every element in the set by <span class="math">\(\lambda\)</span>)</p>
+<div class="math">$$
 x - u = x \in \lambda [-1, 1] = [-\lambda, \lambda].
-$$</p>
+$$</div>
 <p>that is</p>
-<p>$$
+<div class="math">$$
 u = 0\text{ whenever } |x|\le \lambda
-$$</p>
-<p>and similarly for the $u&lt;0$ case, we have $u = x + \lambda$ if $x &lt; -\lambda$. Since this is done for each component, the final operator has action</p>
-<p>$$
+$$</div>
+<p>and similarly for the <span class="math">\(u&lt;0\)</span> case, we have <span class="math">\(u = x + \lambda\)</span> if <span class="math">\(x &lt; -\lambda\)</span>. Since this is done for each component, the final operator has action</p>
+<div class="math">$$
 u_i = \begin{cases}
 x_i - \lambda, &amp; x_i &gt; \lambda\\
 0, &amp; |x_i| \le \lambda \\
 x_i + \lambda, &amp; x_i &lt; -\lambda.
 \end{cases}
-$$</p>
-<p>This operator is called the 'shrinkage' operator because of its action on its input: if $x_i$ is greater than our given $\lambda$, then we shrink it by that amount. Note then, that successively applying (in the same manner as SGD) the update rule</p>
-<p>$$
+$$</div>
+<p>This operator is called the 'shrinkage' operator because of its action on its input: if <span class="math">\(x_i\)</span> is greater than our given <span class="math">\(\lambda\)</span>, then we shrink it by that amount. Note then, that successively applying (in the same manner as SGD) the update rule</p>
+<div class="math">$$
 u^{i+1} = P_{|\cdot|}(u^i)
-$$</p>
-<p>correctly yields the minimum of the given convex function, i.e. 0. Of course, this isn't particularly surprising since we already know how to optimize the $\ell_1$-norm function, $\lVert x \lVert_1$ (just set it to zero!), but it will help out quite a bit when considering more complicated functions.</p>
+$$</div>
+<p>correctly yields the minimum of the given convex function, i.e. 0. Of course, this isn't particularly surprising since we already know how to optimize the <span class="math">\(\ell_1\)</span>-norm function, <span class="math">\(\lVert x \lVert_1\)</span> (just set it to zero!), but it will help out quite a bit when considering more complicated functions.</p>
 <h2>Proximal gradient update</h2>
 <p>Now, given a problem of the form
-$$
+</p>
+<div class="math">$$
 \min_x f(x) + g(x)
-$$</p>
-<p>where $f$ is differentiable, and $g$ is convex, we can write down a possible update in the same vein as the above, except that we now also update our objective for $f$ <em>and</em> $g$ at the same time
-$$
+$$</div>
+<p>where <span class="math">\(f\)</span> is differentiable, and <span class="math">\(g\)</span> is convex, we can write down a possible update in the same vein as the above, except that we now also update our objective for <span class="math">\(f\)</span> <em>and</em> <span class="math">\(g\)</span> at the same time
+</p>
+<div class="math">$$
 u^{i+1} = P_{\gamma^{i+1} g}(u^i - \gamma^{i+1}\nabla f(u^i)).
-$$</p>
-<p>Here, $\gamma^i$ is defined to be the step size for step $i$. It turns out we can prove several things about this update, but, perhaps most importantly, we can show that it works.</p>
+$$</div>
+<p>Here, <span class="math">\(\gamma^i\)</span> is defined to be the step size for step <span class="math">\(i\)</span>. It turns out we can prove several things about this update, but, perhaps most importantly, we can show that it works.</p>
 <p>Anyways, this is all I'll say about the proximal gradient step as there are several good resources on the proximal gradient method around which will do a much better job of explaining it than I probably ever will: see <a href="https://web.stanford.edu/~boyd/papers/pdf/prox_algs.pdf">this</a> for example.</p>
 <h2>Optimizing SVM using proximal gradient</h2>
 <h3>Initial problem</h3>
 <p>I assume some familiarity with SVMs, but the program given might require a bit of explanation. The idea of an SVM is as a soft-margin classifier (there are hard-magin SVMs, but we'll consider the former variety for now): we penalize the error of being on the wrong side of the decision boundary in a linear form (with zero penalty for being on the correct side of the decision boundary). The only additional thing is that we also require that the margin's size also be penalized such that it doesn't depend overly on a particular variable (e.g. as a form of regularization).</p>
-<p>The usual quadratic program for an SVM is, where $\xi^\pm_i$ are the slack variables indicating how much the given margin is violated, $\varepsilon &gt; 0$ is some arbitrary positive constant, and $\mu$ is the hyperplane and constant offset found by the SVM (e.g. by allowing the first feature of a positive/negative sample to be $(x^\pm_i)_0 = 1$):</p>
-<p>$$
+<p>The usual quadratic program for an SVM is, where <span class="math">\(\xi^\pm_i\)</span> are the slack variables indicating how much the given margin is violated, <span class="math">\(\varepsilon &gt; 0\)</span> is some arbitrary positive constant, and <span class="math">\(\mu\)</span> is the hyperplane and constant offset found by the SVM (e.g. by allowing the first feature of a positive/negative sample to be <span class="math">\((x^\pm_i)_0 = 1\)</span>):</p>
+<div class="math">$$
 \begin{aligned}
 &amp; \underset{\xi, \mu}{\text{minimize}}
 &amp; &amp; \sum_i \xi^+_i + \sum_i \xi^-_i + C\lVert \mu \lVert_2 \\
@@ -99,9 +101,9 @@ $$</p>
 &amp;&amp;&amp; \mu^Tx^-_i + \varepsilon \le \xi^-_i,\,\,\text{ for all } i\\
 &amp;&amp;&amp; \xi^\pm_i \ge 0,\,\,\text{ for all } i
 \end{aligned}
-$$</p>
-<p>we can rerwite this immediately, given that the class that our data point $i$ corresponds to is $y^{i}\in \{-1, +1\}$ to a much nicer form</p>
-<p>$$
+$$</div>
+<p>we can rerwite this immediately, given that the class that our data point <span class="math">\(i\)</span> corresponds to is <span class="math">\(y^{i}\in \\{-1, +1\\}\)</span> to a much nicer form</p>
+<div class="math">$$
 \begin{aligned}
 &amp; \underset{\xi, \mu}{\text{minimize}}
 &amp; &amp; 1^T \xi + C\lVert \mu \lVert_2 \\
@@ -109,9 +111,9 @@ $$</p>
 &amp; &amp; -y^i \mu^Tx_i - \varepsilon \ge -\xi_i,\,\,\text{ for all } i \\
 &amp;&amp;&amp; \xi_i \ge 0,\,\,\text{ for all } i
 \end{aligned}
-$$</p>
-<p>and noting that the objective is homogeneous of degree one, we can just multiply the constraints and all variables by $\frac{1}{\varepsilon}$ which yields the immediate result (after flipping some signs and inequalities)</p>
-<p>$$
+$$</div>
+<p>and noting that the objective is homogeneous of degree one, we can just multiply the constraints and all variables by <span class="math">\(\frac{1}{\varepsilon}\)</span> which yields the immediate result (after flipping some signs and inequalities)</p>
+<div class="math">$$
 \begin{aligned}
 &amp; \underset{\xi, \mu}{\text{minimize}}
 &amp; &amp; 1^T\xi + C\lVert \mu \lVert_2 \\
@@ -119,9 +121,9 @@ $$</p>
 &amp; &amp; \xi_i\ge y^i \mu^Tx_i +1,\,\,\text{ for all } i \\
 &amp;&amp;&amp; \xi_i \ge 0,\,\,\text{ for all } i
 \end{aligned}
-$$</p>
-<p>which, after changing the $\ell_2$ regularizer to an $\ell_2^2$-norm regularizer (which is equivalent for approriate regularization hyperparameter, say $\eta$<sup id="fnref-hyperparameter"><a class="footnote-ref" href="#fn-hyperparameter">1</a></sup>) yields</p>
-<p>$$
+$$</div>
+<p>which, after changing the <span class="math">\(\ell_2\)</span> regularizer to an <span class="math">\(\ell_2^2\)</span>-norm regularizer (which is equivalent for approriate regularization hyperparameter, say <span class="math">\(\eta\)</span><sup id="fnref-hyperparameter"><a class="footnote-ref" href="#fn-hyperparameter">1</a></sup>) yields</p>
+<div class="math">$$
 \begin{aligned}
 &amp; \underset{\xi, \mu}{\text{minimize}}
 &amp; &amp; 1^T \xi + C\lVert \mu \lVert_2^2 \\
@@ -129,61 +131,63 @@ $$</p>
 &amp; &amp; \xi_i\ge y^i \mu^Tx_i +1,\,\,\text{ for all } i \\
 &amp;&amp;&amp; \xi_i \ge 0,\,\,\text{ for all } i.
 \end{aligned}
-$$</p>
+$$</div>
 <p>This is the final program we care about and the one we have to solve using our proximal gradient operator. In general, it's not obvious how to fit the inequalities into a step, so we have to define a few more things.</p>
 <h3>Set indicators</h3>
 <p>For now, let's define the set indicator function
-$$
+</p>
+<div class="math">$$
 g_S(x) = \begin{cases}
 0 &amp; x\in S\\
 +\infty &amp; x\not\in S
 \end{cases}
-$$
-which is convex whenever $S$ is convex; we can use this to encode the above constraints (I drop the $S$ for convenience in what follows) such that a program equivalent to be above is</p>
-<p>$$
+$$</div>
+<p>
+which is convex whenever <span class="math">\(S\)</span> is convex; we can use this to encode the above constraints (I drop the <span class="math">\(S\)</span> for convenience in what follows) such that a program equivalent to be above is</p>
+<div class="math">$$
 \underset{\xi, \mu}{\text{minimize}} \,\, 1^T \xi + C\lVert \mu \lVert_2^2 + g(\mu, \xi)
-$$</p>
+$$</div>
 <p>which is exactly what we wanted! Why? Well:</p>
-<p>$$
+<div class="math">$$
 \underset{\xi, \mu}{\text{minimize}}\,\, \underbrace{1^T \xi + C\lVert \mu \lVert_2^2}_\text{differentiable} + \underbrace{g(\mu, \xi)}_\text{convex}
-$$</p>
-<p>so now, we just need to find the proximal gradient operator for $g(x)$ (which is not as nice as one would immediately think, but it's not bad!).</p>
+$$</div>
+<p>so now, we just need to find the proximal gradient operator for <span class="math">\(g(x)\)</span> (which is not as nice as one would immediately think, but it's not bad!).</p>
 <h3>Proximal gradient of the linear inequality indicator</h3>
-<p>Now, let's generalize the problem a bit: we're tasked with the question of finding the prox-gradient of $g_S(x)$ such that $S$ is given by some set of inequalities $S = \{x\,|\, Ax\le b\}$ for some given $A, b$.<sup id="fnref-equivalence"><a class="footnote-ref" href="#fn-equivalence">2</a></sup> That is, we require</p>
-<p>$$
+<p>Now, let's generalize the problem a bit: we're tasked with the question of finding the prox-gradient of <span class="math">\(g_S(x)\)</span> such that <span class="math">\(S\)</span> is given by some set of inequalities <span class="math">\(S = \\{x\,|\, Ax\le b\\}\)</span> for some given <span class="math">\(A, b\)</span>.<sup id="fnref-equivalence"><a class="footnote-ref" href="#fn-equivalence">2</a></sup> That is, we require</p>
+<div class="math">$$
 \mathop{\arg\!\min}\limits_y \frac{1}{2\lambda}\lVert x- y\lVert_2^2 + g_S(y)
-$$</p>
-<p>which can be rewritten as the equivalent program (where the $1/2\lambda$ is dropped since it's just a proportionality constant)</p>
-<p>$$
+$$</div>
+<p>which can be rewritten as the equivalent program (where the <span class="math">\(1/2\lambda\)</span> is dropped since it's just a proportionality constant)</p>
+<div class="math">$$
 \begin{aligned}
 &amp; \underset{y}{\text{minimize}}
 &amp; &amp; \lVert x- y\lVert_2^2 \\
 &amp; \text{subject to}
 &amp; &amp; Ay\le b
 \end{aligned}
-$$</p>
-<p>it turns out this program isn't nicely solvable using the prox-gradient operator (since there's no obvious way of projecting onto $Ax\le b$ and <em>also</em> minimizing the quadratic objective). But, of course, I wouldn't be writing this if there wasn't a cute trick or two we could do: note that this program has a strong dual (i.e. the values of the <a href="https://en.wikipedia.org/wiki/Duality_(optimization)">dual program</a> and the primal are equal) by <a href="https://en.wikipedia.org/wiki/Slater%27s_condition">Slater's condition</a>, so how about trying to solve the dual program? The lagrangian is</p>
-<p>$$
+$$</div>
+<p>it turns out this program isn't nicely solvable using the prox-gradient operator (since there's no obvious way of projecting onto <span class="math">\(Ax\le b\)</span> and <em>also</em> minimizing the quadratic objective). But, of course, I wouldn't be writing this if there wasn't a cute trick or two we could do: note that this program has a strong dual (i.e. the values of the <a href="https://en.wikipedia.org/wiki/Duality_(optimization)">dual program</a> and the primal are equal) by <a href="https://en.wikipedia.org/wiki/Slater%27s_condition">Slater's condition</a>, so how about trying to solve the dual program? The lagrangian is</p>
+<div class="math">$$
 \mathcal{L} = \lVert x- y\lVert_2^2 + \gamma^T(Ay - b)
-$$</p>
-<p>from which we can derive the dual by taking derivatives over $y$:</p>
-<p>$$
+$$</div>
+<p>from which we can derive the dual by taking derivatives over <span class="math">\(y\)</span>:</p>
+<div class="math">$$
 \nabla\mathcal{L} = y-x + A^T\gamma = 0 \implies y = x - A^T\gamma
-$$</p>
+$$</div>
 <p>and plugging in the above (and simplifying) yields the program</p>
-<p>$$
+<div class="math">$$
 \begin{aligned}
 &amp; \underset{\eta}{\text{maximize}}
 &amp; &amp; \eta^T(Ax-b) - \frac{1}{2}\lVert A^T\eta\lVert_2^2 \\
 &amp; \text{subject to}
 &amp; &amp; \eta \ge 0
 \end{aligned}
-$$</p>
+$$</div>
 <p>from which we can reconstruct the original solution by the above, given:</p>
-<p>$$
+<div class="math">$$
 y = x - A^T\eta.
-$$</p>
-<p>This program now has a nice prox step, since $\left(P_{\eta \ge 0}(\eta)\right)_i = \max\{0, \eta_i\}$ (the 'positive' part of $\eta_i$, in other words). This latter case is left as an exercise for the reader.</p>
+$$</div>
+<p>This program now has a nice prox step, since <span class="math">\(\left(P_{\eta \ge 0}(\eta)\right)_i = \max\\{0, \eta_i\\}\)</span> (the 'positive' part of <span class="math">\(\eta_i\)</span>, in other words). This latter case is left as an exercise for the reader.</p>
 <h2>Final Thoughts</h2>
 <p>Putting the above together yields a complete way of optimizing the SVM program: first, take a single step of the initial objective, then find the minimum projection on the polygon over the given inequality constraints by using the second method, and then take a new step on the original, initial program presented.</p>
 <p>Of course, this serves as little more than an academic exercise (I'm not sure how thrilled either Boyd nor Lall would be at using dual programs in 104, even in a quasi-black-box optimizer), but it may be of interest to people who take interest in relatively uninteresting things (e.g. me) or to people who happen to have <em>really freaking fast</em> proximal gradient optimizers (not sure these exist, but we can pretend).</p>
@@ -198,6 +202,61 @@ $$</p>
 </li>
 </ol>
 </div>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "left",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'blue ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
         <hr>
         <div class="socials">
             <li>Got any questions?</li>

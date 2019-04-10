@@ -8,16 +8,17 @@ body {
     padding: 0 10px;   
 }
 h1 {
-    font-size: 48px;
+    font-size: 40px;
 }
 h2 {
     font-size: 30px;
+    line-height: 1;
 }
 h3 {
-    font-size: 24px;
+    font-size: 26px;
+    line-height: 1.5;
 }
 h1, h2, h3 {
-    line-height: 1;
     font-family: 'helvetica neue', sans-serif;
     font-weight: 200;
 }
@@ -69,6 +70,15 @@ table td {
     border: 1px solid #000;
     text-align: center;
     padding: 2px;
+}
+
+pre {
+    padding: 2px 4px;
+    vertical-align: text-bottom;
+    font-size: 15px;
+    padding: 1em;
+    background: #eee;
+    border-left: 2px solid #628D9B;
 }
 
 /* Classes */

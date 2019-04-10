@@ -30,8 +30,8 @@ As a side note: a simple heuristic, which usually works quite well, is to take t
 
 With that in mind, here's the algorithm, which is really just a (slightly) modified version of $A^*$. (The code below is like quasi-Python pseudocode, but implementing directly shouldn't require too many changes. Additionally, some things can be easily stored instead of recomputed by exploiting the structure of the cost function.)
 
-
-```python
+```
+:::python
 q <- priority queue
 start_node <- start node
 end_node <- end node

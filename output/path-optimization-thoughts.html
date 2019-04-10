@@ -5,7 +5,7 @@
     
     <link rel="stylesheet" href="/theme/css/main.css">
 
-    <script type="text/x-mathjax-config">
+    <!-- <script type="text/x-mathjax-config">
         MathJax.Hub.Config({
             tex2jax: {
                 inlineMath: [ ['$','$'], ['\\(','\\)'] ]
@@ -15,7 +15,7 @@
     
     <script type="text/javascript" async
     src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
-    </script>
+    </script> -->
     
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">    	
@@ -38,48 +38,48 @@
 <p>Discretize the space and goals into a graph problem which is guaranteed to be (a) <em>damn fast to solve</em> and (b) to always give a feasible result (minus a curvature constraint—that will come in later).</p>
 </li>
 <li>
-<p>Make the resulting path through the graph into an ordered set of points $x_i \in \mathbb{R}^2$ (or $\mathbb{R}^3$, depending on what problem needs to be solved) through actual Euclidean space.</p>
+<p>Make the resulting path through the graph into an ordered set of points <span class="math">\(x_i \in \mathbb{R}^2\)</span> (or <span class="math">\(\mathbb{R}^3\)</span>, depending on what problem needs to be solved) through actual Euclidean space.</p>
 </li>
 <li>
 <p>Perform continuous optimization starting at this resulting path in order to meet curvature constraints and add some 'finishing touches' (this will be formalized in a second, don't worry).</p>
 </li>
 <li>
-<p>Do $(3)$ for moving objects, for a while, as $(1) \to (2)$ are solved again, simultaneously.</p>
+<p>Do <span class="math">\((3)\)</span> for moving objects, for a while, as <span class="math">\((1) \to (2)\)</span> are solved again, simultaneously.</p>
 </li>
 </ol>
-<p>In this post, I'll mostly focus on step $(3)$, which is actually all you need to truly optimize over a path (along with some cute other heuristics), though steps $(1)$ and $(2)$ are also really just fast heuristics so we don't get stuck in crappy minima that would take us through the middle of an obstacle. I'll show how this can happen in non-obvious ways which is kinda fun for the first few times and mostly infuriating for the rest of the time (which is why we end up going through $(1)$ and $(2)$ in the end!).</p>
+<p>In this post, I'll mostly focus on step <span class="math">\((3)\)</span>, which is actually all you need to truly optimize over a path (along with some cute other heuristics), though steps <span class="math">\((1)\)</span> and <span class="math">\((2)\)</span> are also really just fast heuristics so we don't get stuck in crappy minima that would take us through the middle of an obstacle. I'll show how this can happen in non-obvious ways which is kinda fun for the first few times and mostly infuriating for the rest of the time (which is why we end up going through <span class="math">\((1)\)</span> and <span class="math">\((2)\)</span> in the end!).</p>
 <h2>Smooth barriers</h2>
 <p>Perhaps the main idea of this step is that we can optimize over some function (which isn't quite a hard-wall constraint) and then slowly tune a parameter until it becomes a better and better approximation of a hard wall; for this example I've chosen the (reversed) logistic function</p>
-<p>$$
+<div class="math">$$
 \phi(x) = \frac{1}{1+e^{x}}
-$$</p>
-<p>such that two things happen: one, that $\phi(x) \to 0$ as $x\to \infty$ and $\phi(x) \to 1$ as $x\to -\infty$, and, two, that $\phi(Cx)$ approximates a hard wall as $C\to \infty$. Below is $\phi(Cx)$ plotted for a few different values of $C$:</p>
+$$</div>
+<p>such that two things happen: one, that <span class="math">\(\phi(x) \to 0\)</span> as <span class="math">\(x\to \infty\)</span> and <span class="math">\(\phi(x) \to 1\)</span> as <span class="math">\(x\to -\infty\)</span>, and, two, that <span class="math">\(\phi(Cx)\)</span> approximates a hard wall as <span class="math">\(C\to \infty\)</span>. Below is <span class="math">\(\phi(Cx)\)</span> plotted for a few different values of <span class="math">\(C\)</span>:</p>
 <p><img src="/images/path-optimization-1/phi_curvature.png" class="plot">
-<em>Barrier functions for varying curvatures $C$.</em></p>
+<em>Barrier functions for varying curvatures <span class="math">\(C\)</span>.</em></p>
 <p>The idea is that the smooth problem should be easy to solve and we can get consistently better approximations by starting at the easy problem and solving a sequence of problems which, in the limit, give the desired path.</p>
-<p>More generally speaking, let the obstacles be centered at some set of points $\{c_j\}$, each with some radius $R_j$, then a single constraint corresponds to the barrier of curvature $C$ given by (where the object is at position $x$)</p>
-<p>$$
+<p>More generally speaking, let the obstacles be centered at some set of points <span class="math">\(\\{c\_j\\}\)</span>, each with some radius <span class="math">\(R\_j\)</span>, then a single constraint corresponds to the barrier of curvature <span class="math">\(C\)</span> given by (where the object is at position <span class="math">\(x\)</span>)</p>
+<div class="math">$$
 \phi\left(C\left(\frac{\lVert x - c_j \lVert_2^2}{R_j^2} - 1\right)\right)
-$$</p>
-<p>which, if we assume that our path is characterized by an ordered set of points $\{x_i\}$, gives our complete energy function to be</p>
-<p>$$
+$$</div>
+<p>which, if we assume that our path is characterized by an ordered set of points <span class="math">\(\\{x_i\\}\)</span>, gives our complete energy function to be</p>
+<div class="math">$$
 \mathcal{L}(x; c, R, C) = \sum_{ij}\phi\left(C\left(\frac{\lVert x_i - c_j \lVert_2^2}{R_j^2} - 1\right)\right)
-$$</p>
-<p>which is really just a fancy way of writing "each discretized point in my path should be outside of an obstacle." This is <em>close</em> to what we want, but it's not quite there yet: we aren't penalizing for being arbitrarily far away from other points—that is, if we just put all of our $\{x_i\}$ at infinity, we now have zero penalty!</p>
-<p>Of course, that's a pretty stupid path that no drone can take (especially if we're constrained to be in some particular region, which, in this case, we are), so we do the next straightforward thing: we also penalize any point being far away from its adjacent points. E.g. we add a penalty term of the form $\eta\lVert x_i - x_{i+1}\lVert_2^2$ for $\eta&gt;0$. </p>
+$$</div>
+<p>which is really just a fancy way of writing "each discretized point in my path should be outside of an obstacle." This is <em>close</em> to what we want, but it's not quite there yet: we aren't penalizing for being arbitrarily far away from other points—that is, if we just put all of our <span class="math">\(\\{x_i\\}\)</span> at infinity, we now have zero penalty!</p>
+<p>Of course, that's a pretty stupid path that no drone can take (especially if we're constrained to be in some particular region, which, in this case, we are), so we do the next straightforward thing: we also penalize any point being far away from its adjacent points. E.g. we add a penalty term of the form <span class="math">\(\eta\lVert x\_i - x\_{i+1}\lVert_2^2\)</span> for <span class="math">\(\eta&gt;0\)</span>. </p>
 <p>In this case, our complete energy function then looks like</p>
-<p>$$
-\mathcal{L}(x; c, R, C) = \sum_{i}\left[\sum_j\phi\left(C\left(\frac{\lVert x_i - c_j \lVert_2^2}{R_j^2} - 1\right)\right) + \eta \lVert x_i - x_{i+1}\lVert_2^2\right]
-$$</p>
-<p>with a 'tunable' parameter $\eta$, and constraint wall 'hardness' $C$ which we send to infinity as we solve a sequence of problems. That is, let $\{C_k\}$ be a sequence such that $C_k\to \infty$ then we solve the sequence of problems</p>
-<p>$$
-x^{(k)} = \min_x\mathcal{L}(x; c, R, C_k) 
-$$</p>
+<div class="math">$$
+\mathcal{L}(x; c, R, C) = \sum_{i}\left[\sum_j\phi\left(C\left(\frac{\lVert x_i - c_j \lVert_2^2}{R_j^2} - 1\right)\right) + \eta \lVert x\_i - x\_{i+1}\lVert_2^2\right]
+$$</div>
+<p>with a 'tunable' parameter <span class="math">\(\eta\)</span>, and constraint wall 'hardness' <span class="math">\(C\)</span> which we send to infinity as we solve a sequence of problems. That is, let <span class="math">\(\\{C\_k\\}\)</span> be a sequence such that <span class="math">\(C_k\to \infty\)</span> then we solve the sequence of problems</p>
+<div class="math">$$
+x^{(k)} = \min\_x\mathcal{L}(x; c, R, C_k) 
+$$</div>
 <p>and take the trajectory</p>
-<p>$$
-x^* = \lim_{k\to\infty} x^{(k)}
-$$</p>
-<p>in the limit. Why do we do this? Because the derivative of $\mathcal{L}$ vanishes as $C\to\infty$ for the hard constraints. This can be seen in the picture above, by looking at the left side; as $C$ becomes large, the function becomes essentially flat when $x&lt;0$ and $x&gt;0$. This is generally bad, since, if we were to optimize directly for some very large $C$ which goes through the interior of an obstacle, we would be near a point where the derivative nearly vanishes even though we're inside of an obstacle!</p>
+<div class="math">$$
+x^* = \lim\_{k\to\infty} x^{(k)}
+$$</div>
+<p>in the limit. Why do we do this? Because the derivative of <span class="math">\(\mathcal{L}\)</span> vanishes as <span class="math">\(C\to\infty\)</span> for the hard constraints. This can be seen in the picture above, by looking at the left side; as <span class="math">\(C\)</span> becomes large, the function becomes essentially flat when <span class="math">\(x&lt;0\)</span> and <span class="math">\(x&gt;0\)</span>. This is generally bad, since, if we were to optimize directly for some very large <span class="math">\(C\)</span> which goes through the interior of an obstacle, we would be near a point where the derivative nearly vanishes even though we're inside of an obstacle!</p>
 <p>This is totally infeasible for our problem and we cannot sidestep this issue in an obvious way using general optimization tools. So we're forced to do the Next Best Thing™, which is to perform this cooling schedule idea while optimizing over the objective.<sup id="fnref-shortestpath"><a class="footnote-ref" href="#fn-shortestpath">1</a></sup></p>
 <p>Anyways, optimizing this function somewhat successfully with some decent cooling schedule (which is the subject of the next post) yields a cute movie that looks like the following</p>
 <video controls>
@@ -92,10 +92,65 @@ $$</p>
 <hr>
 <ol>
 <li id="fn-shortestpath">
-<p>As given before, we can create feasible trajectories which do not have this problem by discretization methods—this helps out quite a bit since, for complicated trajectories where a lot of the initial path intersects obstacles, most of the time is spent on either (a) making a good cooling schedule for $C$ or (b) escaping the minima which include local obstacles. I'll discuss these methods in a later post.&#160;<a class="footnote-backref" href="#fnref-shortestpath" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<p>As given before, we can create feasible trajectories which do not have this problem by discretization methods—this helps out quite a bit since, for complicated trajectories where a lot of the initial path intersects obstacles, most of the time is spent on either (a) making a good cooling schedule for <span class="math">\(C\)</span> or (b) escaping the minima which include local obstacles. I'll discuss these methods in a later post.&#160;<a class="footnote-backref" href="#fnref-shortestpath" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "left",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'blue ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
         <hr>
         <div class="socials">
             <li>Got any questions?</li>

@@ -51,10 +51,10 @@ I should note that this is a *very* strong condition, but it can be quite useful
 
 $$
 \begin{aligned}
-D(p_t\lVert p_{t'})&=-\sum_x p_t(x) \log \frac{p_{t'}(x)}{p_t(x)} \\\\
-&\ge -\log\left(\sum_x p_t(x)\frac{p_{t'}(x)}{p_t(x)}\right) \\\\
-&= -\log\left(\sum_x p_{t'}(x)\right) \\\\
-& = -\log 1 \\\\
+D(p_t\lVert p_{t'})&=-\sum_x p_t(x) \log \frac{p_{t'}(x)}{p_t(x)} \\
+&\ge -\log\left(\sum_x p_t(x)\frac{p_{t'}(x)}{p_t(x)}\right) \\
+&= -\log\left(\sum_x p_{t'}(x)\right) \\
+& = -\log 1 \\
 &= 0,
 \end{aligned}
 $$
@@ -93,9 +93,9 @@ $$
 so, putting it all together
 $$
 \begin{aligned}
-H(p_{t+1}) &= -\sum_{x'} p_{t+1}(x') \log p_{t+1}(x') \\\\
-&= -\sum_{x, x'} p_t(x)K(x, x') \log p_{t+1}(x')\\\\
-&\ge -\sum_x p_t(x) \log p_t(x) \\\\
+H(p_{t+1}) &= -\sum_{x'} p_{t+1}(x') \log p_{t+1}(x') \\
+&= -\sum_{x, x'} p_t(x)K(x, x') \log p_{t+1}(x')\\
+&\ge -\sum_x p_t(x) \log p_t(x) \\
 &= H(p_t),
 \end{aligned}
 $$
