@@ -87,19 +87,19 @@ More specifically, take a peek at Helmholtz's equation:
 $$
 \nabla^2 a(x) + \left(\frac{\omega^2}{c(x)^2}\right)a(x) = u(x),
 $$
-where $c: \mathbb{R}^3 \to \mathbb{R}\_{> 0}$ is a function specifying the speed of sound at every point in the material, while $a: \mathbb{R}^3 \to \mathbb{R}$ is a function specifying the amplitude at each point, $u: \mathbb{R}^3 \to \mathbb{R}$ is a function specifying an excitation, and $\omega \in \mathbb{R}\_{\ge 0}$ is the frequency of the wave. We can make some simple correspondences:
+where $c: \mathbb{R}^3 \to \mathbb{R}_{> 0}$ is a function specifying the speed of sound at every point in the material, while $a: \mathbb{R}^3 \to \mathbb{R}$ is a function specifying the amplitude at each point, $u: \mathbb{R}^3 \to \mathbb{R}$ is a function specifying an excitation, and $\omega \in \mathbb{R}_{\ge 0}$ is the frequency of the wave. We can make some simple correspondences:
 $$
-\Bigg(\underbrace{\nabla^2}\_{A} + \underbrace{\bigg(\frac{\omega^2}{c(x)^2}\bigg)}\_{\mathrm{diag}(\theta)}\Bigg)\underbrace{a(x)}\_{z} = \underbrace{u(x)}\_{b}.
+\Bigg(\underbrace{\nabla^2}_{A} + \underbrace{\bigg(\frac{\omega^2}{c(x)^2}\bigg)}_{\mathrm{diag}(\theta)}\Bigg)\underbrace{a(x)}_{z} = \underbrace{u(x)}_{b}.
 $$
 
-Now, we usually want the field ($z$) to look similar to a desired field (which we will call $\hat z$), while satisfying the physics equation described above. We can phrase this in several ways, but a [particularly natural one](/ls-images.html) is by attempting to minimize the objective $\left\\|z - \hat z\right\\|\_2^2$.
+Now, we usually want the field ($z$) to look similar to a desired field (which we will call $\hat z$), while satisfying the physics equation described above. We can phrase this in several ways, but a [particularly natural one](/ls-images.html) is by attempting to minimize the objective $\left\|z - \hat z\right\|_2^2$.
 
 Finally, we are only able to choose materials within a specific range: that is, $\theta^\mathrm{min} \le \theta \le \theta^\mathrm{max}$.
 
 Putting all of this together, we can write the optimization problem as
 $$
 \begin{array}{ll}
-\text{minimize} & \frac12\left\\|z - \hat z\right\\|\_2^2\\
+\text{minimize} & \frac12\left\|z - \hat z\right\|_2^2\\
 \text{subject to} & (A + \mathrm{diag}(\theta))z = b\\
 & \theta^\mathrm{min} \le \theta \le \theta^\mathrm{max}.
 \end{array}
@@ -109,7 +109,7 @@ which is exactly problem (1) in the paper, in the special case where $W = I$, th
 ### Deriving the dual
 Here is essentially the only 'magic' part of the paper. First, we can write the Lagrangian of the problem as,
 $$
-\mathcal{L}(z, \theta, \nu) = \frac12\left\\|z - \hat z\right\\|\_2^2 + \nu^T((A + \mathrm{diag}(\theta))z - b).
+\mathcal{L}(z, \theta, \nu) = \frac12\left\|z - \hat z\right\|_2^2 + \nu^T((A + \mathrm{diag}(\theta))z - b).
 $$
 Now, there is something weird here: notice that I sneakily dropped the term containing the lower and upper limits for $\theta$—this idea is, in fact, what saves the entire approach. What we will first do is the usual thing: we'll minimize the Lagrangian over all possible $z$, which we can easily do since the Lagrangian is a convex quadratic over $z$. In particular, taking the gradient over $z$ and setting it to zero (which is necessary and sufficient by convexity and differentiability) gives us that the optimal $z$ is
 $$
@@ -117,7 +117,7 @@ z = \hat z - (A + \mathrm{diag(\theta)})^T\nu,
 $$
 which means that
 $$
-\inf_z \mathcal{L}(z, \theta, \nu) = - \frac12\left\\|\hat z - (A + \mathrm{diag(\theta)})^T\nu\right\\|\_2^2 - \nu^Tb + \frac12\\|\hat z\\|\_2^2.
+\inf_z \mathcal{L}(z, \theta, \nu) = - \frac12\left\|\hat z - (A + \mathrm{diag(\theta)})^T\nu\right\|_2^2 - \nu^Tb + \frac12\|\hat z\|_2^2.
 $$
 The next step is then finding the infimum of $\mathcal{L}$ over $\theta$. That is, finding
 $$
@@ -131,26 +131,26 @@ If you've convinced yourself of this (or haven't yet, but want to continue), we 
 $$
 \begin{aligned}
 g(\nu) &= \inf_{\theta^\mathrm{min} \le \theta \le \theta^\mathrm{max}} \left(\inf_z \mathcal{L}(z, \theta, \nu)\right)\\
-&= \inf_{\theta^\mathrm{min} \le \theta \le \theta^\mathrm{max}} \left(- \frac12\left\\|\hat z - (A + \mathrm{diag(\theta)})^T\nu\right\\|\_2^2 - \nu^Tb + \frac12\\|\hat z\\|\_2^2\right)
+&= \inf_{\theta^\mathrm{min} \le \theta \le \theta^\mathrm{max}} \left(- \frac12\left\|\hat z - (A + \mathrm{diag(\theta)})^T\nu\right\|_2^2 - \nu^Tb + \frac12\|\hat z\|_2^2\right)
 \end{aligned}
 $$
 The trick is to notice two things. One, that the objective is concave in $\theta$ and, two, that the objective is *separable* over each component of $\theta$. 
 
 First off, let's say a function $v: \mathbb{R} \to \mathbb{R}$ is concave over the interval $[L, U]$, then it achieves its minimum value at the boundaries of the interval. Why? Well, the definition of concavity says, for every $0 \le \gamma \le 1$,
 $$
-v(\gamma L + (1- \gamma)U) \ge \gamma v(L) + (1-\gamma)v(U) \ge \min\\{v(L), v(U)\\}.
+v(\gamma L + (1- \gamma)U) \ge \gamma v(L) + (1-\gamma)v(U) \ge \min\{v(L), v(U)\}.
 $$
 but any point in the interval $[L, U]$ is a convex combination of $L$ or $U$! So every point inside of the interval is at least as large as the smallest endpoint of the interval, which completes the proof.
 
 This solves our problem: since the objective is separable, then we only need to consider each component of $\theta$, and, because it's concave, then we know that an optimal $\theta_i$ is one of either $\theta^\mathrm{min}_i$ or $\theta^\mathrm{max}_i$. Replacing the complicated $\inf$ with this (much simpler) $\min$ gives the analytic solution for $g$:
 $$
 \begin{multline}
-g(\nu) = \sum_i \min\bigg\\{-\frac12 (\hat z\_i - a\_i^T\nu + \theta\_i^\mathrm{min} \nu_i)^2, - \frac12 (\hat z\_i - a\_i^T\nu + \theta\_i^\mathrm{max} \nu_i)^2\bigg\\} \\- \nu^Tb + \frac12\\|\hat z\\|\_2^2,
+g(\nu) = \sum_i \min\bigg\{-\frac12 (\hat z_i - a_i^T\nu + \theta_i^\mathrm{min} \nu_i)^2, - \frac12 (\hat z_i - a_i^T\nu + \theta_i^\mathrm{max} \nu_i)^2\bigg\} \\- \nu^Tb + \frac12\|\hat z\|_2^2,
 \end{multline}
 $$
 or, writing it in the same way as the paper, by pulling out the $-1/2$ (and using $\theta^\mathrm{min} = 0$),
 $$
-g(\nu) = -\frac12 \sum_i \max\bigg\\{ (\hat z\_i - a\_i^T\nu + \nu_i)^2, (\hat z\_i - a\_i^T\nu + \theta\_i^\mathrm{max} \nu_i)^2\bigg\\} - \nu^Tb + \frac12\\|\hat z\\|\_2^2.
+g(\nu) = -\frac12 \sum_i \max\bigg\{ (\hat z_i - a_i^T\nu + \nu_i)^2, (\hat z_i - a_i^T\nu + \theta_i^\mathrm{max} \nu_i)^2\bigg\} - \nu^Tb + \frac12\|\hat z\|_2^2.
 $$
 Now that we have an analytic form for $g$ (our set of lower bounds), we can maximize the function to get the best lower bound. As discussed before, this is a convex optimization problem which can be formulated by [CVXPY](https://www.cvxpy.org) and solved using one of the many available solvers for [convex quadratically-constrained quadratic programs](https://osqp.org) (QCQPs) or [second-order conic programs](https://www.embotech.com/ECOS) (SOCPs).
 

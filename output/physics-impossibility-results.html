@@ -122,18 +122,18 @@ where <span class="math">\(\theta \in \mathbb{R}^n\)</span> are the design param
 \nabla^2 a(x) + \left(\frac{\omega^2}{c(x)^2}\right)a(x) = u(x),
 $$</div>
 <p>
-where <span class="math">\(c: \mathbb{R}^3 \to \mathbb{R}\_{&gt; 0}\)</span> is a function specifying the speed of sound at every point in the material, while <span class="math">\(a: \mathbb{R}^3 \to \mathbb{R}\)</span> is a function specifying the amplitude at each point, <span class="math">\(u: \mathbb{R}^3 \to \mathbb{R}\)</span> is a function specifying an excitation, and <span class="math">\(\omega \in \mathbb{R}\_{\ge 0}\)</span> is the frequency of the wave. We can make some simple correspondences:
+where <span class="math">\(c: \mathbb{R}^3 \to \mathbb{R}_{&gt; 0}\)</span> is a function specifying the speed of sound at every point in the material, while <span class="math">\(a: \mathbb{R}^3 \to \mathbb{R}\)</span> is a function specifying the amplitude at each point, <span class="math">\(u: \mathbb{R}^3 \to \mathbb{R}\)</span> is a function specifying an excitation, and <span class="math">\(\omega \in \mathbb{R}_{\ge 0}\)</span> is the frequency of the wave. We can make some simple correspondences:
 </p>
 <div class="math">$$
-\Bigg(\underbrace{\nabla^2}\_{A} + \underbrace{\bigg(\frac{\omega^2}{c(x)^2}\bigg)}\_{\mathrm{diag}(\theta)}\Bigg)\underbrace{a(x)}\_{z} = \underbrace{u(x)}\_{b}.
+\Bigg(\underbrace{\nabla^2}_{A} + \underbrace{\bigg(\frac{\omega^2}{c(x)^2}\bigg)}_{\mathrm{diag}(\theta)}\Bigg)\underbrace{a(x)}_{z} = \underbrace{u(x)}_{b}.
 $$</div>
-<p>Now, we usually want the field (<span class="math">\(z\)</span>) to look similar to a desired field (which we will call <span class="math">\(\hat z\)</span>), while satisfying the physics equation described above. We can phrase this in several ways, but a <a href="/ls-images.html">particularly natural one</a> is by attempting to minimize the objective <span class="math">\(\left\\|z - \hat z\right\\|\_2^2\)</span>.</p>
+<p>Now, we usually want the field (<span class="math">\(z\)</span>) to look similar to a desired field (which we will call <span class="math">\(\hat z\)</span>), while satisfying the physics equation described above. We can phrase this in several ways, but a <a href="/ls-images.html">particularly natural one</a> is by attempting to minimize the objective <span class="math">\(\left\|z - \hat z\right\|_2^2\)</span>.</p>
 <p>Finally, we are only able to choose materials within a specific range: that is, <span class="math">\(\theta^\mathrm{min} \le \theta \le \theta^\mathrm{max}\)</span>.</p>
 <p>Putting all of this together, we can write the optimization problem as
 </p>
 <div class="math">$$
 \begin{array}{ll}
-\text{minimize} &amp; \frac12\left\\|z - \hat z\right\\|\_2^2\\
+\text{minimize} &amp; \frac12\left\|z - \hat z\right\|_2^2\\
 \text{subject to} &amp; (A + \mathrm{diag}(\theta))z = b\\
 &amp; \theta^\mathrm{min} \le \theta \le \theta^\mathrm{max}.
 \end{array}
@@ -144,7 +144,7 @@ which is exactly problem (1) in the paper, in the special case where <span class
 <p>Here is essentially the only 'magic' part of the paper. First, we can write the Lagrangian of the problem as,
 </p>
 <div class="math">$$
-\mathcal{L}(z, \theta, \nu) = \frac12\left\\|z - \hat z\right\\|\_2^2 + \nu^T((A + \mathrm{diag}(\theta))z - b).
+\mathcal{L}(z, \theta, \nu) = \frac12\left\|z - \hat z\right\|_2^2 + \nu^T((A + \mathrm{diag}(\theta))z - b).
 $$</div>
 <p>
 Now, there is something weird here: notice that I sneakily dropped the term containing the lower and upper limits for <span class="math">\(\theta\)</span>—this idea is, in fact, what saves the entire approach. What we will first do is the usual thing: we'll minimize the Lagrangian over all possible <span class="math">\(z\)</span>, which we can easily do since the Lagrangian is a convex quadratic over <span class="math">\(z\)</span>. In particular, taking the gradient over <span class="math">\(z\)</span> and setting it to zero (which is necessary and sufficient by convexity and differentiability) gives us that the optimal <span class="math">\(z\)</span> is
@@ -156,7 +156,7 @@ $$</div>
 which means that
 </p>
 <div class="math">$$
-\inf_z \mathcal{L}(z, \theta, \nu) = - \frac12\left\\|\hat z - (A + \mathrm{diag(\theta)})^T\nu\right\\|\_2^2 - \nu^Tb + \frac12\\|\hat z\\|\_2^2.
+\inf_z \mathcal{L}(z, \theta, \nu) = - \frac12\left\|\hat z - (A + \mathrm{diag(\theta)})^T\nu\right\|_2^2 - \nu^Tb + \frac12\|\hat z\|_2^2.
 $$</div>
 <p>
 The next step is then finding the infimum of <span class="math">\(\mathcal{L}\)</span> over <span class="math">\(\theta\)</span>. That is, finding
@@ -172,7 +172,7 @@ Now, of course, minimization over all <span class="math">\(\theta\)</span> is a 
 <div class="math">$$
 \begin{aligned}
 g(\nu) &amp;= \inf_{\theta^\mathrm{min} \le \theta \le \theta^\mathrm{max}} \left(\inf_z \mathcal{L}(z, \theta, \nu)\right)\\
-&amp;= \inf_{\theta^\mathrm{min} \le \theta \le \theta^\mathrm{max}} \left(- \frac12\left\\|\hat z - (A + \mathrm{diag(\theta)})^T\nu\right\\|\_2^2 - \nu^Tb + \frac12\\|\hat z\\|\_2^2\right)
+&amp;= \inf_{\theta^\mathrm{min} \le \theta \le \theta^\mathrm{max}} \left(- \frac12\left\|\hat z - (A + \mathrm{diag(\theta)})^T\nu\right\|_2^2 - \nu^Tb + \frac12\|\hat z\|_2^2\right)
 \end{aligned}
 $$</div>
 <p>
@@ -180,7 +180,7 @@ The trick is to notice two things. One, that the objective is concave in <span c
 <p>First off, let's say a function <span class="math">\(v: \mathbb{R} \to \mathbb{R}\)</span> is concave over the interval <span class="math">\([L, U]\)</span>, then it achieves its minimum value at the boundaries of the interval. Why? Well, the definition of concavity says, for every <span class="math">\(0 \le \gamma \le 1\)</span>,
 </p>
 <div class="math">$$
-v(\gamma L + (1- \gamma)U) \ge \gamma v(L) + (1-\gamma)v(U) \ge \min\\{v(L), v(U)\\}.
+v(\gamma L + (1- \gamma)U) \ge \gamma v(L) + (1-\gamma)v(U) \ge \min\{v(L), v(U)\}.
 $$</div>
 <p>
 but any point in the interval <span class="math">\([L, U]\)</span> is a convex combination of <span class="math">\(L\)</span> or <span class="math">\(U\)</span>! So every point inside of the interval is at least as large as the smallest endpoint of the interval, which completes the proof.</p>
@@ -188,14 +188,14 @@ but any point in the interval <span class="math">\([L, U]\)</span> is a convex c
 </p>
 <div class="math">$$
 \begin{multline}
-g(\nu) = \sum_i \min\bigg\\{-\frac12 (\hat z\_i - a\_i^T\nu + \theta\_i^\mathrm{min} \nu_i)^2, - \frac12 (\hat z\_i - a\_i^T\nu + \theta\_i^\mathrm{max} \nu_i)^2\bigg\\} \\- \nu^Tb + \frac12\\|\hat z\\|\_2^2,
+g(\nu) = \sum_i \min\bigg\{-\frac12 (\hat z_i - a_i^T\nu + \theta_i^\mathrm{min} \nu_i)^2, - \frac12 (\hat z_i - a_i^T\nu + \theta_i^\mathrm{max} \nu_i)^2\bigg\} \\- \nu^Tb + \frac12\|\hat z\|_2^2,
 \end{multline}
 $$</div>
 <p>
 or, writing it in the same way as the paper, by pulling out the <span class="math">\(-1/2\)</span> (and using <span class="math">\(\theta^\mathrm{min} = 0\)</span>),
 </p>
 <div class="math">$$
-g(\nu) = -\frac12 \sum_i \max\bigg\\{ (\hat z\_i - a\_i^T\nu + \nu_i)^2, (\hat z\_i - a\_i^T\nu + \theta\_i^\mathrm{max} \nu_i)^2\bigg\\} - \nu^Tb + \frac12\\|\hat z\\|\_2^2.
+g(\nu) = -\frac12 \sum_i \max\bigg\{ (\hat z_i - a_i^T\nu + \nu_i)^2, (\hat z_i - a_i^T\nu + \theta_i^\mathrm{max} \nu_i)^2\bigg\} - \nu^Tb + \frac12\|\hat z\|_2^2.
 $$</div>
 <p>
 Now that we have an analytic form for <span class="math">\(g\)</span> (our set of lower bounds), we can maximize the function to get the best lower bound. As discussed before, this is a convex optimization problem which can be formulated by <a href="https://www.cvxpy.org">CVXPY</a> and solved using one of the many available solvers for <a href="https://osqp.org">convex quadratically-constrained quadratic programs</a> (QCQPs) or <a href="https://www.embotech.com/ECOS">second-order conic programs</a> (SOCPs).</p>
