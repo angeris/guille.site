@@ -10,10 +10,16 @@ body {
 h1 {
     font-size: 48px;
 }
+h2 {
+    font-size: 30px;
+}
+h3 {
+    font-size: 24px;
+}
 h1, h2, h3 {
     line-height: 1;
-    font-family: 'Helvetica', sans-serif;
-    font-weight: 100;
+    font-family: 'helvetica neue', sans-serif;
+    font-weight: 200;
 }
 a {
     color: #628D9B;
@@ -79,14 +85,14 @@ table td {
     margin-left: 0px;
     padding-left: 10px;
     padding-right: 10px;
-    font-family: 'Helvetica', sans-serif;
+    font-family: 'helvetica neue', sans-serif;
     font-weight: 500;
     font-size: 16px;
 }
 .webtitle {
-    font-family: 'Helvetica', sans-serif;
+    font-family: 'helvetica neue', sans-serif;
     color: #888;
-    font-weight: 100;
+    font-weight: 200;
     line-height: 1;
 }
 img {
@@ -127,6 +133,6 @@ span.lightemph {
 p.tagline {
     text-align: center;
     color: #666;
-    font-family: 'Helvetica', sans-serif;
+    font-family: 'helvetica neue', sans-serif;
     font-weight: 300;
 }
