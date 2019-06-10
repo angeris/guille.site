@@ -143,10 +143,10 @@ That is, we know what photos, in general, look like: they're usually pretty smoo
 
 How do we do this, you ask? Well, let's consider the gradient at every point. If the gradient is large, then we've met an edge since there's a large color variation between one pixel and its neighbour, similarly, if the gradient is small at that point, the image is relatively smooth at that point.
 
-So, how about specifying that the sum of the norms of the gradients at every point be small?[^heat-diffusion] That is, we want the gradients to *all* be relatively small (minus those at edges, of course!), with some parameter that we can tune. In other words, let $D_x$ be the difference matrix between pixel $(i,j)$ and pixel $(i+1,j)$ (e.g. if our image is $X$ then $(D_x X)\_{ij} = X\_{i+1,j} - X\_{ij}$, and, similarly, let $D_y$ be the difference matrix between pixel $(i, j)$ and $(i,j+1)$.[^derivative-mat] Then our final objective is of the form
+So, how about specifying that the sum of the norms of the gradients at every point be small?[^heat-diffusion] That is, we want the gradients to *all* be relatively small (minus those at edges, of course!), with some parameter that we can tune. In other words, let $D_x$ be the difference matrix between pixel $(i,j)$ and pixel $(i+1,j)$ (e.g. if our image is $X$ then $(D_x X)_{ij} = X_{i+1,j} - X_{ij}$, and, similarly, let $D_y$ be the difference matrix between pixel $(i, j)$ and $(i,j+1)$.[^derivative-mat] Then our final objective is of the form
 
 $$
-\min_x \,\,\lVert Gx - y \lVert^2 + \lambda\left(\lVert D\_x x \lVert^2 + \lVert D\_y x \lVert^2\right)
+\min_x \,\,\lVert Gx - y \lVert^2 + \lambda\left(\lVert D_x x \lVert^2 + \lVert D_y x \lVert^2\right)
 $$
 
 where $\lambda \ge 0$ is our 'smoothness' parameter. Note that, if we send $\lambda \to \infty$ then we really care that our image is 'infinitely smooth' (what would that look like?[^smooth-image]), while if we send it to zero, we care that the reconstruction from the (possibly not great) approximation of $G^\text{real}$ is really good. Now, let's compare the two methods with a slightly corrupted image:
@@ -204,11 +204,11 @@ If you'd like, the complete code for this post can be found [here](https://githu
     $$
     for any $y$.
 
-    In other words, that
-    $$
-    f(y) \ge f(x^0),
-    $$
-    for any $y$. But this is the definition of a global minimum since the point $f(x^0)$ is less than any other value the function takes on! So we've proved the claim that any local minimum (in fact, more strongly, that any point with vanishing derivative) is immediately a global minimum for a convex function. This is what makes convex functions so nice!
+In other words, that
+$$
+f(y) \ge f(x^0),
+$$
+for any $y$. But this is the definition of a global minimum since the point $f(x^0)$ is less than any other value the function takes on! So we've proved the claim that any local minimum (in fact, more strongly, that any point with vanishing derivative) is immediately a global minimum for a convex function. This is what makes convex functions so nice!
     
 [^eq-constraint]: There are, of course, better ways of doing this which I'll present in some later post. For now, though, note that if the constraint is not achievable at equality, e.g. that we have $\lVert Cx - d\lVert^2 \ge \varepsilon > 0$ for any $x$, then the objective $\lambda_i\lVert Cx - d\lVert^2 \ge \lambda_i\varepsilon \to \infty$ whenever we send $\lambda_i \to \infty$. This gives us a way of determining if the constraint is feasible (which happens only if the program converges to a finite value for arbitrarily increasing $\lambda_i$) or infeasible (which happens, as shown before, if the minimization program diverges to infinity).
 

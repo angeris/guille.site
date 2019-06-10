@@ -125,9 +125,9 @@ $$</div>
 <p>Except for one problem: while we may <em>know</em> the gaussian blurring operator on artificial images that <em>we</em> actively blur, the blurring operator that we provide for real images may not be fully representative of what's really happening! By that I mean, if the real blurring operator is given by <span class="math">\(G^\text{real}\)</span>, it could be that our guess <span class="math">\(G\)</span> is far away from <span class="math">\(G^\text{real}\)</span>, perhaps because of some non-linear effects, or random noise, or whatever.</p>
 <p>That is, we know what photos, in general, look like: they're usually pretty smooth and have relatively few edges. In other words, the variations and displacements aren't large almost everywhere in most images. This is where the multi-objective form of least-squares comes in handy—we can add a secondary (or third, etc) objective that allows us to specify how smooth the actual image should be! </p>
 <p>How do we do this, you ask? Well, let's consider the gradient at every point. If the gradient is large, then we've met an edge since there's a large color variation between one pixel and its neighbour, similarly, if the gradient is small at that point, the image is relatively smooth at that point.</p>
-<p>So, how about specifying that the sum of the norms of the gradients at every point be small?<sup id="fnref-heat-diffusion"><a class="footnote-ref" href="#fn-heat-diffusion">5</a></sup> That is, we want the gradients to <em>all</em> be relatively small (minus those at edges, of course!), with some parameter that we can tune. In other words, let <span class="math">\(D_x\)</span> be the difference matrix between pixel <span class="math">\((i,j)\)</span> and pixel <span class="math">\((i+1,j)\)</span> (e.g. if our image is <span class="math">\(X\)</span> then <span class="math">\((D_x X)\_{ij} = X\_{i+1,j} - X\_{ij}\)</span>, and, similarly, let <span class="math">\(D_y\)</span> be the difference matrix between pixel <span class="math">\((i, j)\)</span> and <span class="math">\((i,j+1)\)</span>.<sup id="fnref-derivative-mat"><a class="footnote-ref" href="#fn-derivative-mat">7</a></sup> Then our final objective is of the form</p>
+<p>So, how about specifying that the sum of the norms of the gradients at every point be small?<sup id="fnref-heat-diffusion"><a class="footnote-ref" href="#fn-heat-diffusion">5</a></sup> That is, we want the gradients to <em>all</em> be relatively small (minus those at edges, of course!), with some parameter that we can tune. In other words, let <span class="math">\(D_x\)</span> be the difference matrix between pixel <span class="math">\((i,j)\)</span> and pixel <span class="math">\((i+1,j)\)</span> (e.g. if our image is <span class="math">\(X\)</span> then <span class="math">\((D_x X)_{ij} = X_{i+1,j} - X_{ij}\)</span>, and, similarly, let <span class="math">\(D_y\)</span> be the difference matrix between pixel <span class="math">\((i, j)\)</span> and <span class="math">\((i,j+1)\)</span>.<sup id="fnref-derivative-mat"><a class="footnote-ref" href="#fn-derivative-mat">7</a></sup> Then our final objective is of the form</p>
 <div class="math">$$
-\min_x \,\,\lVert Gx - y \lVert^2 + \lambda\left(\lVert D\_x x \lVert^2 + \lVert D\_y x \lVert^2\right)
+\min_x \,\,\lVert Gx - y \lVert^2 + \lambda\left(\lVert D_x x \lVert^2 + \lVert D_y x \lVert^2\right)
 $$</div>
 <p>where <span class="math">\(\lambda \ge 0\)</span> is our 'smoothness' parameter. Note that, if we send <span class="math">\(\lambda \to \infty\)</span> then we really care that our image is 'infinitely smooth' (what would that look like?<sup id="fnref-smooth-image"><a class="footnote-ref" href="#fn-smooth-image">6</a></sup>), while if we send it to zero, we care that the reconstruction from the (possibly not great) approximation of <span class="math">\(G^\text{real}\)</span> is really good. Now, let's compare the two methods with a slightly corrupted image:</p>
 <p><img src="/images/constrained-ls-intro/corrupted_blurred_image.png" class="insert">
@@ -150,6 +150,13 @@ $$</div>
 <p>To that end, one could think of many more ways of characterizing a 'natural' image (say, if we know what some colors should look like, what is our usual contrast, etc.), all of which will yield successively better results, but I'll leave with saying that LS, though relatively simple, is quite a powerful method for many cases. In particular, I'll cover fully-constrained LS (in a more theoretical post) in the future, but with an application to path-planning.</p>
 <p>Hopefully this was enough to convince you that even simple optimization methods are pretty useful! But if I didn't do my job, maybe you'll have to read some future posts. ;)</p>
 <p>If you'd like, the complete code for this post can be found <a href="https://github.com/guillean/guille.site/tree/master/notebooks/constrained-ls-intro">here</a>.</p>
+<p>In other words, that
+</p>
+<div class="math">$$
+f(y) \ge f(x^0),
+$$</div>
+<p>
+for any <span class="math">\(y\)</span>. But this is the definition of a global minimum since the point <span class="math">\(f(x^0)\)</span> is less than any other value the function takes on! So we've proved the claim that any local minimum (in fact, more strongly, that any point with vanishing derivative) is immediately a global minimum for a convex function. This is what makes convex functions so nice!</p>
 <div class="footnote">
 <hr>
 <ol>
@@ -169,12 +176,7 @@ for all <span class="math">\(x, y\)</span>.</p>
 <div class="math">$$
 f(y) \ge (y-x^0)^T(\underbrace{\nabla f(x^0)}_{=0}) + f(x^0) = (y-x^0)^T0 + f(x^0) = f(x^0),
 $$</div>
-for any <span class="math">\(y\)</span>.</p>
-<p>In other words, that
-<div class="math">$$
-f(y) \ge f(x^0),
-$$</div>
-for any <span class="math">\(y\)</span>. But this is the definition of a global minimum since the point <span class="math">\(f(x^0)\)</span> is less than any other value the function takes on! So we've proved the claim that any local minimum (in fact, more strongly, that any point with vanishing derivative) is immediately a global minimum for a convex function. This is what makes convex functions so nice!&#160;<a class="footnote-backref" href="#fnref-convex-global-min" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+for any <span class="math">\(y\)</span>.&#160;<a class="footnote-backref" href="#fnref-convex-global-min" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
 <li id="fn-eq-constraint">
 <p>There are, of course, better ways of doing this which I'll present in some later post. For now, though, note that if the constraint is not achievable at equality, e.g. that we have <span class="math">\(\lVert Cx - d\lVert^2 \ge \varepsilon &gt; 0\)</span> for any <span class="math">\(x\)</span>, then the objective <span class="math">\(\lambda_i\lVert Cx - d\lVert^2 \ge \lambda_i\varepsilon \to \infty\)</span> whenever we send <span class="math">\(\lambda_i \to \infty\)</span>. This gives us a way of determining if the constraint is feasible (which happens only if the program converges to a finite value for arbitrarily increasing <span class="math">\(\lambda_i\)</span>) or infeasible (which happens, as shown before, if the minimization program diverges to infinity).&#160;<a class="footnote-backref" href="#fnref-eq-constraint" title="Jump back to footnote 3 in the text">&#8617;</a></p>
@@ -272,8 +274,18 @@ $$</div>&#160;<a class="footnote-backref" href="#fnref-derivative-mat" title="Ju
 </script>
         <hr>
         <div class="socials">
-            <li>Got any questions?</li>
-            <li><a href="https://twitter.com/intent/tweet?screen_name=guilleangeris" class="twitter-mention-button" data-size="large" data-show-count="false">Tweet to @guilleangeris</a><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></li>
+            <li>
+                <div class="small-img">
+                <a href="https://twitter.com/intent/tweet?screen_name=guilleangeris">
+                <img src="/theme/img_static/Twitter_Social_Icon_Circle_Color.png"
+                    style="width:1.5em" alt="Twitter logo"></a>
+                </div>
+                <div class="small-img">
+                <a href="https://github.com/angeris">
+                <img src="/theme/img_static/GitHub-Mark-120px-plus.png"
+                     style="width:1.5em" alt="Github logo"></a>
+                </div>
+            </li>
         </div>
     </div>
 </div>

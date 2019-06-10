@@ -4,7 +4,7 @@ body {
     max-width: 650px;
     line-height: 1.8;
     font-size: 18px;
-    color: #444;
+    color: #555;
     padding: 0 10px;   
 }
 h1 {
@@ -27,7 +27,7 @@ a {
     text-decoration: none;
 }
 hr {
-    border: 0px solid #ccc;
+    border: 0px solid #ddd;
     border-top-width: 1px;
     clear: both;
     height: 0px;
@@ -36,9 +36,8 @@ a:hover {
     text-decoration: underline;
 }
 footer {
-    color: #777;
-    padding-top: 20px;
-    border-top: 1px solid #ccc;
+    color: #bbb;
+    padding-top: 10px;
     text-align: center;
 }
 img+em {
@@ -105,6 +104,10 @@ pre {
     font-weight: 200;
     line-height: 1;
 }
+.socials {
+    padding-top:20px;
+    /*padding-bottom:10px;*/
+}
 img {
     display: block;
     margin: 0 auto;
@@ -123,6 +126,9 @@ img.plot {
     display: block;
     margin: 0 auto;
     width: 75%;
+}
+div.small-img {
+    display: inline-block;
 }
 span.slightemph {
     color: #205160;

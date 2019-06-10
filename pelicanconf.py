@@ -43,4 +43,6 @@ FEED_RSS = 'feeds/feed.rss'
 PLUGIN_PATHS = ['/Users/guille/Documents/programming/github/pelican-plugins']
 PLUGINS = ['render_math']
 
+STATIC_PATHS = ['images', 'notes']
+
 MATH_JAX = {'color':'blue', 'align':'left'}

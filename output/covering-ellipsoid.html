@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>The S-procedure and small covering ellipsoids</title>
+    
+    <link rel="stylesheet" href="/theme/css/main.css">
+
+    <!-- <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [ ['$','$'], ['\\(','\\)'] ]
+            },
+        });
+    </script>
+    
+    <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script> -->
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">    	
+
+</head>
+<body>
+    <div class="container">
+<div class="row">
+    <div class="col-md-8">
+        <h2><a href="/">&larr; Home</a></h2>
+        <h1>The S-procedure and small covering ellipsoids</h1>
+        <p>Category: <a href="/category/convex-optimization.html">convex-optimization</a></p>
+        <p><label>Posted <strong>June 05, 2019</strong></label></p>
+        <p><em>Note:</em> This post was inspired by <a href="https://msl.stanford.edu/people/kunal-shah">Kunal Shah</a>'s question that came up at some point during one of our meetings: is there an efficient way of finding an ellipsoid which covers the intersections and unions of a bunch of other ellipsoids?</p>
+<p>While this question has been explored <a href="https://pdfs.semanticscholar.org/ab38/565f7957f7ee4980663324b5820b0a018de2.pdf">somewhat</a> <a href="http://www.optimization-online.org/DB_FILE/2018/07/6719.pdf">extensively</a>, the exposition is often more general than necessary and aimed at a relatively mathematical audience. Either way, if you're interested, both papers are fairly well-written—I highly recommend at least a quick skim!</p>
+<h1>The S-procedure</h1>
+<p>The <a href="https://en.wikipedia.org/wiki/S-procedure">S-procedure</a> is a well known lemma in control theory that seeks to answer the following question:</p>
+<p>Let's say we have a bunch of quadratic functions <span class="math">\(f_0, f_1, f_2, \dots, f_n : \mathbb{R}^m \to \mathbb{R}\)</span>. When is it true that
+</p>
+<div class="math">$$
+    f_i(x) \le 0 ~~ \text{for $i=1, \dots, n$} \implies  f_0(x) \le 0,
+$$</div>
+<p>
+for <span class="math">\(x \in \mathbb{R}^m\)</span>? (Recall that a quadratic is a function of the form <span class="math">\(f(x) = x^TPx + 2q^Tx + r\)</span> for symmetric <span class="math">\(P \in \mathbb{R}^{m\times m}\)</span>, <span class="math">\(q \in \mathbb{R}^m\)</span>, and <span class="math">\(r \in \mathbb{R}\)</span>).</p>
+<p>There are many reasons to attempt to answer this (surprisingly useful) question. The original motivations were to show <a href="https://stanford.edu/class/ee363/lectures/lmi-s-proc.pdf">stability of systems</a>, though the domain of applications is certainly larger. We can use this to show anything from impossibility results (for example, many of the results of <a href="https://arxiv.org/abs/1811.12936">this paper</a> can be recast in terms of the S-procedure) to, well, in our case, the construction of a small covering ellipsoid from a bunch of other ellipsoids, which is itself useful for things like filtering (for localizing drones from noisy measurements for example) along with many other applications.</p>
+<p>If you're familiar with Lagrange duality, this is mostly an equivalent statement—except that this statement is in the special case of quadratics, where you can say a little more than with general functions.</p>
+<h2>The <span class="math">\(n=1\)</span> case</h2>
+<p>We can fully and completely answer this question in the case that <span class="math">\(n=1\)</span>: there exists any nonnegative number <span class="math">\(\tau \ge 0\)</span> such that
+</p>
+<div class="math">$$
+    f_0(x) \le \tau f_1(x)
+$$</div>
+<p>
+for all <span class="math">\(x\)</span> if, and only if, <span class="math">\(f_1(x) \le 0 \implies f_0(x) \le 0\)</span>.</p>
+<p>Why? Well, let say we have a <span class="math">\(\tau\ge 0\)</span> that satisfies the above inequality. Then, if we have an <span class="math">\(x\)</span> such that <span class="math">\(f_1(x) \le 0\)</span>, then
+</p>
+<div class="math">$$
+f_0(x) \le \tau f_1(x) \le \tau0 = 0.
+$$</div>
+<p>The converse is slightly trickier, so I will defer to <a href="http://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf">B&amp;V's <em>Convex Optimization</em></a> which has a very readable presentation of the proof (see B.1 and B.2 in the appendix).</p>
+<h2>The general case</h2>
+<p>The general case is really only a slight change from the <span class="math">\(n=1\)</span> case (except that the converse of the statement is not true). In particular, if there exist <span class="math">\(\lambda \ge 0\)</span> such that
+</p>
+<div class="math">$$
+    f_0(x) \le \sum_i \lambda_i f_i(x) ~~ \text{for all $x \in \mathbb{R}^m$},
+$$</div>
+<p>
+then, <span class="math">\(f_i(x) \le 0 ~ \text{for} ~ i = 1, \dots, n \implies f_0(x) \le 0\)</span>. Showing this is nearly the same as the <span class="math">\(n=1\)</span> case,
+</p>
+<div class="math">$$
+f_0(x) \le \sum_i \lambda_i f_i(x) \le \sum_i \lambda_i 0 = 0.
+$$</div>
+<p>So now we have a family of sufficient (but not necessary!) conditions for which we know when <span class="math">\(f_i(x) \le 0 ~ \text{for} ~ i = 1, \dots, n\)</span> implies that <span class="math">\(f_0(x) \le 0\)</span>.</p>
+<h1>Covering ellipsoids for unions</h1>
+<h2>Definitions and connections</h2>
+<p>Ellipsoids are a particularly nice family to work with since, as you may have guessed, they are the sets defined by
+</p>
+<div class="math">$$
+\mathcal{E} = \{x \mid f(x) \le 0\},
+$$</div>
+<p>
+where <span class="math">\(f: \mathbb{R}^m \to \mathbb{R}\)</span> is a convex quadratic. This definition gives us a way of translating statements about sets (inclusion, etc) into statements about the functions which generate them. In particular, if we have two ellipsoids <span class="math">\(\mathcal{E}, \mathcal{E}_0 \subseteq \mathbb{R}^n\)</span> defined by the convex quadratics <span class="math">\(f, f_0\)</span>, then
+</p>
+<div class="math">$$
+\mathcal{E} \subseteq \mathcal{E}_0 \iff (f(x) \le 0 \implies f_0(x) \le 0).
+$$</div>
+<p>
+But wait a minute, we know exactly when this happens! By the previous section, we found that
+</p>
+<div class="math">$$
+f(x) \le 0 \implies f_0(x) \le 0,
+$$</div>
+<p>
+if and only if there is some <span class="math">\(\tau \ge 0\)</span> with <span class="math">\(f_0(x) \le \tau f(x)\)</span>. Also note that if we have a union of a bunch of ellipsoids (say <span class="math">\(\mathcal{E}_1, \dots, \mathcal{E}_m\)</span>) that we want to cover with an ellipsoid <span class="math">\(\mathcal{E}_0\)</span>, then this is the same as saying
+</p>
+<div class="math">$$
+\mathcal{E}_i \subseteq \mathcal{E}_0, ~\text{for $i=1, \dots, m$},
+$$</div>
+<p>
+or, that each ellipsoid is covered by the big one, <span class="math">\(\mathcal{E}_0\)</span>.</p>
+<h2>Back to our goal</h2>
+<p>Ok, to reiterate, we are looking for a small ellipsoid <span class="math">\(\mathcal{E}_0 = \{x \mid f_0(x) \le 0\}\)</span> such that <span class="math">\(\mathcal{E}_0\)</span> contains all of the other ellipsoids <span class="math">\(\mathcal{E}_i = \{x \mid f_i(x) \le 0\}\)</span>, where the <span class="math">\(f_i\)</span> and <span class="math">\(f_0\)</span> are convex quadratics. In other words, using the results of the previous subsection, we look for a quadratic <span class="math">\(f_0\)</span> such that
+</p>
+<div class="math">$$
+(f_i(x) \le 0 \implies f_0(x) \le 0) ~~ \text{for each $i$}
+$$</div>
+<p>
+which we know happens only when there exists some <span class="math">\(\tau_i \ge 0\)</span> with
+</p>
+<div class="math">$$
+f_0(x) \le \tau f_i(x) ~~ \text{for each $i$ and all $x$}.
+$$</div>
+<p>
+Now remains the final question: given two quadratics, <span class="math">\(f_i\)</span> and <span class="math">\(f_0\)</span> and some number <span class="math">\(\tau \ge 0\)</span>, how can we check if <span class="math">\(f_0(x) \le \tau f_i(x)\)</span> for all <span class="math">\(x\)</span>? I won't prove this (though I have written a quick proof of this statement in my notes, found <a href="/notes/lmi-iff-quadratic-inequality.pdf">here</a>), but, if we let <span class="math">\(f_i(x) = x^TP_ix + 2q_i^Tx + r_i\)</span> and <span class="math">\(f_0(x) = x^TP'x + 2(q')^Tx + r'\)</span> then <span class="math">\(f_0(x) \le f_i(x)\)</span> for all <span class="math">\(x\)</span> if, <em>and only if</em>,
+</p>
+<div class="math">$$
+\begin{bmatrix}
+P' &amp; q\\
+(q')^T &amp; r'
+\end{bmatrix} \le \tau\begin{bmatrix}
+P_i &amp; q_i\\
+q_i^T &amp; r_i
+\end{bmatrix},
+$$</div>
+<p>
+where we say two symmetric matrices <span class="math">\(A, B\)</span> satisfy <span class="math">\(A \le B\)</span> whenever <span class="math">\(x^TAx \le x^TBx\)</span> for all <span class="math">\(x\)</span>. A straightforward exercise it to verify that the set of matrices <span class="math">\(A \ge 0\)</span> is a convex cone (almost universally called the positive semidefinite or PSD cone).</p>
+<p>This rewriting is extremely useful, since we've turned a problem over a potentially difficult-to-handle space (the space of quadratics greater than or equal to another) into a problem that is easy to handle (the PSD cone). The best news, though, is that we have efficient algorithms to solve optimization problems whose constraints are PSD constraints.<sup id="fnref-lmi-book"><a class="footnote-ref" href="#fn-lmi-book">1</a></sup></p>
+<h2>Corresponding optimization problem</h2>
+<p>Finally, after enough background, we can get to the final goal: writing an efficiently-solvable optimization problem to give us a small bounding ellipsoid.</p>
+<p>There are several ways of defining "small," in the case of ellipsoids, but one of the most common definitions is to pick the ellipsoid with the smallest volume. In the case that <span class="math">\(\mathcal{E}_0 = \{x \mid x^TP'x + 2(q')^Tx + r \le 0\}\)</span>, the <em>volume</em> of this ellipsoid is given by the determinant, <span class="math">\(\mathop{\mathrm{det}} P'\)</span>, of the matrix <span class="math">\(P'\)</span>. So, we can write—using the conditions given above—an optimization problem corresponding to finding the smallest (in volume) ellipsoid <span class="math">\(\mathcal{E}_0\)</span> which contains all ellipsoids, <span class="math">\(\mathcal{E}_i\)</span> as
+</p>
+<div class="math">$$
+\begin{aligned}
+&amp; \underset{P', q', r', \tau}{\mathrm{minimize}}
+&amp; &amp; \mathop{\mathrm{det}} P'  \\
+&amp; \text{subject to}
+&amp; &amp; \begin{bmatrix}
+P' &amp; q\\
+(q')^T &amp; r'
+\end{bmatrix} \le \tau_i\begin{bmatrix}
+P_i &amp; q_i\\
+q_i^T &amp; r_i
+\end{bmatrix}, \quad i = 1, \dots, n.
+\end{aligned}
+$$</div>
+<p>
+The only problem here (which we can easily fix) is that the determinant is not a convex function. On the other hand, the <em>log</em> determinant <em>is</em> (for a proof, see the <a href="https://web.stanford.edu/~boyd/cvxbook/">Convex book</a>, section 3.1.5), so we can write,
+</p>
+<div class="math">$$
+\begin{aligned}
+&amp; \underset{P', q', r', \tau}{\mathrm{minimize}}
+&amp; &amp; \log \mathop{\mathrm{det}} P'  \\
+&amp; \text{subject to}
+&amp; &amp; \begin{bmatrix}
+P' &amp; q\\
+(q')^T &amp; r'
+\end{bmatrix} \le \tau_i\begin{bmatrix}
+P_i &amp; q_i\\
+q_i^T &amp; r_i
+\end{bmatrix}, \quad i = 1, \dots, n.
+\end{aligned}
+$$</div>
+<p>
+This is equivalent to the original problem since <span class="math">\(\log(y)\)</span> is an increasing function of <span class="math">\(y\)</span>. </p>
+<p>Of course, any convex function (such as, for example the trace) would do here as well.</p>
+<h1>Covering ellipsoids for intersections and unions</h1>
+<p>Ok, now we know how to solve the problem where we have a bunch of ellipsoids and we want to find an ellipsoid which covers all of them. How about the problem where we want to find an ellipsoid which also covers the sets <span class="math">\(\{N_i\}\)</span> for <span class="math">\(i=1, \dots, k\)</span>, which are, themselves, intersections of ellipsoids?</p>
+<p>In particular, if <span class="math">\(N_i\)</span> is defined as
+</p>
+<div class="math">$$
+N_i = \bigcap_{j \in I_i} \mathcal{E}_j,
+$$</div>
+<p>
+for some index set <span class="math">\(I_i \subseteq \{1, \dots, n\}\)</span> and some set of ellipsoids <span class="math">\(\{\mathcal{E}_j\}\)</span>, each of which are defined as before (<span class="math">\(\mathcal{E}_j = \{x \mid f_j(x) \le 0 \}\)</span>), we can perform a similar trick to the one above!</p>
+<p>More generally, if we have an ellipsoid <span class="math">\(\mathcal{E}_0 = \{x \mid f_0(x) \le 0\}\)</span>, then
+</p>
+<div class="math">$$
+N_i \subseteq \mathcal{E}_0 \iff (f_j(x) \le 0 ~~ \text{for $j \in I_i$} \implies f_0(x) \le 0).
+$$</div>
+<p>
+(It's a worthwhile exercise to think about why, but it follows the same idea as before.) In other words, <span class="math">\(\mathcal{E}_0\)</span> is a superset of <span class="math">\(N_i\)</span> only when <em>a bunch of quadratic inequalities imply another</em>. (Where have we seen this before...?)</p>
+<p>In other words, we know that (by the first section), if there exist <span class="math">\(\lambda \ge 0\)</span> such that
+</p>
+<div class="math">$$
+f_0(x) \le \sum_{j \in I_i} \lambda_{j} f_j(x),
+$$</div>
+<p>
+then we immediately have that <span class="math">\(N_i \subseteq \mathcal{E}_0\)</span>. Since the converse is not true, we are sadly not guaranteed to actually find the smallest bounding ellipsoid <span class="math">\(\mathcal{E}_0\)</span>, but this is usually quite a good approximation (if it's not exact).</p>
+<p>Following exactly the same steps as in the previous section and using the same definitions, we now get a new program for minimizing the volume for the union and intersection of ellipsoids:
+</p>
+<div class="math">$$
+\begin{aligned}
+&amp; \underset{P', q', r', \lambda}{\mathrm{minimize}}
+&amp; &amp; \log \mathop{\mathrm{det}} P'  \\
+&amp; \text{subject to}
+&amp; &amp; \begin{bmatrix}
+P' &amp; q\\
+(q')^T &amp; r'
+\end{bmatrix} \le \sum_{j \in I_i}\lambda_{ij}\begin{bmatrix}
+P_i &amp; q_i\\
+q_i^T &amp; r_i
+\end{bmatrix}, \quad i = 1, \dots, k \\
+&amp;&amp;&amp; \lambda_{ij} \ge 0, \quad i=1, \dots, k, ~~ j \in I_i.
+\end{aligned}
+$$</div>
+<p>
+As before, this program does not guarantee actually finding the minimal volume ellipsoid, but it is likely to be quite close! (That is, if it's not spot on, most of the time.)</p>
+<div class="footnote">
+<hr>
+<ol>
+<li id="fn-lmi-book">
+<p>For more information, see Boyd's <a href="https://web.stanford.edu/~boyd/lmibook/">Linear Matrix Inequalities</a> book.&#160;<a class="footnote-backref" href="#fnref-lmi-book" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "left",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'blue ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+        <hr>
+        <div class="socials">
+            <li>
+                <div class="small-img">
+                <a href="https://twitter.com/intent/tweet?screen_name=guilleangeris">
+                <img src="/theme/img_static/Twitter_Social_Icon_Circle_Color.png"
+                    style="width:1.5em" alt="Twitter logo"></a>
+                </div>
+                <div class="small-img">
+                <a href="https://github.com/angeris">
+                <img src="/theme/img_static/GitHub-Mark-120px-plus.png"
+                     style="width:1.5em" alt="Github logo"></a>
+                </div>
+            </li>
+        </div>
+    </div>
+</div>
+    </div>
+</body>
+<footer>
+    Made with <a href="https://blog.getpelican.com">🐍</a> and hosted on <a href="https://neocities.org">neocities.org</a>.
+</footer>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-73543332-2', 'auto');
+    ga('send', 'pageview');
+</script>
+</html>
