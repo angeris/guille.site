@@ -35,7 +35,7 @@ $$
 Minimizing this function by setting its gradient to zero (this is necessary and sufficient by differentiability, convexity, and coerciveness [that is, $E(u) \to \infty$, whenever $\lVert u\lVert \to \infty$]) gives the solution[^generalization]
 
 $$
-\nabla E(u, \varepsilon) = \lambda_p \left(u - K\varepsilon (t)\right\) + \lambda_i \left( u - K\int d\tau\, \varepsilon(t)\right) + \lambda_d\left(u - K \frac{\partial\varepsilon(t)}{\partial t}\right) = 0,
+\nabla E(u, \varepsilon) = \lambda_p \left(u - K\varepsilon (t)\right) + \lambda_i \left( u - K\int d\tau\, \varepsilon(t)\right) + \lambda_d\left(u - K \frac{\partial\varepsilon(t)}{\partial t}\right) = 0,
 $$
 
 or, after rearranging

@@ -40,9 +40,7 @@ FEED_RSS = 'feeds/feed.rss'
 # Uncomment following line if you want document-relative URLs when developing
 #RELATIVE_URLS = True
 
-PLUGIN_PATHS = ['/Users/guille/Documents/programming/github/pelican-plugins']
+PLUGIN_PATHS = ['/Users/guille/Documents/programming/pelican-plugins']
 PLUGINS = ['render_math']
 
 STATIC_PATHS = ['images', 'notes']
-
-MATH_JAX = {'color':'blue', 'align':'left'}

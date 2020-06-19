@@ -33,7 +33,7 @@
 <h2>Introduction and thank yous</h2>
 <p>The results presented in this post are those found in <a href="https://github.com/ischeinfeld/navigation229/blob/master/paper/methods-drone-obstacle.pdf">Delgeris, Kulgod, Scheinfeld, 2017</a>. Before this, though, I want to give a huge thank you to <a href="https://github.com/ischeinfeld">Isaach Scheinfeld</a> and Raja Ramesh for their work implementing all of the ideas presented previously into a complete (and usable!) framework—which they did using only the relatively poorly-written (even by my standards) iPython notebook I gave in the second post. Additionally, I note that many of the images used below are from the paper above; so, for further reference, it's worth reading the above paper.</p>
 <p>I'm sure you can guess which of DQN, Q-learning, or classical optimization wins (hint: it's none of the ones containing any buzzwords). And the question here, which I will attempt to answer is, why?</p>
-<p>First—and I'll just get this out of the way, right now—is that this is a class project and there is no expectation of peer review (i.e. much like everything in this blog). So, don't take anything I say here (or, really, anything I say in general) as gospel. There could've been some bugs in the implementation or things that can be improved. That being said, I'll cover why the overall results aren't so surprising in the first place and why it might take some pretty hard work to really beat a classical implementation in the tasks we're interested in.<sup id="fnref-andanotherreminder"><a class="footnote-ref" href="#fn-andanotherreminder">1</a></sup></p>
+<p>First—and I'll just get this out of the way, right now—is that this is a class project and there is no expectation of peer review (i.e. much like everything in this blog). So, don't take anything I say here (or, really, anything I say in general) as gospel. There could've been some bugs in the implementation or things that can be improved. That being said, I'll cover why the overall results aren't so surprising in the first place and why it might take some pretty hard work to really beat a classical implementation in the tasks we're interested in.<sup id="fnref:andanotherreminder"><a class="footnote-ref" href="#fn:andanotherreminder">1</a></sup></p>
 <p>Okay, enough with the disclaimers. Let's take a look at the results!</p>
 <h2>Results</h2>
 <p>As mentioned in the <a href="/path-optimization-thoughts.html">first post</a> of the series, an important step of the algorithms is a discretization of the plane into a graph problem, from which we receive a feasible point for our optimization problem (assuming, say, that the wall constraints are hard rather than the relaxed constraints we use for optimization). The figure below (taken from the paper) shows a really nice image of the process:</p>
@@ -43,8 +43,8 @@
 <div class="footnote">
 <hr>
 <ol>
-<li id="fn-andanotherreminder">
-<p>I've been proven wrong before and would love to be proved wrong here as well!&#160;<a class="footnote-backref" href="#fnref-andanotherreminder" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<li id="fn:andanotherreminder">
+<p>I've been proven wrong before and would love to be proved wrong here as well!&#160;<a class="footnote-backref" href="#fnref:andanotherreminder" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>

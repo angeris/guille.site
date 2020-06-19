@@ -37,7 +37,7 @@
 <div class="math">$$
 \mathcal{L}(x; c, R, C) = \sum_{i}\left[\sum_j\phi\left(C\left(\frac{\lVert x_i - c_j \lVert_2^2}{R_j^2} - 1\right)\right) + \eta \lVert x_i - x_{i+1}\lVert_2^2\right]
 $$</div>
-<p>over some large <span class="math">\(C\)</span>, since we've noted that the objective becomes almost-everywhere flat in the limit<sup id="fnref-measure-theory"><a class="footnote-ref" href="#fn-measure-theory">1</a></sup> and thus becomes very difficult to optimize using typical methods. Instead, we optimize over the sequence of functions, for <span class="math">\(C_k \to \infty\)</span>,</p>
+<p>over some large <span class="math">\(C\)</span>, since we've noted that the objective becomes almost-everywhere flat in the limit<sup id="fnref:measure-theory"><a class="footnote-ref" href="#fn:measure-theory">1</a></sup> and thus becomes very difficult to optimize using typical methods. Instead, we optimize over the sequence of functions, for <span class="math">\(C_k \to \infty\)</span>,</p>
 <div class="math">$$
 x^{(k)} = \min_x\mathcal{L}(x; c, R, C_k) 
 $$</div>
@@ -56,7 +56,7 @@ $$</div>
 <div class="math">$$
 m\ddot x = -\nabla V(x) - \mu \dot x.
 $$</div>
-<p>Now, here I'll note we can do two things: one, we can keep the former term containing acceleration (i.e. momentum), accepting that we could possibly overshoot our minimum (because, say, we're going 'too fast') but then later 'come back' to it (this is known as gradient descent with momentum),<sup id="fnref-momentum"><a class="footnote-ref" href="#fn-momentum">2</a></sup> or, if we never want to overshoot it (but allow for the possibility that we may always be too slow in getting there in the first place) we can just send our momentum term to zero by sending <span class="math">\(m \to 0\)</span>. I'll take the latter approach for now, but we'll consider the former case, soon.</p>
+<p>Now, here I'll note we can do two things: one, we can keep the former term containing acceleration (i.e. momentum), accepting that we could possibly overshoot our minimum (because, say, we're going 'too fast') but then later 'come back' to it (this is known as gradient descent with momentum),<sup id="fnref:momentum"><a class="footnote-ref" href="#fn:momentum">2</a></sup> or, if we never want to overshoot it (but allow for the possibility that we may always be too slow in getting there in the first place) we can just send our momentum term to zero by sending <span class="math">\(m \to 0\)</span>. I'll take the latter approach for now, but we'll consider the former case, soon.</p>
 <p>Anyways, sending <span class="math">\(m\to 0\)</span> corresponds to having a ball slowly rolling down an extremely sticky hill, stopping only at a local minimum, that is:</p>
 <div class="math">$$
 \mu\dot x + \nabla V(x) = 0
@@ -103,7 +103,7 @@ v_{t+1} &amp;= -\gamma \nabla V(x_t) + (1-\mu \gamma) v_t\\
 x_{t+1} &amp;= x_t + h'v_{t+1}
 \end{align}
 $$</div>
-<p>usually we take <span class="math">\(h' = 1\)</span>, and, to prevent <span class="math">\(v_t\)</span> from having weird behaviour, we require that <span class="math">\(1-\mu\gamma &gt; 0\)</span>, i.e. that <span class="math">\(\gamma &lt; \frac{1}{\mu}\)</span>.<sup id="fnref-oscillations"><a class="footnote-ref" href="#fn-oscillations">3</a></sup> If we call <span class="math">\(\beta \equiv 1 - \mu\gamma\)</span> and therefore have that <span class="math">\(0 &lt; \beta  &lt; 1\)</span> then we obtain the classical momentum for gradient descent</p>
+<p>usually we take <span class="math">\(h' = 1\)</span>, and, to prevent <span class="math">\(v_t\)</span> from having weird behaviour, we require that <span class="math">\(1-\mu\gamma &gt; 0\)</span>, i.e. that <span class="math">\(\gamma &lt; \frac{1}{\mu}\)</span>.<sup id="fnref:oscillations"><a class="footnote-ref" href="#fn:oscillations">3</a></sup> If we call <span class="math">\(\beta \equiv 1 - \mu\gamma\)</span> and therefore have that <span class="math">\(0 &lt; \beta  &lt; 1\)</span> then we obtain the classical momentum for gradient descent</p>
 <div class="math">$$
 \begin{align}
 v_{t+1} &amp;= -\gamma \nabla V(x_t) + \beta v_t\\
@@ -113,7 +113,7 @@ $$</div>
 <p>which is what we needed! Well... close to what we needed, really.</p>
 <p>Anyways, just to give some perspective on the speed up: using momentum, the optimization problem took around 600 iterations to converge, more than 8 times less than the original given above. I'll give a picture of this soon, but I'm missing one more slight detail.</p>
 <h2>Cooling schemes</h2>
-<p>Imagine we want to optimize some function <span class="math">\(\ell(\cdot)\)</span> that is, in general, extremely hard to solve. If we're lucky, we may be able to do the next best thing: take a series of functions parametrized by, say, <span class="math">\(C\)</span>, such that <span class="math">\(\ell_C(\cdot) \to \ell(\cdot)\)</span> as <span class="math">\(C\to\infty\)</span>,<sup id="fnref-approaches"><a class="footnote-ref" href="#fn-approaches">4</a></sup> <em>and</em> where the problem is simple to solve for <span class="math">\(C_{k+1}\)</span>, given the solution for <span class="math">\(C_k\)</span>.</p>
+<p>Imagine we want to optimize some function <span class="math">\(\ell(\cdot)\)</span> that is, in general, extremely hard to solve. If we're lucky, we may be able to do the next best thing: take a series of functions parametrized by, say, <span class="math">\(C\)</span>, such that <span class="math">\(\ell_C(\cdot) \to \ell(\cdot)\)</span> as <span class="math">\(C\to\infty\)</span>,<sup id="fnref:approaches"><a class="footnote-ref" href="#fn:approaches">4</a></sup> <em>and</em> where the problem is simple to solve for <span class="math">\(C_{k+1}\)</span>, given the solution for <span class="math">\(C_k\)</span>.</p>
 <p>Of course, given this and the above we can already solve the problem: we begin with some small <span class="math">\(C_0\)</span> and then, after converging for <span class="math">\(\ell_{C_0}(\cdot)\)</span> we then continue to <span class="math">\(\ell_{C_1}(\cdot)\)</span>, after converging to that, we then continue to solve for <span class="math">\(\ell_{C_2}(\cdot)\)</span>, etc., until we reach some desired tolerance on the given result.</p>
 <p>Or... (of course, I'm writing this for a reason), we could do something fancy using the previous scheme:</p>
 <p>Every time we update our variable, we also increase <span class="math">\(k\)</span> such that both the problem sequence and the final solution converge at the same time. It is, of course, totally not obvious that this works (though with some decent choice of schedule, one could imagine it should); the video below shows this idea in action using both momentum and this particular choice of cooling scheme (note the number of iterations is much lower relative to the previous attempt's 5000, but also note that, while the scheme converged in the norm—that is, the variables were updated very little—it didn't actually converge to an optimal solution, but it was pretty close!).</p>
@@ -129,26 +129,26 @@ $$</div>
 <div class="footnote">
 <hr>
 <ol>
-<li id="fn-measure-theory">
-<p>This is, indeed, a technical term, but it's also quite suggestive of what really happens.&#160;<a class="footnote-backref" href="#fnref-measure-theory" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<li id="fn:measure-theory">
+<p>This is, indeed, a technical term, but it's also quite suggestive of what really happens.&#160;<a class="footnote-backref" href="#fnref:measure-theory" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
-<li id="fn-momentum">
-<p>Of course, there are many reasons why we'll want momentum, but those will come soon.&#160;<a class="footnote-backref" href="#fnref-momentum" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+<li id="fn:momentum">
+<p>Of course, there are many reasons why we'll want momentum, but those will come soon.&#160;<a class="footnote-backref" href="#fnref:momentum" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
-<li id="fn-oscillations">
+<li id="fn:oscillations">
 <p>Consider <span class="math">\(V(x) = 0\)</span>, with some initial condition, <span class="math">\(v_0 &gt; 0\)</span>, say, then we'll have
 <div class="math">$$
 v_t = -k v_{t-1}
 $$</div>
-for some <span class="math">\(k = \mu\gamma - 1&gt;0\)</span>. Solving this yields <span class="math">\(v_{t} = (-1)^tk^t v_{0}\)</span>. This is weird, because it means that our velocity will change directions every iteration even though there's no potential! This is definitely not expected (nor desirable) behaviour.&#160;<a class="footnote-backref" href="#fnref-oscillations" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+for some <span class="math">\(k = \mu\gamma - 1&gt;0\)</span>. Solving this yields <span class="math">\(v_{t} = (-1)^tk^t v_{0}\)</span>. This is weird, because it means that our velocity will change directions every iteration even though there's no potential! This is definitely not expected (nor desirable) behaviour.&#160;<a class="footnote-backref" href="#fnref:oscillations" title="Jump back to footnote 3 in the text">&#8617;</a></p>
 </li>
-<li id="fn-approaches">
-<p>In some sense. Say: in the square error, or something of the like. This can be made entirely rigorous, but I choose not to do it here since it's not terribly essential.&#160;<a class="footnote-backref" href="#fnref-approaches" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+<li id="fn:approaches">
+<p>In some sense. Say: in the square error, or something of the like. This can be made entirely rigorous, but I choose not to do it here since it's not terribly essential.&#160;<a class="footnote-backref" href="#fnref:approaches" title="Jump back to footnote 4 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
-    var align = "left",
+    var align = "center",
         indent = "0em",
         linebreak = "false";
 
@@ -162,10 +162,13 @@ for some <span class="math">\(k = \mu\gamma - 1&gt;0\)</span>. Solving this yiel
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
     mathjaxscript.type = 'text/javascript';
     mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
-    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
         "MathJax.Hub.Config({" +
         "    config: ['MMLorHTML.js']," +
-        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
         "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
         "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
         "    displayAlign: '"+ align +"'," +
@@ -179,7 +182,9 @@ for some <span class="math">\(k = \mu\gamma - 1&gt;0\)</span>. Solving this yiel
         "        preview: 'TeX'," +
         "    }, " +
         "    'HTML-CSS': { " +
-        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'blue ! important'} }," +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
         "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
         "    }, " +
         "}); " +
@@ -199,6 +204,8 @@ for some <span class="math">\(k = \mu\gamma - 1&gt;0\)</span>. Solving this yiel
                 "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
             "});" +
         "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 </script>

@@ -31,7 +31,7 @@
         <p><label>Posted <strong>May 16, 2018</strong></label></p>
         <p>It's been a while since I last posted (my posting has been less once every two weeks and more like once every two months), but here's a post I've been sitting on for a while that I never got around to finishing. As per <a href="https://rachelbythebay.com/w/2018/03/13/write/">rachelbythebay's advice</a>, I decided to just finish it and post it up. It's likely to be a little rough, but feel free to <a href="https://twitter.com/GuilleAngeris">tweet</a> any questions or things that you'd like more fleshed out (as usual!).</p>
 <h2>Quick introduction to PCA</h2>
-<p>Most people know <a href="https://en.wikipedia.org/wiki/Principal_component_analysis">Principal Component Analysis</a> (PCA) as a fast, and easily-scalable dimensionality-reduction technique used quite frequently in machine learning and data exploration—in fact, it's often mentioned that one-layer, linear neural network<sup id="fnref-loss-type"><a class="footnote-ref" href="#fn-loss-type">1</a></sup> applied on some data-set recovers the result from PCA.</p>
+<p>Most people know <a href="https://en.wikipedia.org/wiki/Principal_component_analysis">Principal Component Analysis</a> (PCA) as a fast, and easily-scalable dimensionality-reduction technique used quite frequently in machine learning and data exploration—in fact, it's often mentioned that one-layer, linear neural network<sup id="fnref:loss-type"><a class="footnote-ref" href="#fn:loss-type">1</a></sup> applied on some data-set recovers the result from PCA.</p>
 <p>It's (also) often mentioned that PCA is one of the <a href="https://groups.google.com/forum/#!topic/10725-f12/P9e8BsqaAok">few non-convex problems that we can solve efficiently</a>, though a (let's say 'non-constructive') answer showing this problem is convex is given in <a href="https://stats.stackexchange.com/questions/301532/is-pca-optimization-convex">this Stats.SE thread</a>, which requires knowing the eigenvectors of <span class="math">\(X^TX\)</span>, a priori. It turns out it's possible to create a fairly natural semi-definite program which actually constructs the solution in its entirety.</p>
 <p>Since I'll only give a short overview of the topic of PCA itself, I won't go too much into depth on methods of solving this. But, the general idea of PCA is to find the best low-rank approximation of a given matrix <span class="math">\(A\)</span>. In other words, we want, for some given <span class="math">\(k\)</span>:</p>
 <div class="math">$$
@@ -57,7 +57,7 @@ $$</div>
 <div class="math">$$
 X^* = U_k\Sigma_kV_k^T.
 $$</div>
-<p>This is the usual way of computing the PCA decomposition of <span class="math">\(A\)</span>: simply take the SVD and then look at the first <span class="math">\(k\)</span> columns of <span class="math">\(V\)</span>.<sup id="fnref-truncated-svd"><a class="footnote-ref" href="#fn-truncated-svd">2</a></sup> We'll make use of this fact to show that the optimal values are equal, but it won't be necessary to actually <em>compute</em> the result.</p>
+<p>This is the usual way of computing the PCA decomposition of <span class="math">\(A\)</span>: simply take the SVD and then look at the first <span class="math">\(k\)</span> columns of <span class="math">\(V\)</span>.<sup id="fnref:truncated-svd"><a class="footnote-ref" href="#fn:truncated-svd">2</a></sup> We'll make use of this fact to show that the optimal values are equal, but it won't be necessary to actually <em>compute</em> the result.</p>
 <h2>Construction of the SDP</h2>
 <p>In general, semi-definite programs (i.e. optimization over symmetric, positive-semidefinite matrices with convex objectives and constraints) are convex problems. Here, we'll construct a (relatively) simple reduction of the non-convex problem of PCA, as presented above, to the SDP.</p>
 <h3>Quick overview of method</h3>
@@ -121,16 +121,16 @@ $$</div>
 <div class="footnote">
 <hr>
 <ol>
-<li id="fn-loss-type">
-<p>More specifically, a one-layer, linear NN with <span class="math">\(\ell_2\)</span> loss.&#160;<a class="footnote-backref" href="#fnref-loss-type" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<li id="fn:loss-type">
+<p>More specifically, a one-layer, linear NN with <span class="math">\(\ell_2\)</span> loss.&#160;<a class="footnote-backref" href="#fnref:loss-type" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
-<li id="fn-truncated-svd">
-<p>As usual, there are smarter ways of doing this. It turns out one can run a truncated or partial SVD decomposition, which doesn't require constructing all singular values and all the columns of <span class="math">\(U, V\)</span>. This is far more efficient whenever <span class="math">\(k\ll \min\{m, n\}\)</span>, where <span class="math">\(m,n\)</span> are the dimensions of the data. This latter condition is usually the case for practical purposes.&#160;<a class="footnote-backref" href="#fnref-truncated-svd" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+<li id="fn:truncated-svd">
+<p>As usual, there are smarter ways of doing this. It turns out one can run a truncated or partial SVD decomposition, which doesn't require constructing all singular values and all the columns of <span class="math">\(U, V\)</span>. This is far more efficient whenever <span class="math">\(k\ll \min\{m, n\}\)</span>, where <span class="math">\(m,n\)</span> are the dimensions of the data. This latter condition is usually the case for practical purposes.&#160;<a class="footnote-backref" href="#fnref:truncated-svd" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
-    var align = "left",
+    var align = "center",
         indent = "0em",
         linebreak = "false";
 
@@ -144,10 +144,13 @@ $$</div>
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
     mathjaxscript.type = 'text/javascript';
     mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
-    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
         "MathJax.Hub.Config({" +
         "    config: ['MMLorHTML.js']," +
-        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
         "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
         "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
         "    displayAlign: '"+ align +"'," +
@@ -161,7 +164,9 @@ $$</div>
         "        preview: 'TeX'," +
         "    }, " +
         "    'HTML-CSS': { " +
-        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'blue ! important'} }," +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
         "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
         "    }, " +
         "}); " +
@@ -181,6 +186,8 @@ $$</div>
                 "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
             "});" +
         "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 </script>

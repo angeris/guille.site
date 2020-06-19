@@ -29,7 +29,7 @@
         <h1>PID as least squares</h1>
         <p>Category: <a href="/category/least-squares.html">least-squares</a></p>
         <p><label>Posted <strong>September 13, 2017</strong></label></p>
-        <p>I want to say this is a folk theorem (borrowing terminology from game theory) in that everyone who does optimal control theory knows about this stuff, probably,<sup id="fnref-people"><a class="footnote-ref" href="#fn-people">1</a></sup> but I haven't really seen it stated explicitly anywhere. If anyone does indeed work on optimal control, I'd love to know your thoughts! (even if you don't, I'd still like to know your thoughts on it!)</p>
+        <p>I want to say this is a folk theorem (borrowing terminology from game theory) in that everyone who does optimal control theory knows about this stuff, probably,<sup id="fnref:people"><a class="footnote-ref" href="#fn:people">1</a></sup> but I haven't really seen it stated explicitly anywhere. If anyone does indeed work on optimal control, I'd love to know your thoughts! (even if you don't, I'd still like to know your thoughts on it!)</p>
 <p>For context, I'm currently leading a team on path planning for fixed-wing UAVs (I still don't really know who put me in charge of this stuff, or <em>why</em> for that matter---overall, it seems pretty terrifying for them, but kinda fun for me), and I wondered why I hadn't actually seen least squares in many papers on fixed-wing control. I still haven't gotten an answer to the question, to be honest, but I did waste some potentially productive time showing that PID <span class="math">\(\subset\)</span> LS. Some quick definitions: let <span class="math">\(u(t)\)</span> be our control input and allow <span class="math">\(\varepsilon(t)\)</span> to be the error of the function (that is, <span class="math">\(\varepsilon(t) = x(t) - \hat x(t)\)</span> where <span class="math">\(x(t)\)</span> is the desired position and <span class="math">\(\hat x(t)\)</span> is the current position), then a PID controller is defined as</p>
 <div class="math">$$
 u(t) = K_p \varepsilon(t) + K_i \int_0^t d\tau\,\varepsilon(\tau) + K_d\frac{\partial\varepsilon(t)}{\partial t}
@@ -44,13 +44,13 @@ $$</div>
 &amp; &amp; Cu = d
 \end{aligned}
 $$</div>
-<p>where the <span class="math">\(\lVert \cdot \lVert_2^2\)</span> norm is the usual <span class="math">\(\ell_2\)</span>-norm (i.e. <span class="math">\(\lVert x \lVert_2^2 = \sum_i x_i^2\)</span>). It's notable that this problem has an analytical solution (not that you'd necessarily <em>want</em> the analytical solution for most big-enough scenarios) and is extremely well-behaved for most optimization methods.<sup id="fnref-politifact"><a class="footnote-ref" href="#fn-politifact">2</a></sup> Now, consider the following objective function with trivial equality constraints (e.g. <span class="math">\(0=0\)</span>, for convenience, by setting <span class="math">\(C = (0,0,…,0)^T,\, d = 0\)</span>) and <span class="math">\(K\)</span> being some proportionality constant (I'll make the connection to the original <span class="math">\(K_{(\cdot)}\)</span> variables above, soon):</p>
+<p>where the <span class="math">\(\lVert \cdot \lVert_2^2\)</span> norm is the usual <span class="math">\(\ell_2\)</span>-norm (i.e. <span class="math">\(\lVert x \lVert_2^2 = \sum_i x_i^2\)</span>). It's notable that this problem has an analytical solution (not that you'd necessarily <em>want</em> the analytical solution for most big-enough scenarios) and is extremely well-behaved for most optimization methods.<sup id="fnref:politifact"><a class="footnote-ref" href="#fn:politifact">2</a></sup> Now, consider the following objective function with trivial equality constraints (e.g. <span class="math">\(0=0\)</span>, for convenience, by setting <span class="math">\(C = (0,0,…,0)^T,\, d = 0\)</span>) and <span class="math">\(K\)</span> being some proportionality constant (I'll make the connection to the original <span class="math">\(K_{(\cdot)}\)</span> variables above, soon):</p>
 <div class="math">$$
 E(u, \varepsilon) = \lambda_p \left\lVert u - K\varepsilon (t)\right\lVert_2^2 + \lambda_i \left\lVert u - K\int d\tau\, \varepsilon(t)\right\lVert_2^2 + \lambda_d\left\lVert u - K \frac{\partial\varepsilon(t)}{\partial t}\right\lVert_2^2
 $$</div>
-<p>Minimizing this function by setting its gradient to zero (this is necessary and sufficient by differentiability, convexity, and coerciveness [that is, <span class="math">\(E(u) \to \infty\)</span>, whenever <span class="math">\(\lVert u\lVert \to \infty\)</span>]) gives the solution<sup id="fnref-generalization"><a class="footnote-ref" href="#fn-generalization">3</a></sup></p>
+<p>Minimizing this function by setting its gradient to zero (this is necessary and sufficient by differentiability, convexity, and coerciveness [that is, <span class="math">\(E(u) \to \infty\)</span>, whenever <span class="math">\(\lVert u\lVert \to \infty\)</span>]) gives the solution<sup id="fnref:generalization"><a class="footnote-ref" href="#fn:generalization">3</a></sup></p>
 <div class="math">$$
-\nabla E(u, \varepsilon) = \lambda_p \left(u - K\varepsilon (t)\right\) + \lambda_i \left( u - K\int d\tau\, \varepsilon(t)\right) + \lambda_d\left(u - K \frac{\partial\varepsilon(t)}{\partial t}\right) = 0,
+\nabla E(u, \varepsilon) = \lambda_p \left(u - K\varepsilon (t)\right) + \lambda_i \left( u - K\int d\tau\, \varepsilon(t)\right) + \lambda_d\left(u - K \frac{\partial\varepsilon(t)}{\partial t}\right) = 0,
 $$</div>
 <p>or, after rearranging</p>
 <div class="math">$$
@@ -72,19 +72,19 @@ $$</div>
 <div class="footnote">
 <hr>
 <ol>
-<li id="fn-people">
-<p>I mostly know people who do hardware work, etc. on UAVs, so I don't really have a representative sample of control people.&#160;<a class="footnote-backref" href="#fnref-people" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<li id="fn:people">
+<p>I mostly know people who do hardware work, etc. on UAVs, so I don't really have a representative sample of control people.&#160;<a class="footnote-backref" href="#fnref:people" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
-<li id="fn-politifact">
-<p><strong>PolitiFact</strong>: <em>Mostly true.</em> I mean the usual cases (e.g. first-order methods, second-order methods, or conjugate gradient/quasi-newton methods). It's horribly behaved in conic program (SOCP) solvers.&#160;<a class="footnote-backref" href="#fnref-politifact" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+<li id="fn:politifact">
+<p><strong>PolitiFact</strong>: <em>Mostly true.</em> I mean the usual cases (e.g. first-order methods, second-order methods, or conjugate gradient/quasi-newton methods). It's horribly behaved in conic program (SOCP) solvers.&#160;<a class="footnote-backref" href="#fnref:politifact" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
-<li id="fn-generalization">
-<p>There's an immediate generalization here: any control of the form <span class="math">\(\sum_i \gamma_i\left(u - C_i\right), \gamma_i&gt;0\)</span> can be immediately written as the minimizer to an energy function <span class="math">\(E(u) = \sum_i \eta_i\lVert u - \xi C_i\lVert^2_2\)</span>. We can actually go further and note there's yet another generalization to any control of the form <span class="math">\(\sum_i \left(S_iu - C_i\right)\)</span>, where each <span class="math">\(S_i\)</span> is symmetric and (strictly) positive definite. This is true as each <span class="math">\(S_i\)</span> has an inverse and a 'square root' matrix (e.g. let, <span class="math">\(S\)</span> be some positive-definite matrix. We know <span class="math">\(SV =  V\Lambda\)</span> for <span class="math">\(V^TV = VV^T = I\)</span> and diagonal <span class="math">\(\Lambda &gt; 0\)</span>, thus <span class="math">\(S^{1/2}=V\Lambda^{1/2}V^T\)</span>), such that the energy function is written in terms of these. Though it's somewhat enlightening (I guess), I leave the derivation as an exercise for the reader.&#160;<a class="footnote-backref" href="#fnref-generalization" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+<li id="fn:generalization">
+<p>There's an immediate generalization here: any control of the form <span class="math">\(\sum_i \gamma_i\left(u - C_i\right), \gamma_i&gt;0\)</span> can be immediately written as the minimizer to an energy function <span class="math">\(E(u) = \sum_i \eta_i\lVert u - \xi C_i\lVert^2_2\)</span>. We can actually go further and note there's yet another generalization to any control of the form <span class="math">\(\sum_i \left(S_iu - C_i\right)\)</span>, where each <span class="math">\(S_i\)</span> is symmetric and (strictly) positive definite. This is true as each <span class="math">\(S_i\)</span> has an inverse and a 'square root' matrix (e.g. let, <span class="math">\(S\)</span> be some positive-definite matrix. We know <span class="math">\(SV =  V\Lambda\)</span> for <span class="math">\(V^TV = VV^T = I\)</span> and diagonal <span class="math">\(\Lambda &gt; 0\)</span>, thus <span class="math">\(S^{1/2}=V\Lambda^{1/2}V^T\)</span>), such that the energy function is written in terms of these. Though it's somewhat enlightening (I guess), I leave the derivation as an exercise for the reader.&#160;<a class="footnote-backref" href="#fnref:generalization" title="Jump back to footnote 3 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
-    var align = "left",
+    var align = "center",
         indent = "0em",
         linebreak = "false";
 
@@ -98,10 +98,13 @@ $$</div>
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
     mathjaxscript.type = 'text/javascript';
     mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
-    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
         "MathJax.Hub.Config({" +
         "    config: ['MMLorHTML.js']," +
-        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
         "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
         "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
         "    displayAlign: '"+ align +"'," +
@@ -115,7 +118,9 @@ $$</div>
         "        preview: 'TeX'," +
         "    }, " +
         "    'HTML-CSS': { " +
-        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'blue ! important'} }," +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
         "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
         "    }, " +
         "}); " +
@@ -135,6 +140,8 @@ $$</div>
                 "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
             "});" +
         "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 </script>

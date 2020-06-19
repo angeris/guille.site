@@ -35,14 +35,14 @@
 <p>First, as before, it's reasonable to ask for a fast heuristic to discover paths on a graph which are 'feasible' in a weak sense (i.e. a path where the UAV does not crash against an obstacle whose trajectory is known). This solution is then relaxed into a continuous problem inro <span class="math">\(\mathbb{R}^2\)</span> space and then optimized over. This latter trajectory is the one actually fed directly to the UAV controller and which is executed by the UAV. It should be noted that performing this weird relaxation is useful since it often takes quite a while for the algorithm to begin to converge to a feasible solution (and often can run into numerical stability problems while trying to do so). Anyways, for more of the details, check out the first <a href="/path-optimization-thoughts.html">first</a> and <a href="/path-optimization-thoughts2.html">second</a> posts (and the videos at the bottom, to observe the qualitative behavior).</p>
 <p>I should mention that, unlike the previous problems, there already exist some fun <a href="https://www.cs.ucsb.edu/~suri/psdir/soda11.pdf">results</a> on this notion of the shortest path (including a poly-time <span class="math">\((1+\varepsilon)OPT\)</span> approximation!), but it's interesting enough to describe in a quick post anyways. In general, I assume no constraints on the possible curvature of a trajectory for this approximation, though it's straightforward include them in the general problem if the hit on run time performance isn't an issue.</p>
 <h3>Definition</h3>
-<p>The problem set up is the following: let's say we have a family of graphs <span class="math">\(G_t\subseteq G\)</span> parametrized by some time parameter <span class="math">\(t\in \mathbb{R}^{\ge 0}\)</span>, where <span class="math">\(G\)</span> is the 'universal graph'; in other words, every graph at every point in time is a subset of both edges and vertices of that graph. One idea for constructing this <span class="math">\(G\)</span> is to set <span class="math">\(G = \bigcup_{t\in \mathbb{R}^{\ge 0}} G_t\)</span> and insist that <span class="math">\(G\)</span> be a finite graph.<sup id="fnref-union-graphs"><a class="footnote-ref" href="#fn-union-graphs">1</a></sup></p>
+<p>The problem set up is the following: let's say we have a family of graphs <span class="math">\(G_t\subseteq G\)</span> parametrized by some time parameter <span class="math">\(t\in \mathbb{R}^{\ge 0}\)</span>, where <span class="math">\(G\)</span> is the 'universal graph'; in other words, every graph at every point in time is a subset of both edges and vertices of that graph. One idea for constructing this <span class="math">\(G\)</span> is to set <span class="math">\(G = \bigcup_{t\in \mathbb{R}^{\ge 0}} G_t\)</span> and insist that <span class="math">\(G\)</span> be a finite graph.<sup id="fnref:union-graphs"><a class="footnote-ref" href="#fn:union-graphs">1</a></sup></p>
 <p><span class="math">\(G_t\)</span> at each point encodes some constraints on the current position of the drone, which is indicated by some vertex <span class="math">\(v\in V(G)\)</span> (where <span class="math">\(V(G)\)</span> is the vertex set of <span class="math">\(G\)</span>) and this position is <em>valid</em> at time <span class="math">\(t\)</span> if the vertex exists in <span class="math">\(G_t\)</span>. In other words, position <span class="math">\(v\)</span> is valid at <span class="math">\(t\)</span> if <span class="math">\(v\in V(G_t)\)</span>.</p>
-<p>Now, the question becomes: given some cost function <span class="math">\(c: V(G)\times V(G) \to \mathbb{R}^{\ge 0}\)</span> and some start and end nodes, construct a shortest valid path<sup id="fnref-valid-path"><a class="footnote-ref" href="#fn-valid-path">2</a></sup> from the start to the end nodes (where the start node is assumed to be at time <span class="math">\(t=0\)</span>), if it exists.</p>
+<p>Now, the question becomes: given some cost function <span class="math">\(c: V(G)\times V(G) \to \mathbb{R}^{\ge 0}\)</span> and some start and end nodes, construct a shortest valid path<sup id="fnref:valid-path"><a class="footnote-ref" href="#fn:valid-path">2</a></sup> from the start to the end nodes (where the start node is assumed to be at time <span class="math">\(t=0\)</span>), if it exists.</p>
 <h3>A simple algorithm</h3>
 <p>With this definition and knowledge of the <span class="math">\(A^*\)</span> algorithm (hint, hint!), I encourage working out what the solution to this problem is, assuming we have a <a href="https://en.wikipedia.org/wiki/Consistent_heuristic">consistent heuristic</a> for the path.</p>
 <p>As a side note: a simple heuristic, which usually works quite well, is to take the <span class="math">\(\ell^2\)</span> distance between two nodes and divide it by the maximum velocity of the UAV—this is consistent since the UAV cannot travel between two points faster than being at its maximum velocity along the shortest possible line. In cases where many of the obstacles are small relative to the size of the graph and are sparse, this idea works extremely well because the approximation is fairly tight.</p>
 <p>With that in mind, here's the algorithm, which is really just a (slightly) modified version of <span class="math">\(A^*\)</span>. (The code below is like quasi-Python pseudocode, but implementing directly shouldn't require too many changes. Additionally, some things can be easily stored instead of recomputed by exploiting the structure of the cost function.)</p>
-<div class="highlight"><pre><span></span><span class="n">q</span> <span class="o">&lt;-</span> <span class="n">priority</span> <span class="n">queue</span>
+<div class="highlight"><pre><span></span><code><span class="n">q</span> <span class="o">&lt;-</span> <span class="n">priority</span> <span class="n">queue</span>
 <span class="n">start_node</span> <span class="o">&lt;-</span> <span class="n">start</span> <span class="n">node</span>
 <span class="n">end_node</span> <span class="o">&lt;-</span> <span class="n">end</span> <span class="n">node</span>
 
@@ -54,7 +54,7 @@
 <span class="c1"># Algorithm begins here</span>
 <span class="n">add</span> <span class="p">([</span><span class="n">start_node</span><span class="p">],</span> <span class="n">cost</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="n">to</span> <span class="n">q</span>
 
-<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+<span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
     <span class="n">curr_path</span><span class="p">,</span> <span class="n">curr_cost</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">pop_smallest</span><span class="p">()</span>
     <span class="n">last_node</span> <span class="o">=</span> <span class="n">curr_path</span><span class="p">[</span><span class="n">end</span><span class="p">]</span>
 
@@ -69,8 +69,8 @@
         <span class="n">add</span> <span class="p">(</span><span class="n">new_path</span><span class="p">,</span> <span class="n">cost</span><span class="o">=</span><span class="p">(</span><span class="n">new_cost</span> <span class="o">+</span> <span class="n">h</span><span class="p">(</span><span class="n">neighbor</span><span class="p">,</span> <span class="n">end_node</span><span class="p">)))</span> <span class="n">to</span> <span class="n">q</span>
 
 
-<span class="k">return</span> <span class="bp">None</span>
-</pre></div>
+<span class="k">return</span> <span class="kc">None</span>
+</code></pre></div>
 
 
 <p>This algorithm returns one of the optimal paths, since a path will only be returned if the total cost of the found path is at most as large as the next possible valid path to some point <span class="math">\(v_t\)</span> plus the heuristic cost <span class="math">\(h(v_t, e)\)</span>. By assumption, the heuristic function is a global underestimator, which immediately implies that this return path must have had a minimum possible original cost. I should also point out that there's nothing preventing an exponential time solution (and it's certainly exponential in the worst case... if there doesn't exist a path between <span class="math">\(s, e\)</span>, for example)! This is not great, but (as usual) this algorithm works much better than exponential time, in practice.</p>
@@ -79,20 +79,20 @@
 <div class="footnote">
 <hr>
 <ol>
-<li id="fn-union-graphs">
+<li id="fn:union-graphs">
 <p>By the 'union' of graphs, I mean that the new graph should be
 <div class="math">$$
 \bigcup_{t} G_t = \left(\bigcup_{t} V(G_t), ~ \bigcup_t E(G_t)\right)
 $$</div>
-where <span class="math">\(V(G)\)</span> is the set of vertices of <span class="math">\(G\)</span> and <span class="math">\(E(G)\)</span> is the set of edges of <span class="math">\(G\)</span>.&#160;<a class="footnote-backref" href="#fnref-union-graphs" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+where <span class="math">\(V(G)\)</span> is the set of vertices of <span class="math">\(G\)</span> and <span class="math">\(E(G)\)</span> is the set of edges of <span class="math">\(G\)</span>.&#160;<a class="footnote-backref" href="#fnref:union-graphs" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
-<li id="fn-valid-path">
-<p>A path <span class="math">\(v = (v_t)\)</span> is valid if it is a path from the start node to the end node and each <span class="math">\(v_t \in G_t\)</span> for every possible <span class="math">\(t\)</span>. We also have that <span class="math">\(t_{i+1} - t_i = c(v_{t}, v_{t+1})\)</span>. In other words, the time at action number <span class="math">\(i\)</span> is the sum of the times of all of the previous actions (this just gives a definition of 'time' in this problem).&#160;<a class="footnote-backref" href="#fnref-valid-path" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+<li id="fn:valid-path">
+<p>A path <span class="math">\(v = (v_t)\)</span> is valid if it is a path from the start node to the end node and each <span class="math">\(v_t \in G_t\)</span> for every possible <span class="math">\(t\)</span>. We also have that <span class="math">\(t_{i+1} - t_i = c(v_{t}, v_{t+1})\)</span>. In other words, the time at action number <span class="math">\(i\)</span> is the sum of the times of all of the previous actions (this just gives a definition of 'time' in this problem).&#160;<a class="footnote-backref" href="#fnref:valid-path" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
-    var align = "left",
+    var align = "center",
         indent = "0em",
         linebreak = "false";
 
@@ -106,10 +106,13 @@ where <span class="math">\(V(G)\)</span> is the set of vertices of <span class="
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
     mathjaxscript.type = 'text/javascript';
     mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
-    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
         "MathJax.Hub.Config({" +
         "    config: ['MMLorHTML.js']," +
-        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
         "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
         "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
         "    displayAlign: '"+ align +"'," +
@@ -123,7 +126,9 @@ where <span class="math">\(V(G)\)</span> is the set of vertices of <span class="
         "        preview: 'TeX'," +
         "    }, " +
         "    'HTML-CSS': { " +
-        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'blue ! important'} }," +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
         "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
         "    }, " +
         "}); " +
@@ -143,6 +148,8 @@ where <span class="math">\(V(G)\)</span> is the set of vertices of <span class="
                 "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
             "});" +
         "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 </script>

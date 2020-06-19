@@ -43,7 +43,7 @@ for <span class="math">\(x \in \mathbb{R}^m\)</span>? (Recall that a quadratic i
 <p>There are many reasons to attempt to answer this (surprisingly useful) question. The original motivations were to show <a href="https://stanford.edu/class/ee363/lectures/lmi-s-proc.pdf">stability of systems</a>, though the domain of applications is certainly larger. We can use this to show anything from impossibility results (for example, many of the results of <a href="https://arxiv.org/abs/1811.12936">this paper</a> can be recast in terms of the S-procedure) to, well, in our case, the construction of a small covering ellipsoid from a bunch of other ellipsoids, which is itself useful for things like filtering (for localizing drones from noisy measurements for example) along with many other applications.</p>
 <p>If you're familiar with Lagrange duality, this is mostly an equivalent statement—except that this statement is in the special case of quadratics, where you can say a little more than with general functions.</p>
 <h2>The <span class="math">\(n=1\)</span> case</h2>
-<p>We can fully and completely answer this question in the case that <span class="math">\(n=1\)</span>: there exists any nonnegative number <span class="math">\(\tau \ge 0\)</span> such that
+<p>We can fully and completely answer this question in the case that <span class="math">\(n=1\)</span>: there exists a nonnegative number <span class="math">\(\tau \ge 0\)</span> such that
 </p>
 <div class="math">$$
     f_0(x) \le \tau f_1(x)
@@ -122,7 +122,7 @@ q_i^T &amp; r_i
 $$</div>
 <p>
 where we say two symmetric matrices <span class="math">\(A, B\)</span> satisfy <span class="math">\(A \le B\)</span> whenever <span class="math">\(x^TAx \le x^TBx\)</span> for all <span class="math">\(x\)</span>. A straightforward exercise it to verify that the set of matrices <span class="math">\(A \ge 0\)</span> is a convex cone (almost universally called the positive semidefinite or PSD cone).</p>
-<p>This rewriting is extremely useful, since we've turned a problem over a potentially difficult-to-handle space (the space of quadratics greater than or equal to another) into a problem that is easy to handle (the PSD cone). The best news, though, is that we have efficient algorithms to solve optimization problems whose constraints are PSD constraints.<sup id="fnref-lmi-book"><a class="footnote-ref" href="#fn-lmi-book">1</a></sup></p>
+<p>This rewriting is extremely useful, since we've turned a problem over a potentially difficult-to-handle space (the space of quadratics greater than or equal to another) into a problem that is easy to handle (the PSD cone). The best news, though, is that we have efficient algorithms to solve optimization problems whose constraints are PSD constraints.<sup id="fnref:lmi-book"><a class="footnote-ref" href="#fn:lmi-book">1</a></sup></p>
 <h2>Corresponding optimization problem</h2>
 <p>Finally, after enough background, we can get to the final goal: writing an efficiently-solvable optimization problem to give us a small bounding ellipsoid.</p>
 <p>There are several ways of defining "small," in the case of ellipsoids, but one of the most common definitions is to pick the ellipsoid with the smallest volume. In the case that <span class="math">\(\mathcal{E}_0 = \{x \mid x^TP'x + 2(q')^Tx + r \le 0\}\)</span>, the <em>volume</em> of this ellipsoid is given by the determinant, <span class="math">\(\mathop{\mathrm{det}} P'\)</span>, of the matrix <span class="math">\(P'\)</span>. So, we can write—using the conditions given above—an optimization problem corresponding to finding the smallest (in volume) ellipsoid <span class="math">\(\mathcal{E}_0\)</span> which contains all ellipsoids, <span class="math">\(\mathcal{E}_i\)</span> as
@@ -206,13 +206,13 @@ As before, this program does not guarantee actually finding the minimal volume e
 <div class="footnote">
 <hr>
 <ol>
-<li id="fn-lmi-book">
-<p>For more information, see Boyd's <a href="https://web.stanford.edu/~boyd/lmibook/">Linear Matrix Inequalities</a> book.&#160;<a class="footnote-backref" href="#fnref-lmi-book" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<li id="fn:lmi-book">
+<p>For more information, see Boyd's <a href="https://web.stanford.edu/~boyd/lmibook/">Linear Matrix Inequalities</a> book.&#160;<a class="footnote-backref" href="#fnref:lmi-book" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
-    var align = "left",
+    var align = "center",
         indent = "0em",
         linebreak = "false";
 
@@ -226,10 +226,13 @@ As before, this program does not guarantee actually finding the minimal volume e
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
     mathjaxscript.type = 'text/javascript';
     mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
-    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
         "MathJax.Hub.Config({" +
         "    config: ['MMLorHTML.js']," +
-        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
         "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
         "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
         "    displayAlign: '"+ align +"'," +
@@ -243,7 +246,9 @@ As before, this program does not guarantee actually finding the minimal volume e
         "        preview: 'TeX'," +
         "    }, " +
         "    'HTML-CSS': { " +
-        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'blue ! important'} }," +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
         "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
         "    }, " +
         "}); " +
@@ -263,6 +268,8 @@ As before, this program does not guarantee actually finding the minimal volume e
                 "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
             "});" +
         "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 </script>

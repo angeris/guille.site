@@ -80,7 +80,7 @@ $$</div>
 x^* = \lim\_{k\to\infty} x^{(k)}
 $$</div>
 <p>in the limit. Why do we do this? Because the derivative of <span class="math">\(\mathcal{L}\)</span> vanishes as <span class="math">\(C\to\infty\)</span> for the hard constraints. This can be seen in the picture above, by looking at the left side; as <span class="math">\(C\)</span> becomes large, the function becomes essentially flat when <span class="math">\(x&lt;0\)</span> and <span class="math">\(x&gt;0\)</span>. This is generally bad, since, if we were to optimize directly for some very large <span class="math">\(C\)</span> which goes through the interior of an obstacle, we would be near a point where the derivative nearly vanishes even though we're inside of an obstacle!</p>
-<p>This is totally infeasible for our problem and we cannot sidestep this issue in an obvious way using general optimization tools. So we're forced to do the Next Best Thing™, which is to perform this cooling schedule idea while optimizing over the objective.<sup id="fnref-shortestpath"><a class="footnote-ref" href="#fn-shortestpath">1</a></sup></p>
+<p>This is totally infeasible for our problem and we cannot sidestep this issue in an obvious way using general optimization tools. So we're forced to do the Next Best Thing™, which is to perform this cooling schedule idea while optimizing over the objective.<sup id="fnref:shortestpath"><a class="footnote-ref" href="#fn:shortestpath">1</a></sup></p>
 <p>Anyways, optimizing this function somewhat successfully with some decent cooling schedule (which is the subject of the next post) yields a cute movie that looks like the following</p>
 <video controls>
     <source src="/images/path-optimization-1/path_optimization.mp4" type="video/mp4">
@@ -91,13 +91,13 @@ $$</div>
 <div class="footnote">
 <hr>
 <ol>
-<li id="fn-shortestpath">
-<p>As given before, we can create feasible trajectories which do not have this problem by discretization methods—this helps out quite a bit since, for complicated trajectories where a lot of the initial path intersects obstacles, most of the time is spent on either (a) making a good cooling schedule for <span class="math">\(C\)</span> or (b) escaping the minima which include local obstacles. I'll discuss these methods in a later post.&#160;<a class="footnote-backref" href="#fnref-shortestpath" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<li id="fn:shortestpath">
+<p>As given before, we can create feasible trajectories which do not have this problem by discretization methods—this helps out quite a bit since, for complicated trajectories where a lot of the initial path intersects obstacles, most of the time is spent on either (a) making a good cooling schedule for <span class="math">\(C\)</span> or (b) escaping the minima which include local obstacles. I'll discuss these methods in a later post.&#160;<a class="footnote-backref" href="#fnref:shortestpath" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
-    var align = "left",
+    var align = "center",
         indent = "0em",
         linebreak = "false";
 
@@ -111,10 +111,13 @@ $$</div>
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
     mathjaxscript.type = 'text/javascript';
     mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
-    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
         "MathJax.Hub.Config({" +
         "    config: ['MMLorHTML.js']," +
-        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
         "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
         "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
         "    displayAlign: '"+ align +"'," +
@@ -128,7 +131,9 @@ $$</div>
         "        preview: 'TeX'," +
         "    }, " +
         "    'HTML-CSS': { " +
-        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'blue ! important'} }," +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
         "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
         "    }, " +
         "}); " +
@@ -148,6 +153,8 @@ $$</div>
                 "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
             "});" +
         "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 </script>

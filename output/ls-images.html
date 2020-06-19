@@ -37,7 +37,7 @@
 <div class="math">$$
 \min_x \,\,\lVert Ax - b \lVert^2
 $$</div>
-<p>where I define <span class="math">\(\lVert y\lVert^2 \equiv \sum_i y_i^2 = y^Ty\)</span> to be the usual Euclidean norm (and <span class="math">\(y^T\)</span> denotes the transpose of <span class="math">\(y\)</span>). This problem has a unique solution provided that <span class="math">\(A\)</span> is full-rank (i.e. has independent columns), and therefore that <span class="math">\(A^TA\)</span> is invertible.<sup id="fnref-sq-invertible"><a class="footnote-ref" href="#fn-sq-invertible">1</a></sup> This is true since the problem above is convex (e.g. any local minimum, if it exists, corresponds to the global minimum<sup id="fnref-convex-global-min"><a class="footnote-ref" href="#fn-convex-global-min">2</a></sup>), coercive (the function diverges to infinity, and therefore <em>has</em> a local minimum) and differentiable such that</p>
+<p>where I define <span class="math">\(\lVert y\lVert^2 \equiv \sum_i y_i^2 = y^Ty\)</span> to be the usual Euclidean norm (and <span class="math">\(y^T\)</span> denotes the transpose of <span class="math">\(y\)</span>). This problem has a unique solution provided that <span class="math">\(A\)</span> is full-rank (i.e. has independent columns), and therefore that <span class="math">\(A^TA\)</span> is invertible.<sup id="fnref:sq-invertible"><a class="footnote-ref" href="#fn:sq-invertible">1</a></sup> This is true since the problem above is convex (e.g. any local minimum, if it exists, corresponds to the global minimum<sup id="fnref:convex-global-min"><a class="footnote-ref" href="#fn:convex-global-min">2</a></sup>), coercive (the function diverges to infinity, and therefore <em>has</em> a local minimum) and differentiable such that</p>
 <div class="math">$$
 \nabla \lVert Ax - b \lVert^2 = \nabla (Ax-b)^T(Ax-b) = 2A^T(Ax-b) = 0,
 $$</div>
@@ -97,7 +97,7 @@ $$</div>
 \min_x \,\, \lVert \bar A x - \bar b\lVert^2
 $$</div>
 <p>which we can solve by the same means as before.</p>
-<p>This 'extension' now allows us to solve a large amount of problems (even equality-constrained ones! For example, say <span class="math">\(\lambda_i\)</span> corresponds to an equality constraint, then we can send <span class="math">\(\lambda_i \to \infty\)</span>, which, if possible, sends that particular term to zero<sup id="fnref-eq-constraint"><a class="footnote-ref" href="#fn-eq-constraint">3</a></sup>), including the image reconstruction problem that will be presented below. Yes, there are better methods, but I can't think of many that can be written in about 4 lines of Python with only a linear-algebra library (not counting loading and saving, of course 😉).</p>
+<p>This 'extension' now allows us to solve a large amount of problems (even equality-constrained ones! For example, say <span class="math">\(\lambda_i\)</span> corresponds to an equality constraint, then we can send <span class="math">\(\lambda_i \to \infty\)</span>, which, if possible, sends that particular term to zero<sup id="fnref:eq-constraint"><a class="footnote-ref" href="#fn:eq-constraint">3</a></sup>), including the image reconstruction problem that will be presented below. Yes, there are better methods, but I can't think of many that can be written in about 4 lines of Python with only a linear-algebra library (not counting loading and saving, of course 😉).</p>
 <h2>Image de-blurring with LS</h2>
 <p>Let's say we are given a blurred image, represented by some vector <span class="math">\(y\)</span> with, say, a gaussian blur operator given by <span class="math">\(G\)</span> (which can be represented as a matrix). Usually, we'd want to minimize a problem of the form</p>
 <div class="math">$$
@@ -107,7 +107,7 @@ $$</div>
 <div class="math">$$
 Gx \approx y.
 $$</div>
-<p>Writing this out is a bit of a pain, but it's made a bit easier by noting that convolution with a 2D gaussian kernel is separable into two convolutions of 1D (e.g. convolve the image with the up-down filter, and do the same with the left-right) and by use of the Kronecker product to write out the individual matrices.<sup id="fnref-kronecker-conv"><a class="footnote-ref" href="#fn-kronecker-conv">4</a></sup> The final <span class="math">\(G\)</span> is therefore the product of each of the convolutions. Just to show the comparison, here's the initial image, taken from <a href="https://commons.wikimedia.org/wiki/File:Lichtenstein_img_processing_test.png">Wikipedia</a></p>
+<p>Writing this out is a bit of a pain, but it's made a bit easier by noting that convolution with a 2D gaussian kernel is separable into two convolutions of 1D (e.g. convolve the image with the up-down filter, and do the same with the left-right) and by use of the Kronecker product to write out the individual matrices.<sup id="fnref:kronecker-conv"><a class="footnote-ref" href="#fn:kronecker-conv">4</a></sup> The final <span class="math">\(G\)</span> is therefore the product of each of the convolutions. Just to show the comparison, here's the initial image, taken from <a href="https://commons.wikimedia.org/wiki/File:Lichtenstein_img_processing_test.png">Wikipedia</a></p>
 <p><img src="/images/constrained-ls-intro/initial_image.png" class="insert">
 <em>Original greyscale image</em></p>
 <p>and here's the image, blurred with a 2D gaussian kernel of size 5, with <span class="math">\(\sigma = 3\)</span></p>
@@ -125,11 +125,11 @@ $$</div>
 <p>Except for one problem: while we may <em>know</em> the gaussian blurring operator on artificial images that <em>we</em> actively blur, the blurring operator that we provide for real images may not be fully representative of what's really happening! By that I mean, if the real blurring operator is given by <span class="math">\(G^\text{real}\)</span>, it could be that our guess <span class="math">\(G\)</span> is far away from <span class="math">\(G^\text{real}\)</span>, perhaps because of some non-linear effects, or random noise, or whatever.</p>
 <p>That is, we know what photos, in general, look like: they're usually pretty smooth and have relatively few edges. In other words, the variations and displacements aren't large almost everywhere in most images. This is where the multi-objective form of least-squares comes in handy—we can add a secondary (or third, etc) objective that allows us to specify how smooth the actual image should be! </p>
 <p>How do we do this, you ask? Well, let's consider the gradient at every point. If the gradient is large, then we've met an edge since there's a large color variation between one pixel and its neighbour, similarly, if the gradient is small at that point, the image is relatively smooth at that point.</p>
-<p>So, how about specifying that the sum of the norms of the gradients at every point be small?<sup id="fnref-heat-diffusion"><a class="footnote-ref" href="#fn-heat-diffusion">5</a></sup> That is, we want the gradients to <em>all</em> be relatively small (minus those at edges, of course!), with some parameter that we can tune. In other words, let <span class="math">\(D_x\)</span> be the difference matrix between pixel <span class="math">\((i,j)\)</span> and pixel <span class="math">\((i+1,j)\)</span> (e.g. if our image is <span class="math">\(X\)</span> then <span class="math">\((D_x X)_{ij} = X_{i+1,j} - X_{ij}\)</span>, and, similarly, let <span class="math">\(D_y\)</span> be the difference matrix between pixel <span class="math">\((i, j)\)</span> and <span class="math">\((i,j+1)\)</span>.<sup id="fnref-derivative-mat"><a class="footnote-ref" href="#fn-derivative-mat">7</a></sup> Then our final objective is of the form</p>
+<p>So, how about specifying that the sum of the norms of the gradients at every point be small?<sup id="fnref:heat-diffusion"><a class="footnote-ref" href="#fn:heat-diffusion">5</a></sup> That is, we want the gradients to <em>all</em> be relatively small (minus those at edges, of course!), with some parameter that we can tune. In other words, let <span class="math">\(D_x\)</span> be the difference matrix between pixel <span class="math">\((i,j)\)</span> and pixel <span class="math">\((i+1,j)\)</span> (e.g. if our image is <span class="math">\(X\)</span> then <span class="math">\((D_x X)_{ij} = X_{i+1,j} - X_{ij}\)</span>, and, similarly, let <span class="math">\(D_y\)</span> be the difference matrix between pixel <span class="math">\((i, j)\)</span> and <span class="math">\((i,j+1)\)</span>.<sup id="fnref:derivative-mat"><a class="footnote-ref" href="#fn:derivative-mat">7</a></sup> Then our final objective is of the form</p>
 <div class="math">$$
 \min_x \,\,\lVert Gx - y \lVert^2 + \lambda\left(\lVert D_x x \lVert^2 + \lVert D_y x \lVert^2\right)
 $$</div>
-<p>where <span class="math">\(\lambda \ge 0\)</span> is our 'smoothness' parameter. Note that, if we send <span class="math">\(\lambda \to \infty\)</span> then we really care that our image is 'infinitely smooth' (what would that look like?<sup id="fnref-smooth-image"><a class="footnote-ref" href="#fn-smooth-image">6</a></sup>), while if we send it to zero, we care that the reconstruction from the (possibly not great) approximation of <span class="math">\(G^\text{real}\)</span> is really good. Now, let's compare the two methods with a slightly corrupted image:</p>
+<p>where <span class="math">\(\lambda \ge 0\)</span> is our 'smoothness' parameter. Note that, if we send <span class="math">\(\lambda \to \infty\)</span> then we really care that our image is 'infinitely smooth' (what would that look like?<sup id="fnref:smooth-image"><a class="footnote-ref" href="#fn:smooth-image">6</a></sup>), while if we send it to zero, we care that the reconstruction from the (possibly not great) approximation of <span class="math">\(G^\text{real}\)</span> is really good. Now, let's compare the two methods with a slightly corrupted image:</p>
 <p><img src="/images/constrained-ls-intro/corrupted_blurred_image.png" class="insert">
 <em>The corrupted, blurred image we feed into the algorithm</em></p>
 <p><img src="/images/constrained-ls-intro/initial_image.png" class="insert">
@@ -160,10 +160,10 @@ for any <span class="math">\(y\)</span>. But this is the definition of a global 
 <div class="footnote">
 <hr>
 <ol>
-<li id="fn-sq-invertible">
-<p>If <span class="math">\(A^TA x = 0\)</span> then <span class="math">\(x^TA^TAx = 0\)</span>, but <span class="math">\(x^TA^TAx = (Ax)^T(Ax) = \lVert Ax \lVert^2 = 0\)</span> which is zero only when <span class="math">\(Ax = 0\)</span>. E.g. only if there is an <span class="math">\(x\)</span> in the nullspace of <span class="math">\(A\)</span>.&#160;<a class="footnote-backref" href="#fnref-sq-invertible" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<li id="fn:sq-invertible">
+<p>If <span class="math">\(A^TA x = 0\)</span> then <span class="math">\(x^TA^TAx = 0\)</span>, but <span class="math">\(x^TA^TAx = (Ax)^T(Ax) = \lVert Ax \lVert^2 = 0\)</span> which is zero only when <span class="math">\(Ax = 0\)</span>. E.g. only if there is an <span class="math">\(x\)</span> in the nullspace of <span class="math">\(A\)</span>.&#160;<a class="footnote-backref" href="#fnref:sq-invertible" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
-<li id="fn-convex-global-min">
+<li id="fn:convex-global-min">
 <p>A proof is straightforward. Let's say <span class="math">\(f\)</span> is differentiable, since this is the case we care about, then we say <span class="math">\(f\)</span> is convex if the hyperplane given by <span class="math">\(\nabla f(x)\)</span> (at any <span class="math">\(x\)</span>) bounds <span class="math">\(f\)</span> from below. </p>
 <p>A nice picture usually helps with this:
 <img alt="Convex envelope approximation" src="/images/constrained-ls-intro/bounding-hyperplanes.png"></p>
@@ -176,27 +176,27 @@ for all <span class="math">\(x, y\)</span>.</p>
 <div class="math">$$
 f(y) \ge (y-x^0)^T(\underbrace{\nabla f(x^0)}_{=0}) + f(x^0) = (y-x^0)^T0 + f(x^0) = f(x^0),
 $$</div>
-for any <span class="math">\(y\)</span>.&#160;<a class="footnote-backref" href="#fnref-convex-global-min" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+for any <span class="math">\(y\)</span>.&#160;<a class="footnote-backref" href="#fnref:convex-global-min" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
-<li id="fn-eq-constraint">
-<p>There are, of course, better ways of doing this which I'll present in some later post. For now, though, note that if the constraint is not achievable at equality, e.g. that we have <span class="math">\(\lVert Cx - d\lVert^2 \ge \varepsilon &gt; 0\)</span> for any <span class="math">\(x\)</span>, then the objective <span class="math">\(\lambda_i\lVert Cx - d\lVert^2 \ge \lambda_i\varepsilon \to \infty\)</span> whenever we send <span class="math">\(\lambda_i \to \infty\)</span>. This gives us a way of determining if the constraint is feasible (which happens only if the program converges to a finite value for arbitrarily increasing <span class="math">\(\lambda_i\)</span>) or infeasible (which happens, as shown before, if the minimization program diverges to infinity).&#160;<a class="footnote-backref" href="#fnref-eq-constraint" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+<li id="fn:eq-constraint">
+<p>There are, of course, better ways of doing this which I'll present in some later post. For now, though, note that if the constraint is not achievable at equality, e.g. that we have <span class="math">\(\lVert Cx - d\lVert^2 \ge \varepsilon &gt; 0\)</span> for any <span class="math">\(x\)</span>, then the objective <span class="math">\(\lambda_i\lVert Cx - d\lVert^2 \ge \lambda_i\varepsilon \to \infty\)</span> whenever we send <span class="math">\(\lambda_i \to \infty\)</span>. This gives us a way of determining if the constraint is feasible (which happens only if the program converges to a finite value for arbitrarily increasing <span class="math">\(\lambda_i\)</span>) or infeasible (which happens, as shown before, if the minimization program diverges to infinity).&#160;<a class="footnote-backref" href="#fnref:eq-constraint" title="Jump back to footnote 3 in the text">&#8617;</a></p>
 </li>
-<li id="fn-kronecker-conv">
+<li id="fn:kronecker-conv">
 <p>Assuming we write out the image as a row-major order, with dimensions <span class="math">\(m\times m\)</span>, we can write the <a href="https://en.wikipedia.org/wiki/Toeplitz_matrix">Toeplitz matrix</a> of the 1D gaussian convolution of length <span class="math">\(n\)</span>, say <span class="math">\(T\)</span>. Then the row-convolution of the image's one-dimensional vector representation is given by <span class="math">\(I_m \otimes T\)</span>, where <span class="math">\(\otimes\)</span> denotes the <a href="https://en.wikipedia.org/wiki/Kronecker_product">Kronecker product</a> of both matrices and <span class="math">\(I_m\)</span> is the <span class="math">\(m\times m\)</span> identity matrix. Similarly, we can do this for the column convolution by writing it out as <span class="math">\(T\otimes I_{m+n}\)</span> (note the additional <span class="math">\(n\)</span> which comes from the convolution!), then the final <span class="math">\(G\)</span> matrix is</p>
 <p>
 <div class="math">$$
     G = (T\otimes I_{m+n})(I_m \otimes T)
 $$</div>
 </p>
-<p>which is much simpler to compute than the horrible initial expression dealing with indices. Additionally, these expressions are sparse (e.g. the first is block-diagonal), so we can exploit that to save on both memory and processing time. For more info, I'd recommend looking at the code for this entry.&#160;<a class="footnote-backref" href="#fnref-kronecker-conv" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+<p>which is much simpler to compute than the horrible initial expression dealing with indices. Additionally, these expressions are sparse (e.g. the first is block-diagonal), so we can exploit that to save on both memory and processing time. For more info, I'd recommend looking at the code for this entry.&#160;<a class="footnote-backref" href="#fnref:kronecker-conv" title="Jump back to footnote 4 in the text">&#8617;</a></p>
 </li>
-<li id="fn-heat-diffusion">
-<p>It turns out this has deep connections to a bunch of beautiful mathematical theories (most notably, the theory of heat diffusion on manifolds), but we won't go into them here since it's relatively out of scope, though I may cover it in a later post.&#160;<a class="footnote-backref" href="#fnref-heat-diffusion" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+<li id="fn:heat-diffusion">
+<p>It turns out this has deep connections to a bunch of beautiful mathematical theories (most notably, the theory of heat diffusion on manifolds), but we won't go into them here since it's relatively out of scope, though I may cover it in a later post.&#160;<a class="footnote-backref" href="#fnref:heat-diffusion" title="Jump back to footnote 5 in the text">&#8617;</a></p>
 </li>
-<li id="fn-smooth-image">
-<p>You probably guessed it: it's just an image that is all the same color.&#160;<a class="footnote-backref" href="#fnref-smooth-image" title="Jump back to footnote 6 in the text">&#8617;</a></p>
+<li id="fn:smooth-image">
+<p>You probably guessed it: it's just an image that is all the same color.&#160;<a class="footnote-backref" href="#fnref:smooth-image" title="Jump back to footnote 6 in the text">&#8617;</a></p>
 </li>
-<li id="fn-derivative-mat">
+<li id="fn:derivative-mat">
 <p>These are slightly tricker to form for 2D images, but, as with the previous, we make heavy use of the Kronecker product. The derivative matrix for a 1D <span class="math">\(m\)</span>-vector is the one formed by (let's call it <span class="math">\(L\)</span> with dimensions <span class="math">\((m-1)\times m\)</span>)
 <div class="math">$$
 L=\begin{bmatrix}
@@ -213,12 +213,12 @@ $$</div>
 and
 <div class="math">$$
 D_y = L\otimes I_m
-$$</div>&#160;<a class="footnote-backref" href="#fnref-derivative-mat" title="Jump back to footnote 7 in the text">&#8617;</a></p>
+$$</div>&#160;<a class="footnote-backref" href="#fnref:derivative-mat" title="Jump back to footnote 7 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
-    var align = "left",
+    var align = "center",
         indent = "0em",
         linebreak = "false";
 
@@ -232,10 +232,13 @@ $$</div>&#160;<a class="footnote-backref" href="#fnref-derivative-mat" title="Ju
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
     mathjaxscript.type = 'text/javascript';
     mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
-    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
         "MathJax.Hub.Config({" +
         "    config: ['MMLorHTML.js']," +
-        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
         "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
         "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
         "    displayAlign: '"+ align +"'," +
@@ -249,7 +252,9 @@ $$</div>&#160;<a class="footnote-backref" href="#fnref-derivative-mat" title="Ju
         "        preview: 'TeX'," +
         "    }, " +
         "    'HTML-CSS': { " +
-        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'blue ! important'} }," +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
         "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
         "    }, " +
         "}); " +
@@ -269,6 +274,8 @@ $$</div>&#160;<a class="footnote-backref" href="#fnref-derivative-mat" title="Ju
                 "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
             "});" +
         "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 </script>

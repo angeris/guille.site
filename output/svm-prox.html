@@ -122,7 +122,7 @@ $$</div>
 &amp;&amp;&amp; \xi_i \ge 0,\,\,\text{ for all } i
 \end{aligned}
 $$</div>
-<p>which, after changing the <span class="math">\(\ell_2\)</span> regularizer to an <span class="math">\(\ell_2^2\)</span>-norm regularizer (which is equivalent for approriate regularization hyperparameter, say <span class="math">\(\eta\)</span><sup id="fnref-hyperparameter"><a class="footnote-ref" href="#fn-hyperparameter">1</a></sup>) yields</p>
+<p>which, after changing the <span class="math">\(\ell_2\)</span> regularizer to an <span class="math">\(\ell_2^2\)</span>-norm regularizer (which is equivalent for approriate regularization hyperparameter, say <span class="math">\(\eta\)</span><sup id="fnref:hyperparameter"><a class="footnote-ref" href="#fn:hyperparameter">1</a></sup>) yields</p>
 <div class="math">$$
 \begin{aligned}
 &amp; \underset{\xi, \mu}{\text{minimize}}
@@ -153,7 +153,7 @@ $$</div>
 $$</div>
 <p>so now, we just need to find the proximal gradient operator for <span class="math">\(g(x)\)</span> (which is not as nice as one would immediately think, but it's not bad!).</p>
 <h3>Proximal gradient of the linear inequality indicator</h3>
-<p>Now, let's generalize the problem a bit: we're tasked with the question of finding the prox-gradient of <span class="math">\(g_S(x)\)</span> such that <span class="math">\(S\)</span> is given by some set of inequalities <span class="math">\(S = \\{x\,|\, Ax\le b\\}\)</span> for some given <span class="math">\(A, b\)</span>.<sup id="fnref-equivalence"><a class="footnote-ref" href="#fn-equivalence">2</a></sup> That is, we require</p>
+<p>Now, let's generalize the problem a bit: we're tasked with the question of finding the prox-gradient of <span class="math">\(g_S(x)\)</span> such that <span class="math">\(S\)</span> is given by some set of inequalities <span class="math">\(S = \\{x\,|\, Ax\le b\\}\)</span> for some given <span class="math">\(A, b\)</span>.<sup id="fnref:equivalence"><a class="footnote-ref" href="#fn:equivalence">2</a></sup> That is, we require</p>
 <div class="math">$$
 \mathop{\arg\!\min}\limits_y \frac{1}{2\lambda}\lVert x- y\lVert_2^2 + g_S(y)
 $$</div>
@@ -194,16 +194,16 @@ $$</div>
 <div class="footnote">
 <hr>
 <ol>
-<li id="fn-hyperparameter">
-<p>We're also finding this by using cross-validation, rather than a-priori, so it doesn't matter too much.&#160;<a class="footnote-backref" href="#fnref-hyperparameter" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<li id="fn:hyperparameter">
+<p>We're also finding this by using cross-validation, rather than a-priori, so it doesn't matter too much.&#160;<a class="footnote-backref" href="#fnref:hyperparameter" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
-<li id="fn-equivalence">
-<p>Note that this is equivalent to the original problem, actually. The forwards direction is an immediate generalization. The backwards direction is a little more difficult, but can be made simple by considering, say, only positive examples.&#160;<a class="footnote-backref" href="#fnref-equivalence" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+<li id="fn:equivalence">
+<p>Note that this is equivalent to the original problem, actually. The forwards direction is an immediate generalization. The backwards direction is a little more difficult, but can be made simple by considering, say, only positive examples.&#160;<a class="footnote-backref" href="#fnref:equivalence" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
-    var align = "left",
+    var align = "center",
         indent = "0em",
         linebreak = "false";
 
@@ -217,10 +217,13 @@ $$</div>
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
     mathjaxscript.type = 'text/javascript';
     mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
-    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
         "MathJax.Hub.Config({" +
         "    config: ['MMLorHTML.js']," +
-        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
         "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
         "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
         "    displayAlign: '"+ align +"'," +
@@ -234,7 +237,9 @@ $$</div>
         "        preview: 'TeX'," +
         "    }, " +
         "    'HTML-CSS': { " +
-        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'blue ! important'} }," +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
         "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
         "    }, " +
         "}); " +
@@ -254,6 +259,8 @@ $$</div>
                 "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
             "});" +
         "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 </script>

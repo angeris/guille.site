@@ -42,25 +42,25 @@ While this framework is quite general, we'll prove that this estimator is <a hre
 <div class="math">$$
 p(x~|~\theta) = \prod_i p(x^i~|~\theta)
 $$</div>
-<p>The proof that this estimator is consistent is relatively simple and assumes only the <a href="https://en.wikipedia.org/wiki/Law_of_large_numbers#Weak_law">weak law of large numbers</a>, which says that the empirical mean of a bunch of i.i.d variables <span class="math">\(\{Y_i\}\)</span> converges<sup id="fnref-in-probability"><a class="footnote-ref" href="#fn-in-probability">1</a></sup> to its expectation
+<p>The proof that this estimator is consistent is relatively simple and assumes only the <a href="https://en.wikipedia.org/wiki/Law_of_large_numbers#Weak_law">weak law of large numbers</a>, which says that the empirical mean of a bunch of i.i.d variables <span class="math">\(\{Y_i\}\)</span> converges<sup id="fnref:in-probability"><a class="footnote-ref" href="#fn:in-probability">1</a></sup> to its expectation
 </p>
 <div class="math">$$
 \frac{1}{n}\sum_i Y_i \overset{p}{\to} \mathbb{E}[Y_1].
 $$</div>
 <p>
 (from here on out, I will write 'converges in probability' just as <span class="math">\(\to\)</span>, instead of <span class="math">\(\overset{p}{\to}\)</span>).</p>
-<p>First, note that<sup id="fnref-trick"><a class="footnote-ref" href="#fn-trick">2</a></sup></p>
+<p>First, note that<sup id="fnref:trick"><a class="footnote-ref" href="#fn:trick">2</a></sup></p>
 <div class="math">$$
 \underset{\theta}{\operatorname{argmax}}\left(\prod_i p(x^i~|~\theta)\right) = \underset{\theta}{\operatorname{argmax}}\left(\log \left(\prod_i p(x^i~|~\theta)\right)\right),
 $$</div>
 <p>
-since <span class="math">\(0 &lt; x \le y \iff \log(x) \le \log(y)\)</span> (i.e. <span class="math">\(\log\)</span> is monotonic<sup id="fnref-monotonicity"><a class="footnote-ref" href="#fn-monotonicity">3</a></sup>, so it preserves any maximum or minimum). We also have
+since <span class="math">\(0 &lt; x \le y \iff \log(x) \le \log(y)\)</span> (i.e. <span class="math">\(\log\)</span> is monotonic<sup id="fnref:monotonicity"><a class="footnote-ref" href="#fn:monotonicity">3</a></sup>, so it preserves any maximum or minimum). We also have
 </p>
 <div class="math">$$
 \log \left(\prod_i p(x^i~|~\theta)\right) = \sum_i \log p(x^i ~|~ \theta),
 $$</div>
 <p>
-and now we need some way of comparing the current hypothesis <span class="math">\(\theta\)</span>, with the true hypothesis <span class="math">\(\theta^*\)</span>. The simplest way is to subtract one from the other and show that the difference is less than zero whenever <span class="math">\(\theta \ne \theta^*\)</span>, so this is what we will do.<sup id="fnref-sneaky"><a class="footnote-ref" href="#fn-sneaky">4</a></sup> In particular:
+and now we need some way of comparing the current hypothesis <span class="math">\(\theta\)</span>, with the true hypothesis <span class="math">\(\theta^*\)</span>. The simplest way is to subtract one from the other and show that the difference is less than zero whenever <span class="math">\(\theta \ne \theta^*\)</span>, so this is what we will do.<sup id="fnref:sneaky"><a class="footnote-ref" href="#fn:sneaky">4</a></sup> In particular:
 </p>
 <div class="math">$$
 \sum_i \log p(x^i~|~\theta) - \sum_i \log p(x^i~|~\theta^*) = \sum_i \log\left(\frac{p(x^i~|~\theta)}{p(x^i~|~\theta^*)}\right).
@@ -105,7 +105,7 @@ or, multiplying by <span class="math">\(n\)</span> and rearranging,
 \sum_i \log p(x^i~|~\theta) &lt; \sum_i \log p(x^i~|~\theta^*)
 $$</div>
 <p>
-with high probability. So, any point which is not <span class="math">\(\theta^*\)</span> will have a lower likelihood than <span class="math">\(\theta^*\)</span>.<sup id="fnref-immediate-bounds"><a class="footnote-ref" href="#fn-immediate-bounds">5</a></sup></p>
+with high probability. So, any point which is not <span class="math">\(\theta^*\)</span> will have a lower likelihood than <span class="math">\(\theta^*\)</span>.<sup id="fnref:immediate-bounds"><a class="footnote-ref" href="#fn:immediate-bounds">5</a></sup></p>
 <h2>Tail bounds on information</h2>
 <p>The next question, of course, is how many samples do we need to actually guess the right hypothesis? There are several ways of attacking this question, but let's start with a basic one: what is the probability that a wrong (empirical) likelihood is actually better than the true empirical likelihood? In other words, can we give an upper bound on
 </p>
@@ -157,7 +157,7 @@ $$</div>
 <p>since at no point have we assumed anything about the dependence of <span class="math">\(p\)</span> on <span class="math">\(\theta\)</span> or <span class="math">\(X\)</span> (apart from it being a correct probability distribution). More generally speaking, given <span class="math">\(\lambda \ne 0, 1\)</span>, we can find a function such that this quantity blows up (exercise for the reader!), which makes our bound trivial.</p>
 <p>It is possible to make some assumptions about how these tails behave, but it's not entirely clear that these assumptions would be natural or useful. If anyone has further thoughts on this, I'd love to hear them!</p>
 <h2>On Fisher Information and Lower-Bounds</h2>
-<p>The second set of lower-bounds that are easy to derive and are surprisingly useful are the Cramér-Rao bounds on estimators. In particular, we can show that, for any estimator <span class="math">\(\hat \theta\)</span> whose expectation is <span class="math">\(\mathbb{E}(\hat \theta) = \psi(\theta)\)</span>, with underlying probability distribution <span class="math">\(p(\cdot~|~\theta)\)</span>, then<sup id="fnref-dimensions"><a class="footnote-ref" href="#fn-dimensions">6</a></sup>
+<p>The second set of lower-bounds that are easy to derive and are surprisingly useful are the Cramér-Rao bounds on estimators. In particular, we can show that, for any estimator <span class="math">\(\hat \theta\)</span> whose expectation is <span class="math">\(\mathbb{E}(\hat \theta) = \psi(\theta)\)</span>, with underlying probability distribution <span class="math">\(p(\cdot~|~\theta)\)</span>, then<sup id="fnref:dimensions"><a class="footnote-ref" href="#fn:dimensions">6</a></sup>
 </p>
 <div class="math">$$
 \operatorname{Var}(\theta) \ge \frac{[\psi ' (\theta)]^2}{I(\theta)},
@@ -195,7 +195,7 @@ and the quantity on the right hand side goes to, as <span class="math">\(n\uparr
 \end{aligned}
 $$</div>
 <p>
-...zero?!<sup id="fnref-dominated-convergence"><a class="footnote-ref" href="#fn-dominated-convergence">7</a></sup> Well, the expectation of the first derivative of the log-likelihood vanishes, so taking the second term in the Taylor expansion yields
+...zero?!<sup id="fnref:dominated-convergence"><a class="footnote-ref" href="#fn:dominated-convergence">7</a></sup> Well, the expectation of the first derivative of the log-likelihood vanishes, so taking the second term in the Taylor expansion yields
 </p>
 <div class="math">$$
 \frac{1}{2}(\theta - \theta^*)^2\mathbb{E}_X\left(\partial_\theta^2 \log(p(X~|~\theta^*)\right)) = -\frac12(\theta - \theta^*)^2I(\theta^*).
@@ -211,31 +211,31 @@ or that the curvature of the KL-divergence around <span class="math">\(\theta^*\
 <div class="footnote">
 <hr>
 <ol>
-<li id="fn-in-probability">
-<p>In probability. I.e., the probability that the empirical mean differs from the expectation by some amount, <span class="math">\(\left|\frac{1}{n}\sum_i Y_i - \mathbb{E}[Y_1]\right| &gt; \varepsilon\)</span>, goes to zero as <span class="math">\(n\uparrow \infty\)</span>. A simple proof in the finite-variance case follows from Chebyshev's inequality (exercise for the reader!).&#160;<a class="footnote-backref" href="#fnref-in-probability" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<li id="fn:in-probability">
+<p>In probability. I.e., the probability that the empirical mean differs from the expectation by some amount, <span class="math">\(\left|\frac{1}{n}\sum_i Y_i - \mathbb{E}[Y_1]\right| &gt; \varepsilon\)</span>, goes to zero as <span class="math">\(n\uparrow \infty\)</span>. A simple proof in the finite-variance case follows from Chebyshev's inequality (exercise for the reader!).&#160;<a class="footnote-backref" href="#fnref:in-probability" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
-<li id="fn-trick">
-<p>It's often easier to deal with log-probabilities than it is to deal with probabilities, so this trick is relatively common.&#160;<a class="footnote-backref" href="#fnref-trick" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+<li id="fn:trick">
+<p>It's often easier to deal with log-probabilities than it is to deal with probabilities, so this trick is relatively common.&#160;<a class="footnote-backref" href="#fnref:trick" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
-<li id="fn-monotonicity">
-<p>In fact, the logarithm is <em>strictly</em> monotonic, so it preserves minima uniquely. In other words, for any function <span class="math">\(\phi: S\to \mathbb{R}^{&gt; 0}\)</span>, <span class="math">\(\phi\)</span> and <span class="math">\(\log \circ\, \phi\)</span> have minima and maxima at exactly the same points.&#160;<a class="footnote-backref" href="#fnref-monotonicity" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+<li id="fn:monotonicity">
+<p>In fact, the logarithm is <em>strictly</em> monotonic, so it preserves minima uniquely. In other words, for any function <span class="math">\(\phi: S\to \mathbb{R}^{&gt; 0}\)</span>, <span class="math">\(\phi\)</span> and <span class="math">\(\log \circ\, \phi\)</span> have minima and maxima at exactly the same points.&#160;<a class="footnote-backref" href="#fnref:monotonicity" title="Jump back to footnote 3 in the text">&#8617;</a></p>
 </li>
-<li id="fn-sneaky">
-<p>I am, of course, being sneaky: the subtraction <em>happens</em> to work since this just <em>happens</em> to yield the KL-divergence in expectation—but that's how it goes. Additionally, the requirement really is not that <span class="math">\(\theta \ne \theta^*\)</span>, but rather that <span class="math">\(p(x~|~\theta^*) \ne p(x~|~\theta)\)</span>, just in case there happen to be multiple hypotheses with equivalent distributions. Since you're reading this then just assume throughout that <span class="math">\(p(\cdot~|~\theta) \ne p(\cdot~|~\theta^*)\)</span> on some set with nonzero probability (in the base distribution) whenever <span class="math">\(\theta \ne \theta^*\)</span>.&#160;<a class="footnote-backref" href="#fnref-sneaky" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+<li id="fn:sneaky">
+<p>I am, of course, being sneaky: the subtraction <em>happens</em> to work since this just <em>happens</em> to yield the KL-divergence in expectation—but that's how it goes. Additionally, the requirement really is not that <span class="math">\(\theta \ne \theta^*\)</span>, but rather that <span class="math">\(p(x~|~\theta^*) \ne p(x~|~\theta)\)</span>, just in case there happen to be multiple hypotheses with equivalent distributions. Since you're reading this then just assume throughout that <span class="math">\(p(\cdot~|~\theta) \ne p(\cdot~|~\theta^*)\)</span> on some set with nonzero probability (in the base distribution) whenever <span class="math">\(\theta \ne \theta^*\)</span>.&#160;<a class="footnote-backref" href="#fnref:sneaky" title="Jump back to footnote 4 in the text">&#8617;</a></p>
 </li>
-<li id="fn-immediate-bounds">
-<p>While it may seem that there should be easy bounds to give immediately based on this proof, the problem is that we do <em>not</em> have good control of the second moment of <span class="math">\(\log(p(\cdot~|~\theta^*)/p(\cdot~|~\theta))\)</span> (this quantity may not even converge in a nice way). This makes giving any kind of convergence rate quite difficult, since the proof of the weak law given only a first-moment guarantee uses the dominated convergence theorem to give non-constructive bounds.&#160;<a class="footnote-backref" href="#fnref-immediate-bounds" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+<li id="fn:immediate-bounds">
+<p>While it may seem that there should be easy bounds to give immediately based on this proof, the problem is that we do <em>not</em> have good control of the second moment of <span class="math">\(\log(p(\cdot~|~\theta^*)/p(\cdot~|~\theta))\)</span> (this quantity may not even converge in a nice way). This makes giving any kind of convergence rate quite difficult, since the proof of the weak law given only a first-moment guarantee uses the dominated convergence theorem to give non-constructive bounds.&#160;<a class="footnote-backref" href="#fnref:immediate-bounds" title="Jump back to footnote 5 in the text">&#8617;</a></p>
 </li>
-<li id="fn-dimensions">
-<p>This is a derivation of the one-dimensional case, but the <span class="math">\(n\)</span>-dimensional case is almost identical.&#160;<a class="footnote-backref" href="#fnref-dimensions" title="Jump back to footnote 6 in the text">&#8617;</a></p>
+<li id="fn:dimensions">
+<p>This is a derivation of the one-dimensional case, but the <span class="math">\(n\)</span>-dimensional case is almost identical.&#160;<a class="footnote-backref" href="#fnref:dimensions" title="Jump back to footnote 6 in the text">&#8617;</a></p>
 </li>
-<li id="fn-dominated-convergence">
-<p>All I will say about changing the derivative and integral around is that it is well-justified by dominated convergence.&#160;<a class="footnote-backref" href="#fnref-dominated-convergence" title="Jump back to footnote 7 in the text">&#8617;</a></p>
+<li id="fn:dominated-convergence">
+<p>All I will say about changing the derivative and integral around is that it is well-justified by dominated convergence.&#160;<a class="footnote-backref" href="#fnref:dominated-convergence" title="Jump back to footnote 7 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
-    var align = "left",
+    var align = "center",
         indent = "0em",
         linebreak = "false";
 
@@ -249,10 +249,13 @@ or that the curvature of the KL-divergence around <span class="math">\(\theta^*\
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
     mathjaxscript.type = 'text/javascript';
     mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
-    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
         "MathJax.Hub.Config({" +
         "    config: ['MMLorHTML.js']," +
-        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
         "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
         "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
         "    displayAlign: '"+ align +"'," +
@@ -266,7 +269,9 @@ or that the curvature of the KL-divergence around <span class="math">\(\theta^*\
         "        preview: 'TeX'," +
         "    }, " +
         "    'HTML-CSS': { " +
-        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'blue ! important'} }," +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
         "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
         "    }, " +
         "}); " +
@@ -286,6 +291,8 @@ or that the curvature of the KL-divergence around <span class="math">\(\theta^*\
                 "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
             "});" +
         "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 </script>
