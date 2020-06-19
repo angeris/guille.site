@@ -78,7 +78,7 @@ For this post, we will only make use of the following three properties of the en
 2. The entropy is smaller than the log of the size of the sample space $H(X \mid Y) \le H(X) \le \log|\mathcal X|$. (Equivalently, conditioning reduces entropy, and the uniform distribution on $\mathcal X$ has the highest possible entropy, $\log|\mathcal X|$.)
 3. If a random variable $\hat X$ is conditionally independent of $X$ given $Y$ (*i.e.*, if $X \to Y \to \hat X$ is a Markov chain), then $H(X\mid \hat X) \ge H(X\mid Y)$. This is often called a [data processing inequality](https://en.wikipedia.org/wiki/Data_processing_inequality), which simply says that $X$ has smaller entropy knowing $Y$ than knowing a variable, $\hat X$, that has undergone further processing. In other words, you cannot gain more information about $X$ from a variable $Y$ by further processing $Y$.
 
-This is all we need to prove the following inequality. Let $X \to Y \to \hat X$ be a Markov chain such that $\hat X$ is conditionally independent of $X$ given $Y$, then the probability that $X \ne \hat X$ is given by $P_e$ and $P_e$ satisfies
+This is all we need to prove the following inequality. Let $X \to Y \to \hat X$ be a Markov chain such that $\hat X$ is conditionally independent of $X$ given $Y$ and $X$ is uniformly drawn from $\mathcal X$, then the probability that $X \ne \hat X$ is given by $P_e$ and $P_e$ satisfies
 $$
 P_e \ge 1 - \frac{k+1}{\log |\mathcal X|},
 $$
@@ -98,7 +98,7 @@ In other words, the number of queries (or comparisons, or whatever) $k$ must be 
 Now, the last missing piece is showing that the probability of error is bounded from below.
 
 ### A proof of Fano's inequality
-This is a slightly simplified version of the proof presented in [Duchi's notes](http://web.stanford.edu/class/stats311/lecture-notes.pdf) (see section 2.3.2) for the specific case we care about. Let $E$ be the 'error' random variable that is $1$ if $X \ne \hat X$ and 0 otherwise, then let's look at the quantity $H(E, X\mid \hat X)$:
+This is a slightly simplified version of the proof presented in [Duchi's notes](http://web.stanford.edu/class/stats311/lecture-notes.pdf) (see section 2.3.2) for the specific case we care about, which requires less additional definitions and supporting statements. Let $E$ be the 'error' random variable that is $1$ if $X \ne \hat X$ and 0 otherwise, then let's look at the quantity $H(E, X\mid \hat X)$:
 $$
 H(E, X\mid \hat X) = H(X\mid \hat X, E) + H(E\mid \hat X),
 $$
@@ -112,7 +112,33 @@ H(E, X\mid \hat X) = P_e H(X\mid \hat X, E=1) + H(E\mid \hat X).
 $$
 Since $E$ can only take on two values, we have that $H(E\mid \hat X) \le \log(2) = 1$ and we also have that $H(X\mid \hat X, E=1) \le \log |\mathcal X|$, which gives
 $$
-H(E, X\mid \hat X) \le P_e \log|\mathcal X| + 1
+H(E, X\mid \hat X) \le P_e \log|\mathcal X| + 1.
 $$
+Now, we have that
+$$
+H(E, X\mid \hat X) \ge H(X\mid \hat X) \ge H(X\mid Y).
+$$
+The first inequality follows from the fact that we're removing a variable and the second follows from statement 3 in the previous section (as $X \to Y \to \hat X$). Using the definition of $H(X\mid Y)$, then we have
+$$
+H(X, Y) - H(Y) \ge H(X) - H(Y) = \log |\mathcal X| - H(Y) \ge \log |\mathcal X| - \log|\mathcal Y|. 
+$$
+The first inequality here follows since we're (again!) removing a variable and the equality follows from the fact that $X$ is uniformly randomly drawn from $\mathcal X$ and the last inequality follows from the fact that the entropy of $Y$ is always smaller than that of the uniform distribution on $\mathcal Y$. Finally, note that, if we have $k$ queries, then $|\mathcal Y| = 2^k$ (this is the number of possible values a sequence of $k$ binary queries can take on). So, $\log |\mathcal Y| = k$ (in other words, the maximum amount of information we can get with $k$ binary queries is $k$ bits) so we find
+$$
+\log |\mathcal X| - k \le P_e\log |\mathcal X| + 1,
+$$
+or, after some slight rewriting:
+$$
+P_e \ge 1 - \frac{k+1}{\log |\mathcal X|},
+$$
+as required!
+
+### Some discussion
+I think overall that Fano's inequality is a relatively straightforward way of justifying a ton of the statements one can make about information theory without needing to invoke a large number of more complicated notions. Additionally, the proof is relatively straightforward (in the sense that it only requires very few definitions and properties of the entropy) while also matching our intuition about these problems pretty much exactly.
+
+In particular, we see that sorting is hard not because somehow ordering elements is difficult, but because we have to decide between a bunch of different items (in fact, $n!$ of them) while only receiving a few bits of information at any point in time! In fact, this bound applies to *any* yes/no query that one can make of the sorted data, not just comparisons, which is interesting.
+
+There are some even more powerful generalizations of Fano's inequality which can also be extended to machine learning applications: you can use them to show that, given only some small amount of data, you cannot decide between a parameter that correctly describe the data and one that does not.
+
+This is all to say that, even though entropy is a magical quantity, that doesn't mean we can't say very rigorous things about it (and make our intuitions about lower bounds even more rigorous, to boot!).
 
 [^entropy]: In fact, the entropy is really a measure of how close a variable is to the uniform distribution, in the case of compact domains $\mathcal X$—the higher the entropy, the closer it is.
