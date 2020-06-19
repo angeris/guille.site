@@ -69,13 +69,13 @@ where $\mathcal{X}$ is the space of values that $X$ can take on. The conditional
 $$
 H(X|Y) = -\sum_{Y \in \mathcal Y} P(Y) \sum_{X \in \mathcal X} P(X\mid Y) \log P(X\mid Y) = H(X, Y) - H(Y).
 $$
-As usual, the entropy $H$ is a measure of the 'uncertainty' in the variable $X$, with the maximally uncertain distribution being the uniform one.[^entropy] Additionally, note that $H(X, Y)$ is the entropy taken with respect to the joint distribution of $X$ and $Y$.
+As usual, the entropy $H$ is a measure of the 'uncertainty' in the variable $X$, with the maximally uncertain distribution being the uniform one.[^entropy] Additionally, note that $H(X, Y)$ is the entropy taken with respect to the joint distribution of $X$ and $Y$. Finally, if $X$ is a deterministic function of $Y$, then $H(X\mid Y) = 0$ which follows from the definition.
 
 
 For this post, we will only make use of the following three properties of the entropy (I will not prove them here, as there are many available proofs of them, including the notes above and Cover's famous *Elements of Information Theory*):
 
 1. The entropy can only decrease when removing variables, $H(X, Y) \ge H(X)$.
-2. The entropy is smaller than the log of the size of the sample space $H(X) \le \log|\mathcal X|$. (Equivalently, the uniform distribution on $\mathcal X$ has the highest possible entropy, $\log|\mathcal X|$.)
+2. The entropy is smaller than the log of the size of the sample space $H(X \mid Y) \le H(X) \le \log|\mathcal X|$. (Equivalently, conditioning reduces entropy, and the uniform distribution on $\mathcal X$ has the highest possible entropy, $\log|\mathcal X|$.)
 3. If a random variable $\hat X$ is conditionally independent of $X$ given $Y$ (*i.e.*, if $X \to Y \to \hat X$ is a Markov chain), then $H(X\mid \hat X) \ge H(X\mid Y)$. This is often called a [data processing inequality](https://en.wikipedia.org/wiki/Data_processing_inequality), which simply says that $X$ has smaller entropy knowing $Y$ than knowing a variable, $\hat X$, that has undergone further processing. In other words, you cannot gain more information about $X$ from a variable $Y$ by further processing $Y$.
 
 This is all we need to prove the following inequality. Let $X \to Y \to \hat X$ be a Markov chain such that $\hat X$ is conditionally independent of $X$ given $Y$, then the probability that $X \ne \hat X$ is given by $P_e$ and $P_e$ satisfies
@@ -95,7 +95,24 @@ k = \Omega(n \log n).
 $$
 In other words, the number of queries (or comparisons, or whatever) $k$ must be approximately at least as large as $n \log n$, asymptotically (up to constant multiples). In fact, this proves a slightly *stronger* statement that no probabilistic algorithm can succeed with nonvanishing probability if the number of queries is not on the order of $n \log n$, which our original proof above does not cover!
 
-### A proof of Fano's inequality
+Now, the last missing piece is showing that the probability of error is bounded from below.
 
+### A proof of Fano's inequality
+This is a slightly simplified version of the proof presented in [Duchi's notes](http://web.stanford.edu/class/stats311/lecture-notes.pdf) (see section 2.3.2) for the specific case we care about. Let $E$ be the 'error' random variable that is $1$ if $X \ne \hat X$ and 0 otherwise, then let's look at the quantity $H(E, X\mid \hat X)$:
+$$
+H(E, X\mid \hat X) = H(X\mid \hat X, E) + H(E\mid \hat X),
+$$
+by our definition of conditional entropy, and
+$$
+H(X\mid \hat X, E) = P_e H(X\mid \hat X, E=1) + (1-P_e)H(X\mid \hat X, E=0),
+$$
+again by the same definition. Since $X = \hat X$ whenever there is no error, $E=0$, then $H(X\mid \hat X, E=0) = 0$ since $X$ is known, so, we really have
+$$
+H(E, X\mid \hat X) = P_e H(X\mid \hat X, E=1) + H(E\mid \hat X).
+$$
+Since $E$ can only take on two values, we have that $H(E\mid \hat X) \le \log(2) = 1$ and we also have that $H(X\mid \hat X, E=1) \le \log |\mathcal X|$, which gives
+$$
+H(E, X\mid \hat X) \le P_e \log|\mathcal X| + 1
+$$
 
 [^entropy]: In fact, the entropy is really a measure of how close a variable is to the uniform distribution, in the case of compact domains $\mathcal X$—the higher the entropy, the closer it is.
