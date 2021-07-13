@@ -19,7 +19,7 @@ presented depends on the fact that the sorting algorithm is deterministic and go
 Let $C_k$ be the $k$th step of a deterministic sorting algorithm
 (this can be represented, for example, as a tuple containing what the next comparison should be) with input $L \in K^n$ where $L$ is a list of
 $n$ comparable elements. (For example, $L$ can be a list of real numbers,
-in which case $K = \reals$.)
+in which case $K = \mathbb{R}$.)
 
 By the definition of a deterministic algorithm, $C_k$ depends only on the past $k-1$ comparisons; *i.e.*, $C_k(C_{k-1}, C_{k-2}, \dots, C_1)$. (I am slightly overloading
 notation here, of course, but the meaning should be clear.) This means that we can view the
